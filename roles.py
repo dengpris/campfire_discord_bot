@@ -149,7 +149,8 @@ class GameState:
         pass
 
     #find best friend of 'player_name'
-    def best_friend_find_friend(self, player_name)
+    def best_friend_find_friend(self, player_name):
+        pass
     
         
         
