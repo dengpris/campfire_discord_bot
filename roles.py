@@ -48,6 +48,7 @@ class GameState:
         self.num_players = len(player_names)
         self.time = "Night"
         print("before nigth")
+        self.extra_roles=extra_roles
         random_roles, self.picked_roles = self.set_random_roles(extra_roles)
         print("after night")
         #Assigning roles
@@ -212,8 +213,25 @@ class GameState:
     # get 2/3 unpicked roles from group
     def camp_counsellor_unpicked(self, player_name):
         # picked_roles = self.picked_roles
-        pass
-
+        if self.extra_roles == False:
+            print("Error, extra roles is false")
+            return False
+        else:
+            for player in self.players:
+                if player.name == player_name:
+                    if player.role == "Camp Counselor":
+                        break
+                    else:
+                        print("you are not a camp counsellor")
+                        return False 
+            picked_roles = self.picked_roles.copy()
+            unpicked_roles = []
+            for role in ROLE_INFO.keys():
+                if role not in picked_roles:
+                    unpicked_roles.append(role)
+            random.shuffle(unpicked_roles)
+            return unpicked_roles[:2]
+                
     #find best friend of 'player_name'
     def best_friend_find_friend(self, player_name):
         pass

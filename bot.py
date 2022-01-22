@@ -80,7 +80,7 @@ async def gameLogic(ctx, minutes, seconds):
 async def send_role(game,ctx):
     werewolf_list = []
     camper_list = []
-
+    other_list = []
     userlist.pop(0)
     
     for player in game.players:
@@ -93,7 +93,7 @@ async def send_role(game,ctx):
             for user in userlist:
                 if user.name == player.name:
                     camper_list.append(user)
-        elif player.get_role_info() == "Camper":
+        elif player.get_role_info() == "Wannabe":
             for user in userlist:
                 if user.name == player.name:
                     other_list.append(user)
