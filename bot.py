@@ -66,10 +66,28 @@ async def removelist(ctx):
     userlist.remove(member)
     await ctx.send("<@" + str(member) + ">" + ", you've left the game!")
 
-@bot.command(name='players', help='current players')
-async def printlist(ctx):
-    await ctx.send("Players: ")
-    for member in userlist:
-        await ctx.send("<@" + str(member) + ">")
+#@bot.command(name='players', help='current players')
+#async def printlist(ctx):
+#    await ctx.send("Players: ")
+#    for member in userlist:
+#        await ctx.send("<@" + str(member) + ">")
+
+################ PARSE EMOJIS ######################
+@bot.command(name='start', help='start the game')
+async def reactlist(ctx):
+    # Send message React to Join Game then adds a check emoji
+    message = await ctx.send("React to join game!")
+    await message.add_reaction('✅')
+
+    # Waits 5 seconds for people to react
+    await asyncio.sleep(3)
+    await ctx.send('Current Players')
+    message = await ctx.channel.fetch_message(message.id)
+    reaction = message.reactions[0] # checkmark reactions only
+    
+    async for user in reaction.users():
+        userlist.append(user)
+        await ctx.send("<@" + str(user) + ">")
+        await ctx.send(user.id)   
 
 bot.run(TOKEN)
