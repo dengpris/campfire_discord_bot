@@ -7,12 +7,12 @@ import roles
 from discord.ext import commands
 from dotenv import load_dotenv
 
-from poll import poll
+from poll import *
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='~')
 
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
 async def timer(ctx, minutes, seconds=0):
@@ -98,14 +98,12 @@ async def reactlist(ctx):
 
     # Waits 5 seconds for people to react
     await asyncio.sleep(3)
-    await ctx.send('Current Players')
     message = await ctx.channel.fetch_message(message.id)
     reaction = message.reactions[0] # checkmark reactions only
     
     async for user in reaction.users():
         userlist.append(user)
-        await ctx.send("<@" + str(user) + ">")
-        # await ctx.send(user.id)   
+        await ctx.send(user.name) 
 
 # Set the number of werewolves
 @bot.command(name="settings")
@@ -134,22 +132,28 @@ async def a_command(ctx):
 ################ TESTING POLL ###################
 @bot.command(name='poll')
 async def poll_test(ctx):
-    p1 = poll("OptionA", 1)
-    embed = p1.create_poll(userlist)
-    member = ctx.message.author
+    vote_list = []
+    for user in userlist:
+        vote_list.append(poll(user.name, 0))
 
-    channel = await member.create_dm()
-    msg = await channel.send(embed=embed)
+    embed = create_poll(userlist)
+    #member = ctx.message.author
 
-    i=0
-    while i<len(userlist):
-        await msg.add_reaction(unicode_letters[i])
+    for user in userlist:
+        if user.bot == False: # do not send messages to yourself
+            channel = await user.create_dm()
+            msg = await channel.send(embed=embed)
+
+            i=0
+            while i<len(userlist):
+                await msg.add_reaction(unicode_letters[i])
+                i = i+1
 
 @bot.command(name='players', help='current players')
 async def printlist(ctx):
     await ctx.send("Players: ")
-    for member in userlist:
-        await ctx.send("<@" + str(member) + ">")
+    for user in userlist:
+        await ctx.send(user.name)
 
 ################# DIRECT MESSAGE FUNCTIONS ##################
 
