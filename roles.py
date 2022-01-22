@@ -194,13 +194,18 @@ class GameState:
         return False
     
     def camp_counsellor_looks(self, player_name, chosen_player):
+        name_found=False
         for player in self.players:
             if player.name == player_name:
+                name_found = True
                 if player.role == "Camp Counselor":
                     break
                 else:
                     print("you are not a camp counsellor")
                     return False
+            if name_found == False:
+                print('name not found')
+                return False
                 
         for player in self.players:
             if player.name == chosen_player:
@@ -217,13 +222,19 @@ class GameState:
             print("Error, extra roles is false")
             return False
         else:
+            name_found=False
             for player in self.players:
                 if player.name == player_name:
+                    name_found = True
                     if player.role == "Camp Counselor":
                         break
                     else:
                         print("you are not a camp counsellor")
                         return False 
+            if name_found == False:
+                print("player not found")
+                return False
+            
             picked_roles = self.picked_roles.copy()
             unpicked_roles = []
             for role in ROLE_INFO.keys():
@@ -234,8 +245,27 @@ class GameState:
                 
     #find best friend of 'player_name'
     def best_friend_find_friend(self, player_name):
-        pass
-    
+        player_role = ""
+        friend={"bff_1":"bff_2", "bff_2": "bff_1"}
+        
+        for player in self.players:
+            if player.name == player_name:
+                if player.role != "bff_1" or player.role != "bff_2":
+                    print("you are not one of the bestest friends ever or bffs dont exist this game")
+                    return False
+                else:
+                    player_role = player.role
+        if player_role == "":
+            print("incorrect player name")
+            return False
+        
+        for player in self.players:
+            if player.role == friend[player_role]:
+                print(f"your friend is {friend.name}")
+                return True
+        print("can't find a bff Sadge")
+        return False
+
         
         
             
