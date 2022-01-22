@@ -282,14 +282,22 @@ async def printlist(ctx):
 
 @bot.command(name='dmcampcounsellor', help='send dm to camp counsellor')
 async def printlist(ctx):
-    userlist.pop(0)
-    userlist.pop(0)
-    userlist.pop(0)
+    # userlist.pop(0)
+    # userlist.pop(0)
+    # userlist.pop(0)
     embed = create_camp_counsellor_msg(userlist)
     for cc in userlist:
         channel = await cc.create_dm()
         msg = await channel.send(embed=embed)
         await ctx.send("Your role has been sent %s" %cc.name)
+        message = await channel.send(embed=embed)
+        await message.add_reaction(unicode_letters[0])
+        await message.add_reaction(unicode_letters[1])
+
+        # print(message.count)
+        # if(message.reaction[0].count > message.reaction[1].count):
+        #     print(message.reaction[0].count) 
+        #     print(message.reaction[1].count)
 
 def create_camper_msg(userlist):
     embed = discord.Embed(
@@ -340,6 +348,17 @@ def create_wannabe_msg(userlist):
     return embed
 
 def create_camp_counsellor_msg(userlist):
+    embed = discord.Embed(
+        title = "You are a Camp Counsellor!",
+        description = "You will have a good trip if you get rid of any werewolves and don't accidentally get rid of camper. Luckily, you have extra privileges and can figure out who one camper is or who two of the missing ones were.\n\n",
+        color = discord.Color.blue()
+    )
+    embed.set_image(url='https://i.imgur.com/FnS0HP5.jpg')
+    return embed
+
+def create_camp_counsellor_choice(userlist):
+    
+
     embed = discord.Embed(
         title = "You are a Camp Counsellor!",
         description = "You will have a good trip if you get rid of any werewolves and don't accidentally get rid of camper. Luckily, you have extra privileges and can figure out who one camper is or who two of the missing ones were.\n\n",
