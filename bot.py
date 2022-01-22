@@ -13,7 +13,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 bot = commands.Bot(command_prefix='!')
 
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
-async def timer(ctx, minutes, seconds):
+async def timer(ctx, minutes, seconds=0):
     try:
         minuteint = int(minutes)
         secondsint=int(seconds)
