@@ -20,7 +20,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='$', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
 async def timer(ctx, minutes, seconds=0):
@@ -58,15 +58,10 @@ async def werewolfEnd(ctx):
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
     nameList=[member.name for member in userlist]
-<<<<<<< HEAD
     print(nameList)
 
     roles_dictionary = NUM_OF_EACH_ROLE
     game=roles.GameState(nameList, roles_dictionary, custom_roles=custom_roles)
-    print(game)
-=======
-    game=roles.GameState(nameList)
->>>>>>> 80354d306af38afd54571391eb00132b36e4d576
     # game.set_random_roles()
 
     await send_role(game,ctx)

@@ -43,26 +43,21 @@ class Player:
     
 
 class GameState:
-<<<<<<< HEAD
-    def __init__(self, player_names, custom_role_dict, extra_roles=False, custom_roles=False, ):
+    def __init__(self, player_names, custom_role_dict, extra_roles=False, custom_roles=False ):
+        
+        random.seed(time.time())
+        
         self.num_players = len(player_names)
         self.time = "Night"
         print("before nigth")
-
+        self.extra_roles=extra_rolesi
+        
         if custom_roles:
             random_roles, self.picked_roles = self.set_custom_roles(custom_role_dict)
         # Default roles
         else:
             random_roles, self.picked_roles = self.set_random_roles(extra_roles)
-=======
-    def __init__(self, player_names, extra_roles=False):
-        random.seed(time.time())
-        self.num_players = len(player_names)
-        self.time = "Night"
-        print("before nigth")
-        self.extra_roles=extra_roles
-        random_roles, self.picked_roles = self.set_random_roles(extra_roles)
->>>>>>> 80354d306af38afd54571391eb00132b36e4d576
+
         print("after night")
         #Assigning roles
         self.players = [Player(player_names[person], random_roles[person]) for person in range(self.num_players)]
