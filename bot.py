@@ -90,14 +90,13 @@ async def removelist(ctx):
     userlist.remove(member)
     await ctx.send("<@" + str(member) + ">" + ", you've left the game!")
 
-<<<<<<< HEAD
 #@bot.command(name='players', help='current players')
 #async def printlist(ctx):
 #    await ctx.send("Players: ")
 #    for member in userlist:
 #        await ctx.send("<@" + str(member) + ">")
 
-################ PARSE EMOJIS ######################
+################ START GAME ######################
 @bot.command(name='start', help='start the game')
 async def reactlist(ctx):
     # Send message React to Join Game then adds a check emoji
@@ -114,6 +113,30 @@ async def reactlist(ctx):
         userlist.append(user)
         await ctx.send("<@" + str(user) + ">")
         # await ctx.send(user.id)   
+
+# Set the number of werewolves
+@bot.command(name="settings")
+async def a_command(ctx):
+    global times_used
+    await ctx.send(f"Please enter number of werewolves")
+
+    # Check if sent by the same author
+    def check(werewolf_number):
+        return werewolf_number.author == ctx.author and werewolf_number.channel == ctx.channel
+
+    werewolf_number = await bot.wait_for("message",check=check)
+
+    try:
+        werewolf_int = int(werewolf_number.content)
+        if werewolf_int < 1 :
+            await ctx.send("Requires a minimum of 1 werewolf.")
+            raise BaseException
+        else:
+            await ctx.send("You have selected " + werewolf_number.content + " werewolves")
+    
+    except ValueError:
+        print(f'Not a number')
+        await ctx.send("Must be a number!")
 
 ################ TESTING POLL ###################
 @bot.command(name='poll')
