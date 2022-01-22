@@ -12,7 +12,10 @@ from poll import *
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-bot = commands.Bot(command_prefix='!')
+intents = discord.Intents.default()
+intents.members = True
+
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
 async def timer(ctx, minutes, seconds=0):
@@ -111,6 +114,8 @@ async def send_role(game,ctx):
 
 ################# JOIN FUNCTIONS ##################
 userlist=[]
+poll_list=[]
+
 @bot.command(name='join', help='returns list of people who joined')
 async def addlist(ctx):
     member = ctx.message.author.id
@@ -137,7 +142,7 @@ async def reactlist(ctx):
     await message.add_reaction('✅')
 
     # Waits 5 seconds for people to react
-    await asyncio.sleep(3)
+    await asyncio.sleep(5)
     message = await ctx.channel.fetch_message(message.id)
     reaction = message.reactions[0] # checkmark reactions only
     
@@ -186,24 +191,93 @@ async def set_settings(ctx, *args):
     print(f"New role lmits are: {number_of_each_role}")
 
 ################ TESTING POLL ###################
+channel_list=[]
 @bot.command(name='poll')
 async def poll_test(ctx):
-    vote_list = []
-    for user in userlist:
-        vote_list.append(poll(user.name, 0))
+    # vote_list = []
+    # for user in userlist:
+    #     vote_list.append(poll(user.name, 0))
 
-    embed = create_poll(userlist)
+    embed = create_poll(userlist, poll_list)
     #member = ctx.message.author
     userlist.pop(0)
     for user in userlist:
         if user.bot == False: # do not send messages to yourself
             channel = await user.create_dm()
-            msg = await channel.send(embed=embed)
+            message = await channel.send(embed=embed)
+            channel_list.append(channel)
 
+        # add reactions
             i=0
             while i<len(userlist):
-                await msg.add_reaction(unicode_letters[i])
+                await message.add_reaction(unicode_letters[i])
                 i = i+1
+
+@bot.command(name='tally')
+async def tally_votes(ctx):
+    poll_list.sort(key=lambda x: x.votes, reverse=True)
+    
+    eliminated = poll_list[0].user
+    eliminated_2 = poll_list[1].user
+    number = poll_list[0].votes
+    
+    for poll in poll_list:
+        print(poll.votes)
+    
+    if (poll_list[0].votes == poll_list[1].votes):
+        message = await ctx.send(f"Members: {eliminated}, {eliminated_2} have been voted out with {number} votes.")
+    else:
+        message = await ctx.send(f"Member: {eliminated} has been voted out with {number}.")
+
+        
+@bot.event
+async def on_reaction_add(reaction, user):
+    if not isinstance(reaction.message.channel, discord.DMChannel): return
+    #channel = await user.create_dm()
+    # reactions cannot be removed in DMs
+    # for reacts in reaction.message.reactions:
+    #     # do not delete if made by bot or if emoji was just created
+    #     if (user in await reacts.users().flatten() and not user.bot and str(reacts) != str(reaction.emoji)):
+    #         await message.remove_reaction(reaction, user)
+    for poll in poll_list:
+        name = poll.get_name_from_emoji(reaction.emoji)
+        if (name): 
+            await user.send("You are now voting for: " + reaction.emoji + " " + name)
+            poll.votes = poll.votes+1
+            print(poll.votes)
+
+
+@bot.event
+async def on_reaction_remove(reaction, user):
+    if not isinstance(reaction.message.channel, discord.DMChannel): return
+    for poll in poll_list:
+        name = poll.get_name_from_emoji(reaction.emoji)
+        if (name): 
+            await user.send("You are no longer voting for: " + reaction.emoji + " " + name)
+            poll.votes = poll.votes-1
+
+@bot.command(name='dmcamper', help='send dm to campers')
+async def printlist(ctx):
+    camperlist = []
+
+    userlist.pop(0)
+    embed = create_camper_msg(userlist)
+    for camper in userlist:
+        channel = await camper.create_dm()
+        msg = await channel.send(embed=embed)
+        await ctx.send("Your role has been sent %s" %camper.name)
+
+@bot.command(name='dmwerewolf', help='send dm to werewolves')
+async def printlist(ctx):
+    werewolflist = []
+
+    userlist.pop(0)
+    print(userlist)
+    embed = create_werewolf_msg(userlist)
+    for werewolf in userlist:
+        channel = await werewolf.create_dm()
+        msg = await channel.send(embed=embed)
+        await ctx.send("Your role has been sent %s" %werewolf.name)
 
 @bot.command(name='dmintrovert', help='send dm to introvert')
 async def printlist(ctx):
@@ -287,6 +361,15 @@ def create_wannabe_msg(userlist):
         color = discord.Color.red()
     )
     embed.set_image(url='https://i.imgur.com/XZSDOEU.jpg')
+    return embed
+
+def create_camp_counsellor_msg(userlist):
+    embed = discord.Embed(
+        title = "You are a Camp Counsellor!",
+        description = "You will have a good trip if you get rid of any werewolves and don't accidentally get rid of camper. Luckily, you have extra privileges and can figure out who one camper is or who two of the missing ones were.\n\n",
+        color = discord.Color.blue()
+    )
+    embed.set_image(url='https://i.imgur.com/FnS0HP5.jpg')
     return embed
 
 @bot.command(name='players', help='current players')

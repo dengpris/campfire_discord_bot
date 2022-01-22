@@ -19,8 +19,6 @@ class Player:
     def __init__(self,name, role=None):
         self.name = name
         self.role = role
-        self.time = "Night"
-        self.round = 0
         
     def get_role_info(self):
         if self.role is not None:
@@ -34,7 +32,7 @@ class Player:
 
     def vote_player(self, name):
         self.last_voted = name
-        return self.round, self.last_voted
+        return self.last_voted
                 
         
 # camp counsellor can look at 1 persons role at night
@@ -160,9 +158,24 @@ class GameState:
             else:
                 votes[player.last_voted] = 1
 
-        player_booted = max(votes, key=votes.get)
-        return player_booted, votes[player_booted]
+        players_booted = [key  for (key, value) in votes.items() if value == max(votes.values())]        
+
+        return players_booted, max(votes.values())
     
+    def check_votes(self):
+        players_booted, votes = self.tally_votes()
+        win=False
+        for player in self.players:
+            if player.name in players_booted and player.role=="Werewolf":
+                print(f"You voted the werewolf {player.name} with {votes} votes")
+                win=True
+                
+        if not win:
+            print("you did not catch the werewolf. RIP")
+            
+        return win
+            
+
     def set_night(self):
         if self.time == "Day":
             self.time = "Night"
