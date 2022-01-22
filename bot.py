@@ -12,7 +12,6 @@ from poll import *
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-<<<<<<< HEAD
 bot = commands.Bot(command_prefix='!')
 
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -230,6 +229,17 @@ async def printlist(ctx):
         msg = await channel.send(embed=embed)
         await ctx.send("Your role has been sent %s" %wannabe.name)
 
+@bot.command(name='dmcampcounsellor', help='send dm to camp counsellor')
+async def printlist(ctx):
+    userlist.pop(0)
+    userlist.pop(0)
+    userlist.pop(0)
+    embed = create_camp_counsellor_msg(userlist)
+    for cc in userlist:
+        channel = await cc.create_dm()
+        msg = await channel.send(embed=embed)
+        await ctx.send("Your role has been sent %s" %cc.name)
+
 def create_camper_msg(userlist):
     embed = discord.Embed(
         title = "You are a Camper!",
@@ -276,6 +286,15 @@ def create_wannabe_msg(userlist):
         color = discord.Color.red()
     )
     embed.set_image(url='https://i.imgur.com/XZSDOEU.jpg')
+    return embed
+
+def create_camp_counsellor_msg(userlist):
+    embed = discord.Embed(
+        title = "You are a Camp Counsellor!",
+        description = "You will have a good trip if you get rid of any werewolves and don't accidentally get rid of camper. Luckily, you have extra privileges and can figure out who one camper is or who two of the missing ones were.\n\n",
+        color = discord.Color.blue()
+    )
+    embed.set_image(url='https://i.imgur.com/FnS0HP5.jpg')
     return embed
 
 @bot.command(name='players', help='current players')
