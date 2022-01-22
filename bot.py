@@ -113,29 +113,44 @@ async def reactlist(ctx):
             await ctx.send(user.name) 
     await gameLogic(ctx, 1, 1)
 
-# Set the number of werewolves
+# Set the Settings for number of roles
+# Note has a writing error if number error is not at the end
 @bot.command(name="settings")
-async def a_command(ctx):
-    global times_used
-    await ctx.send(f"Please enter number of werewolves")
+async def set_settings(ctx, *args):
 
-    # Check if sent by the same author
-    def check(werewolf_number):
-        return werewolf_number.author == ctx.author and werewolf_number.channel == ctx.channel
-
-    werewolf_number = await bot.wait_for("message",check=check)
-
-    try:
-        werewolf_int = int(werewolf_number.content)
-        if werewolf_int < 1 :
-            await ctx.send("Requires a minimum of 1 werewolf.")
-            raise BaseException
-        else:
-            await ctx.send("You have selected " + werewolf_number.content + " werewolves")
+    list_of_roles = ["werewolf", "camp_councellor", "wannabe", "introvert", "bffpair","camper"]
+    number_of_each_role = {"werewolf":0, "camp_councellor":0, "wannabe":0, "introvert":0, "bffpair":0, "camper":0}
     
-    except ValueError:
-        print(f'Not a number')
-        await ctx.send("Must be a number!")
+    def check(message):
+         return message.author == ctx.author and message.channel == ctx.channel
+
+    if len(args) !=6 :
+        await ctx.send("You need **6** arguments. Please enter 6 numbers, each will correspond to the number of each roles to be used during the game\n"
+                        + "Do `$settings <num of werewolf> <num of councellor> <num of wannabe> <num of introverts> <num of bffpair> <num of camper>`\n"
+                        + "For example: **$settings 1 1 0 0 1 3** for 1 werewolf, 1 councellor, 0 wannabes, 0 introverts, 1 pair of bffs(ie 2 players can have this role), 3 campers. ")
+        raise BaseException
+    
+    NOT_A_NUMBER = 1
+    while (NOT_A_NUMBER):
+        print(f"The args are: ", args)
+        for i in range(6):
+            try:
+                role_int = int(args[i])
+                number_of_each_role[list_of_roles[i]] = role_int
+                NOT_A_NUMBER = 0
+            except ValueError:
+                await ctx.send("Must be a number!\nPlease enter 6 numbers, each will correspond to the number of each role used during the game")
+                new_arguments = await bot.wait_for("message",check=check)
+                print(f'New arguments are: {new_arguments.content}')
+                args = new_arguments.content.split()
+                NOT_A_NUMBER = 1
+                break
+
+    await ctx.send(f"Set settings successfully.\n" + 
+                    "**Werewolves:** " + str(number_of_each_role["werewolf"]) + "\t**CampCounsellor:** " + str(number_of_each_role["camp_councellor"]) +
+                    "\t**Wannabe:** "+ str(number_of_each_role["wannabe"]) + "\t**Introvert:** " + str(number_of_each_role["introvert"]) + "\t**Pairs of BFFs:** " + str(number_of_each_role["bffpair"]) +
+                    "\t**Campers:** " + str(number_of_each_role["camper"]))
+    print(f"New role lmits are: {number_of_each_role}")
 
 ################ TESTING POLL ###################
 @bot.command(name='poll')
