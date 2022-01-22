@@ -58,16 +58,17 @@ class GameState:
                     roles[role]= ROLE_INFO[role]
         else: 
             roles = ROLE_INFO.copy()
+
+        players_left = self.num_players
         
         if self.num_players>5 and extra_roles:
-            players_left = self.num_players
             role_limits = {"werewolf":2, "camp_councellor":1, "wannabe":1, "introvert":1, "bff_1":0, "bff_2":0, "camper":0,}
-            players_left -= 4
+            players_left -= 5
             if players_left >= 2:
                 role_limits['bff_1'] = 1
                 role_limits['bff_2'] = 1
                 players_left -= (role_limits['bff_1'] + role_limits['bff_2'])
-            else:
+            elif players_left == 1:
                 role_limits['camper'] = 1
                 players_left -= role_limits['camper']          
             if players_left != 0:
@@ -79,14 +80,34 @@ class GameState:
                 limit = role_limits[role]
                 while limit != 0:
                     players.append[role]
-            random.shuffle(players)
-            return players
-        
-        if self.num_players>5:
-            pass
-            
-        return rand_roles
-    
+        elif self.num_players>5 and not extra_roles:
+            role_limits = {"werewolf":2, "camper":0}
+            players_left -= role_limits["werewolf"]   
+            if players_left != 0:
+                role_limits['camper'] += players_left
+                players_left -= role_limits['camper']
+
+            players = []
+            for role in role_limits:
+                limit = role_limits[role]
+                while limit != 0:
+                    players.append[role]
+        else: 
+            role_limits = {"werewolf":1, "camper":0}
+            players_left -= role_limits["werewolf"]   
+            if players_left != 0:
+                role_limits['camper'] += players_left
+                players_left -= role_limits['camper']
+
+            players = []
+            for role in role_limits:
+                limit = role_limits[role]
+                while limit != 0:
+                    players.append[role]
+                    
+        random.shuffle(players)
+        return players
+                
     def tally_votes(self):
         votes={}
         for player in self.players:
