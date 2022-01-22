@@ -11,15 +11,20 @@ class poll:
 
 
 
-    def create_poll(self, userlist):
-            embed = discord.Embed(
-                title = "Who will you vote for?",
-                description = "Choose who you want to send home tonight. You can only vote for one person!",
-                color = discord.Color.blue()
-            )
-            i = 0
-            while i < len(userlist):
-                name = userlist[i].name
-                emoji = unicode_letters[i]
-                embed.add_field(name = name, value = emoji)
-            return embed
+def create_poll(userlist):
+    embed = discord.Embed(
+        title = "Who will you vote for?",
+        description = "Choose who you want to send home tonight. You can only vote for one person!",
+        color = discord.Color.blue()
+    )
+    i = 0
+    value = ""
+    # For each player, add their name as an option
+    while i < len(userlist):
+        name = userlist[i].name
+        emoji = unicode_letters[i]
+        value = value + emoji + " " + name + "\n" 
+        i = i+1
+    
+    embed.add_field(name = "Options", value = value)
+    return embed
