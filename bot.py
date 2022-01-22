@@ -12,7 +12,14 @@ from poll import *
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
+<<<<<<< HEAD
 bot = commands.Bot(command_prefix='!')
+=======
+intents = discord.Intents.default()
+intents.members = True
+
+bot = commands.Bot(command_prefix='!', intents=intents)
+>>>>>>> 42c589f926269a6789eedafb51723d71383780c8
 
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
 async def timer(ctx, minutes, seconds=0):
@@ -81,6 +88,8 @@ async def gameLogic(ctx, minutes, seconds):
 
 ################# JOIN FUNCTIONS ##################
 userlist=[]
+poll_list=[]
+
 @bot.command(name='join', help='returns list of people who joined')
 async def addlist(ctx):
     member = ctx.message.author.id
@@ -156,24 +165,70 @@ async def set_settings(ctx, *args):
     print(f"New role lmits are: {number_of_each_role}")
 
 ################ TESTING POLL ###################
+channel_list=[]
 @bot.command(name='poll')
 async def poll_test(ctx):
-    vote_list = []
-    for user in userlist:
-        vote_list.append(poll(user.name, 0))
+    # vote_list = []
+    # for user in userlist:
+    #     vote_list.append(poll(user.name, 0))
 
-    embed = create_poll(userlist)
+    embed = create_poll(userlist, poll_list)
     #member = ctx.message.author
     userlist.pop(0)
     for user in userlist:
         if user.bot == False: # do not send messages to yourself
             channel = await user.create_dm()
-            msg = await channel.send(embed=embed)
+            message = await channel.send(embed=embed)
+            channel_list.append(channel)
 
+        # add reactions
             i=0
             while i<len(userlist):
-                await msg.add_reaction(unicode_letters[i])
+                await message.add_reaction(unicode_letters[i])
                 i = i+1
+
+@bot.command(name='tally')
+async def tally_votes(ctx):
+    poll_list.sort(key=lambda x: x.votes, reverse=True)
+    
+    eliminated = poll_list[0].user
+    eliminated_2 = poll_list[1].user
+    number = poll_list[0].votes
+    
+    for poll in poll_list:
+        print(poll.votes)
+    
+    if (poll_list[0].votes == poll_list[1].votes):
+        message = await ctx.send(f"Members: {eliminated}, {eliminated_2} have been voted out with {number} votes.")
+    else:
+        message = await ctx.send(f"Member: {eliminated} has been voted out with {number}.")
+
+        
+@bot.event
+async def on_reaction_add(reaction, user):
+    if not isinstance(reaction.message.channel, discord.DMChannel): return
+    #channel = await user.create_dm()
+    # reactions cannot be removed in DMs
+    # for reacts in reaction.message.reactions:
+    #     # do not delete if made by bot or if emoji was just created
+    #     if (user in await reacts.users().flatten() and not user.bot and str(reacts) != str(reaction.emoji)):
+    #         await message.remove_reaction(reaction, user)
+    for poll in poll_list:
+        name = poll.get_name_from_emoji(reaction.emoji)
+        if (name): 
+            await user.send("You are now voting for: " + reaction.emoji + " " + name)
+            poll.votes = poll.votes+1
+            print(poll.votes)
+
+
+@bot.event
+async def on_reaction_remove(reaction, user):
+    if not isinstance(reaction.message.channel, discord.DMChannel): return
+    for poll in poll_list:
+        name = poll.get_name_from_emoji(reaction.emoji)
+        if (name): 
+            await user.send("You are no longer voting for: " + reaction.emoji + " " + name)
+            poll.votes = poll.votes-1
 
 @bot.command(name='dmcamper', help='send dm to campers')
 async def printlist(ctx):

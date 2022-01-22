@@ -1,20 +1,28 @@
 import discord 
+
 unicode_letters = ["🇦", "🇧", "🇨", "🇩", "🇪", "🇫", "🇬", "🇭", "🇮"]
 
 class poll:
-    def __init__(self, user='0', votes=0):
+    def __init__(self, user, emoji, votes=0):
         self.user = user
+        self.emoji = emoji
+        # self.voted = False
         self.votes = votes
 
     def get_data(self):
-        print(f'{self.real}+{self.imag}j')
+        print(f'{self.user}+{self.emoji}j')
+
+    def get_name_from_emoji(self, emoji):
+        if self.emoji == emoji:
+            return self.user
+        else:
+            return None
 
 
-
-def create_poll(userlist):
+def create_poll(userlist, poll_list):
     embed = discord.Embed(
         title = "Who will you vote for?",
-        description = "Choose who you want to send home tonight. You can only vote for one person!",
+        description = "Choose who you want to send home tonight. You can only vote for one person! The most recent vote will be the one that's counted.",
         color = discord.Color.blue()
     )
     i = 0
@@ -24,7 +32,10 @@ def create_poll(userlist):
         name = userlist[i].name
         emoji = unicode_letters[i]
         value = value + emoji + " " + name + "\n" 
+        # update global variable poll_list, which maps emojis to names
+        poll_list.append(poll(name, emoji))
         i = i+1
     
     embed.add_field(name = "Options", value = value)
     return embed
+
