@@ -12,33 +12,20 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 bot = commands.Bot(command_prefix='!')
 
-@bot.command(name='99', help='Responds with a random quote from Brooklyn 99')
-async def nine_nine(ctx):
-    brooklyn_99_quotes = [
-        'I\'m the human form of the 💯 emoji.',
-        'Bingpot!',
-        (
-            'Cool. Cool cool cool cool cool cool cool, '
-            'no doubt no doubt no doubt no doubt.'
-        ),
-    ]
-
-    response = random.choice(brooklyn_99_quotes)
-    await ctx.send(response)
-
-@bot.command(name='timer', help='timer command. usage !timer <num of minutes>')
-async def timer(ctx, minutes):
+@bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
+async def timer(ctx, minutes, seconds):
     try:
         minuteint = int(minutes)
-        totalseconds=minuteint*60
-        if minuteint > 60:
+        secondsint=int(seconds)
+        totalseconds=minuteint*60 + secondsint
+        if totalseconds > 3600:
             await ctx.send("I dont think im allowed to do go above 60 minutes.")
             raise BaseException
-        if minuteint <= 0:
+        if totalseconds <= 0:
             await ctx.send("I dont think im allowed to do negatives")
             raise BaseException
         
-        message = await ctx.send("Timer: {minuteint} minutes")
+        message = await ctx.send("Timer: {minuteint} minutes {secondsint} seconds")
         while True:
             totalseconds -= 1
             if totalseconds == 0:
@@ -89,5 +76,8 @@ async def reactlist(ctx):
         userlist.append(user)
         await ctx.send("<@" + str(user) + ">")
         await ctx.send(user.id)   
+
+    #night time timer
+    await timer(ctx, 0, 30)
 
 bot.run(TOKEN)
