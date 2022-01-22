@@ -80,9 +80,13 @@ async def gameLogic(ctx, minutes, seconds):
 async def send_role(game,ctx):
     werewolf_list = []
     camper_list = []
-    other_list = []
+    wannabe_list = []
+    introvert_list = []
+    best_friend_list = []
+    camp_counselor_list = []
+
     userlist.pop(0)
-    
+    userlist.pop(0)
     for player in game.players:
         print(player.name + " "+ player.get_role_info())
         if player.get_role_info() == "Werewolf":
@@ -96,20 +100,38 @@ async def send_role(game,ctx):
         elif player.get_role_info() == "Wannabe":
             for user in userlist:
                 if user.name == player.name:
-                    other_list.append(user)
+                    wannabe_list.append(user)
+        elif player.get_role_info() == "Introvert":
+            for user in userlist:
+                if user.name == player.name:
+                    introvert_list.append(user)
+        elif (player.get_role_info() == "bff_1" or player.get_role_info() == "bff_2"):
+            for user in userlist:
+                if user.name == player.name:
+                    best_friend_list.append(user)
+        else: #camp_counselor
+            for user in userlist:
+                if user.name == player.name:
+                    camp_counselor_list.append(user)
 
-    print(camper_list)
     for camper in camper_list:
         embed = create_camper_msg()
         channel = await camper.create_dm()
         msg = await channel.send(embed=embed)
-        await ctx.send("Your role has been sent %s" %camper.name)
+        await ctx.send("Your role has been sent %s!" %camper.name)
     
     for werewolf in werewolf_list:
         embed = create_werewolf_msg(werewolf_list)
         channel = await werewolf.create_dm()
         msg = await channel.send(embed=embed)
-        await ctx.send("Your role has been sent %s" %werewolf.name)
+        await ctx.send("Your role has been sent %s!" %werewolf.name)
+
+    for wannabe in wannabe_list:
+        embed = create_wannabe_msg(wannabe_list)
+        channel = await wannabe.create_dm()
+        msg = await channel.send(embed=embed)
+        await ctx.send("Your role has been sent %s!" %wannabe.name)
+    
     
 
 ################# JOIN FUNCTIONS ##################
@@ -256,29 +278,6 @@ async def on_reaction_remove(reaction, user):
             await user.send("You are no longer voting for: " + reaction.emoji + " " + name)
             poll.votes = poll.votes-1
 
-@bot.command(name='dmcamper', help='send dm to campers')
-async def printlist(ctx):
-    camperlist = []
-
-    userlist.pop(0)
-    embed = create_camper_msg(userlist)
-    for camper in userlist:
-        channel = await camper.create_dm()
-        msg = await channel.send(embed=embed)
-        await ctx.send("Your role has been sent %s" %camper.name)
-
-@bot.command(name='dmwerewolf', help='send dm to werewolves')
-async def printlist(ctx):
-    werewolflist = []
-
-    userlist.pop(0)
-    print(userlist)
-    embed = create_werewolf_msg(userlist)
-    for werewolf in userlist:
-        channel = await werewolf.create_dm()
-        msg = await channel.send(embed=embed)
-        await ctx.send("Your role has been sent %s" %werewolf.name)
-
 @bot.command(name='dmintrovert', help='send dm to introvert')
 async def printlist(ctx):
     userlist.pop(0)
@@ -353,8 +352,13 @@ def create_best_friend_msg(userlist):
     embed.set_image(url='https://i.imgur.com/wHgG64a.jpg')
     return embed
 
-def create_wannabe_msg(userlist):
-    werewolf_str = "Your fellow wolf is %s." %userlist[-1]
+def create_wannabe_msg(wolf_list):
+    names = []
+    delimeter = '\n'
+    for wolf in wolf_list:
+        names.append(wolf.name)
+    list_wolves = delimeter.join(names)
+    werewolf_str = "Your fellow wolves are:\n" + list_wolves
     embed = discord.Embed(
         title = "You are a Wannabe!",
         description = "You really want the werewolves to like you... even though they don't know who you are. Your goal is for none of them to get kicked out, even if that means you have to go instead.\n\n" + werewolf_str,
