@@ -1,5 +1,4 @@
 # bot.py
-from operator import mod
 import os
 import random
 import asyncio
@@ -12,36 +11,41 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 bot = commands.Bot(command_prefix='!')
 
-@bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
-async def timer(ctx, minutes, seconds=0):
+@bot.command(name='99', help='Responds with a random quote from Brooklyn 99')
+async def nine_nine(ctx):
+    brooklyn_99_quotes = [
+        'I\'m the human form of the 💯 emoji.',
+        'Bingpot!',
+        (
+            'Cool. Cool cool cool cool cool cool cool, '
+            'no doubt no doubt no doubt no doubt.'
+        ),
+    ]
+
+    response = random.choice(brooklyn_99_quotes)
+    await ctx.send(response)
+
+@bot.command(name='timer', help='Responds with a random quote from Brooklyn 99')
+async def timer(ctx):#, seconds):
     try:
-        minuteint = int(minutes)
-        secondsint=int(seconds)
-        totalseconds=minuteint*60 + secondsint
-        if totalseconds > 3600:
-            await ctx.send("I dont think im allowed to do go above 60 minutes.")
+        secondint = int(15)
+        if secondint > 300:
+            await ctx.send("I dont think im allowed to do go above 300 seconds.")
             raise BaseException
-        if totalseconds <= 0:
+        if secondint <= 0:
             await ctx.send("I dont think im allowed to do negatives")
             raise BaseException
-        
-        message = await ctx.send("Timer: {minuteint} minutes {secondsint} seconds")
+        message = await ctx.send("Timer: {seconds}")
         while True:
-            totalseconds -= 1
-            if totalseconds == 0:
+            secondint -= 1
+            if secondint == 0:
                 await message.edit(content="Ended!")
                 break
-            minuteLeft=totalseconds//60
-            secondsLeft=totalseconds%60
-            await message.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            await message.edit(content=f"Timer: {secondint}")
             await asyncio.sleep(1)
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
     except ValueError:
         await ctx.send("Must be a number!")
-
-@bot.command(name='werewolfEnd', help='kill the game')
-async def werewolfEnd(ctx):
-    exit()
 
 ################# JOIN FUNCTIONS ##################
 userlist=[]
@@ -57,31 +61,22 @@ async def removelist(ctx):
     userlist.remove(member)
     await ctx.send("<@" + str(member) + ">" + ", you've left the game!")
 
-#@bot.command(name='players', help='current players')
-#async def printlist(ctx):
-#    await ctx.send("Players: ")
-#    for member in userlist:
-#        await ctx.send("<@" + str(member) + ">")
+@bot.command(name='players', help='current players')
+async def printlist(ctx):
+    await ctx.send("Players: ")
+    for member in userlist:
+        await ctx.send("<@" + str(member) + ">")
 
-################ PARSE EMOJIS ######################
-@bot.command(name='start', help='start the game')
-async def reactlist(ctx):
-    # Send message React to Join Game then adds a check emoji
-    message = await ctx.send("React to join game!")
-    await message.add_reaction('✅')
+################# DIRECT MESSAGE FUNCTIONS ##################
 
-    # Waits 5 seconds for people to react
-    await asyncio.sleep(3)
-    await ctx.send('Current Players')
-    message = await ctx.channel.fetch_message(message.id)
-    reaction = message.reactions[0] # checkmark reactions only
-    
-    async for user in reaction.users():
-        userlist.append(user)
-        await ctx.send("<@" + str(user) + ">")
-        await ctx.send(user.id)   
-
-    #night time timer
-    await timer(ctx, 0, 30)
+#Direct messages the list of mentions in message.
+mentionlist = []
+@bot.command(name='dm', help='direct message mentions')
+async def on_message(ctx):
+    if 'dm' in ctx.message.content:
+        mentionlist = ctx.message.mentions
+        await ctx.message.channel.send("A DM has been sent to your inboxes!")
+        for mention in mentionlist:
+            await mention.send("Hi! I'm here!")
 
 bot.run(TOKEN)
