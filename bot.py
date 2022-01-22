@@ -3,6 +3,7 @@ from operator import mod
 import os
 import random
 import asyncio
+import roles
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -43,6 +44,28 @@ async def timer(ctx, minutes, seconds=0):
 async def werewolfEnd(ctx):
     exit()
 
+async def gameLogic(ctx, minutes, seconds):
+
+    game=roles.GameState()
+    game.set_random_roles()
+    #night time timer
+    await timer(ctx, 0, 30)
+
+    # ensure camp councellor made choices (if applicalble)
+
+    # dm player to remind role and to vote
+
+    # start day time timer
+    await timer(ctx, minutes, seconds)
+
+    #players vote on werewolfs
+
+    #timer ends, initialze vote
+    player_booted, num_votes = game.tally_votes()
+
+    #determine winners
+    
+
 ################# JOIN FUNCTIONS ##################
 userlist=[]
 @bot.command(name='join', help='returns list of people who joined')
@@ -81,7 +104,9 @@ async def reactlist(ctx):
         await ctx.send("<@" + str(user) + ">")
         await ctx.send(user.id)   
 
-    #night time timer
-    await timer(ctx, 0, 30)
+    await gameLogic(ctx)#, minutes, seconds)
+
+
+
 
 bot.run(TOKEN)
