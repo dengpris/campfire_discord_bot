@@ -21,13 +21,56 @@ message individual their role - camp counsellor needs choice to see role of othe
 game logic obviously
 
 ===GAME FLOWCHART THINGY=== (how the game would usually go?)
+1. Introduction
 
 #need to find a way to figure out how people would join a game
+Command to call the bot. (!werewolfStart)
+People react to a message sent by the bot in the server.
+Message includes 'React to join game!'
 
 #maybe use arguments to enter settings like this?
-!werewolfStart <timer> <num_campers> <num_werewolfs> <num_introverts> <num_campcounselors> <num_bestfriends>
+!werewolfStart <timer_gameplay> <num_campers> <num_werewolfs> <num_introverts> <num_campcounselors> <num_bestfriends> <num_wannabes>
 
-> bot would start countdown 
+We need a way to parse arguments.
+The arguments account for the total number of roles in the game (players + missing roles).
+Error-catching (balancing) - at the end
+
+===ROLES===
+
+Werewolf - See the other werewolves.
+Camper - Chills.
+Best Friends (Pair) - See the other best friend.
+Camp Counselor - See below.
+Wannabe - Sees werewolves.
+Introvert - Chills.
+
+2. Night Time
+
+First Use of Timer Preset (30 sec)
+> bot would start countdown for night time
+- DM players their roles using the embed links that Priscila sent on Discord
+
+Camp Counselor (in their DMs)
+Has a choice - React once
+A. Pick a player to know their role.
+B. Pick 1/3 unpicked roles to know (random).
+
+If timer runs out, (i.e. the camp counselor did not react in time - reveal) the game ends (i.e. bot kills itself).
+
+3. Actual Gameplay
+
+Info - Another DM to remind you of your role and to vote!
+Info - In public, voting time (dynamic).
+Voting - Public for now when the timer runs out (Just react - once you have reacted you can't take it back)
+
+4. End Game
+
+Intervals between each reveal (3 sec)
+Introvert -> Best Friends -> Wannabe -> Werewolves -> Campers
+
+5. Kill the bot.
+!werewolfEnd
+
 > bot would send roles to individual players
 > bot would somehow show camp counsellor ANOTHER PLAYERS ROLE or REVEAL TWO ROLES THAT ARE IN THE GAME (if applicable)
 > then people playing would play n stuff
@@ -38,15 +81,6 @@ game logic obviously
 :regional_indicator_a: :regional_indicator_b: :regional_indicator_c: IN DISCORD
 
 >clean up and exit
-
-===ROLES===
-
-Werewolf 
-Camper 
-Best Friends (Pair)
-Camp Counselor 
-Wannabe
-Introvert 
 
 ===COMMANDS TO IMPLEMENT===
 !werewolfStart
