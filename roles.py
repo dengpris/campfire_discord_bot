@@ -1,4 +1,5 @@
 import random
+import time
 
 ROLE_INFO = {"Werewolf": {"About": "see the other werewolves","Limit": 1, "Required": True},
              "Camper": {"About": "we vibing fham", "Limit": 7, "Required": True},
@@ -42,6 +43,7 @@ class Player:
     
 
 class GameState:
+<<<<<<< HEAD
     def __init__(self, player_names, custom_role_dict, extra_roles=False, custom_roles=False, ):
         self.num_players = len(player_names)
         self.time = "Night"
@@ -52,6 +54,15 @@ class GameState:
         # Default roles
         else:
             random_roles, self.picked_roles = self.set_random_roles(extra_roles)
+=======
+    def __init__(self, player_names, extra_roles=False):
+        random.seed(time.time())
+        self.num_players = len(player_names)
+        self.time = "Night"
+        print("before nigth")
+        self.extra_roles=extra_roles
+        random_roles, self.picked_roles = self.set_random_roles(extra_roles)
+>>>>>>> 80354d306af38afd54571391eb00132b36e4d576
         print("after night")
         #Assigning roles
         self.players = [Player(player_names[person], random_roles[person]) for person in range(self.num_players)]
@@ -238,18 +249,79 @@ class GameState:
             return True
         return False
     
-    def camp_counsellor_looks(self, player_name):
-        pass
-    
+    def camp_counsellor_looks(self, player_name, chosen_player):
+        name_found=False
+        for player in self.players:
+            if player.name == player_name:
+                name_found = True
+                if player.role == "Camp Counselor":
+                    break
+                else:
+                    print("you are not a camp counsellor")
+                    return False
+            if name_found == False:
+                print('name not found')
+                return False
+                
+        for player in self.players:
+            if player.name == chosen_player:
+                print(f'This player is a {player.role}')
+                return player.role
+        
+        print("Chosen player name does not exist")
+        return False
+                
     # get 2/3 unpicked roles from group
     def camp_counsellor_unpicked(self, player_name):
         # picked_roles = self.picked_roles
-        pass
-
+        if self.extra_roles == False:
+            print("Error, extra roles is false")
+            return False
+        else:
+            name_found=False
+            for player in self.players:
+                if player.name == player_name:
+                    name_found = True
+                    if player.role == "Camp Counselor":
+                        break
+                    else:
+                        print("you are not a camp counsellor")
+                        return False 
+            if name_found == False:
+                print("player not found")
+                return False
+            
+            picked_roles = self.picked_roles.copy()
+            unpicked_roles = []
+            for role in ROLE_INFO.keys():
+                if role not in picked_roles:
+                    unpicked_roles.append(role)
+            random.shuffle(unpicked_roles)
+            return unpicked_roles[:2]
+                
     #find best friend of 'player_name'
     def best_friend_find_friend(self, player_name):
-        pass
-    
+        player_role = ""
+        friend={"bff_1":"bff_2", "bff_2": "bff_1"}
+        
+        for player in self.players:
+            if player.name == player_name:
+                if player.role != "bff_1" or player.role != "bff_2":
+                    print("you are not one of the bestest friends ever or bffs dont exist this game")
+                    return False
+                else:
+                    player_role = player.role
+        if player_role == "":
+            print("incorrect player name")
+            return False
+        
+        for player in self.players:
+            if player.role == friend[player_role]:
+                print(f"your friend is {friend.name}")
+                return True
+        print("can't find a bff Sadge")
+        return False
+
         
         
             

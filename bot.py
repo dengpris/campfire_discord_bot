@@ -58,16 +58,18 @@ async def werewolfEnd(ctx):
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
     nameList=[member.name for member in userlist]
+<<<<<<< HEAD
     print(nameList)
 
     roles_dictionary = NUM_OF_EACH_ROLE
     game=roles.GameState(nameList, roles_dictionary, custom_roles=custom_roles)
     print(game)
+=======
+    game=roles.GameState(nameList)
+>>>>>>> 80354d306af38afd54571391eb00132b36e4d576
     # game.set_random_roles()
-    print("printing game.players")
 
-    for player in game.players:
-        print(player.name + " "+ player.get_role_info())
+    await send_role(game,ctx)
     print(game.players)
     print("printing game object")
     print(game)
@@ -87,6 +89,40 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     player_booted, num_votes = game.tally_votes()
 
     #determine winners
+    
+async def send_role(game,ctx):
+    werewolf_list = []
+    camper_list = []
+    other_list = []
+    userlist.pop(0)
+    
+    for player in game.players:
+        print(player.name + " "+ player.get_role_info())
+        if player.get_role_info() == "Werewolf":
+            for user in userlist:
+                if user.name == player.name:
+                    werewolf_list.append(user)
+        elif player.get_role_info() == "Camper":
+            for user in userlist:
+                if user.name == player.name:
+                    camper_list.append(user)
+        elif player.get_role_info() == "Wannabe":
+            for user in userlist:
+                if user.name == player.name:
+                    other_list.append(user)
+
+    print(camper_list)
+    for camper in camper_list:
+        embed = create_camper_msg()
+        channel = await camper.create_dm()
+        msg = await channel.send(embed=embed)
+        await ctx.send("Your role has been sent %s" %camper.name)
+    
+    for werewolf in werewolf_list:
+        embed = create_werewolf_msg(werewolf_list)
+        channel = await werewolf.create_dm()
+        msg = await channel.send(embed=embed)
+        await ctx.send("Your role has been sent %s" %werewolf.name)
     
 
 ################# JOIN FUNCTIONS ##################
@@ -120,7 +156,7 @@ async def reactlist(ctx):
     await message.add_reaction('✅')
 
     # Waits 5 seconds for people to react
-    await asyncio.sleep(3)
+    await asyncio.sleep(5)
     message = await ctx.channel.fetch_message(message.id)
     reaction = message.reactions[0] # checkmark reactions only
     
@@ -312,16 +348,24 @@ async def printlist(ctx):
 
 @bot.command(name='dmcampcounsellor', help='send dm to camp counsellor')
 async def printlist(ctx):
-    userlist.pop(0)
-    userlist.pop(0)
-    userlist.pop(0)
+    # userlist.pop(0)
+    # userlist.pop(0)
+    # userlist.pop(0)
     embed = create_camp_counsellor_msg(userlist)
     for cc in userlist:
         channel = await cc.create_dm()
         msg = await channel.send(embed=embed)
         await ctx.send("Your role has been sent %s" %cc.name)
+        message = await channel.send(embed=embed)
+        await message.add_reaction(unicode_letters[0])
+        await message.add_reaction(unicode_letters[1])
 
-def create_camper_msg(userlist):
+        # print(message.count)
+        # if(message.reaction[0].count > message.reaction[1].count):
+        #     print(message.reaction[0].count) 
+        #     print(message.reaction[1].count)
+
+def create_camper_msg():
     embed = discord.Embed(
         title = "You are a Camper!",
         description = "You will have a great time at camp if you get rid of any werewolves and don't accidentally kick out a fellow camper. You just want to have fun at camp.",
@@ -330,8 +374,13 @@ def create_camper_msg(userlist):
     embed.set_image(url='https://i.imgur.com/4AYKSl3.jpg')
     return embed
 
-def create_werewolf_msg(userlist):
-    werewolf_str = "Your fellow wolf is %s." %userlist[-1]
+def create_werewolf_msg(wolf_list):
+    names = []
+    delimeter = '\n'
+    for wolf in wolf_list:
+        names.append(wolf.name)
+    list_wolves = delimeter.join(names)
+    werewolf_str = "Your fellow wolves are:\n" + list_wolves
     embed = discord.Embed(
         title = "You are a Werewolf!",
         description = "You will have a good trip as long as no one from your misunderstood wolf pack gets kicked out.\n\n" + werewolf_str,
@@ -340,7 +389,7 @@ def create_werewolf_msg(userlist):
     embed.set_image(url='https://i.imgur.com/VP45oFp.jpg')
     return embed
 
-def create_introvert_msg(userlist):
+def create_introvert_msg():
     embed = discord.Embed(
         title = "You are an Introvert!",
         description = "You do not like camp, but your mom made you come. You have to figure out a way to go home without her blaming you. You will have a good trip if you get kicked out in the morning.",
@@ -370,6 +419,17 @@ def create_wannabe_msg(userlist):
     return embed
 
 def create_camp_counsellor_msg(userlist):
+    embed = discord.Embed(
+        title = "You are a Camp Counsellor!",
+        description = "You will have a good trip if you get rid of any werewolves and don't accidentally get rid of camper. Luckily, you have extra privileges and can figure out who one camper is or who two of the missing ones were.\n\n",
+        color = discord.Color.blue()
+    )
+    embed.set_image(url='https://i.imgur.com/FnS0HP5.jpg')
+    return embed
+
+def create_camp_counsellor_choice(userlist):
+    
+
     embed = discord.Embed(
         title = "You are a Camp Counsellor!",
         description = "You will have a good trip if you get rid of any werewolves and don't accidentally get rid of camper. Luckily, you have extra privileges and can figure out who one camper is or who two of the missing ones were.\n\n",
