@@ -1,5 +1,6 @@
 # bot.py
 import os
+from pickle import FALSE
 import random
 import asyncio
 import roles
@@ -8,6 +9,10 @@ from discord.ext import commands
 from dotenv import load_dotenv
 
 from poll import *
+
+#GLOBAL VARIABLES
+NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Councellor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
+CUSTOM_ROLES = False
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -50,10 +55,13 @@ async def werewolfEnd(ctx):
 
     exit()
 
-async def gameLogic(ctx, minutes, seconds):
+async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
     nameList=[member.name for member in userlist]
-    game=roles.GameState(nameList)
+    print(nameList)
+
+    roles_dictionary = NUM_OF_EACH_ROLE
+    game=roles.GameState(nameList, roles_dictionary, custom_roles=custom_roles)
     # game.set_random_roles()
 
     await send_role(game,ctx)
@@ -159,6 +167,7 @@ async def removelist(ctx):
 ################ START GAME ######################
 @bot.command(name='start', help='start the game')
 async def reactlist(ctx):
+
     # Send message React to Join Game then adds a check emoji
     message = await ctx.send("React to join game!")
     await message.add_reaction('✅')
@@ -171,15 +180,16 @@ async def reactlist(ctx):
     async for user in reaction.users():
             userlist.append(user)
             await ctx.send(user.name) 
-    await gameLogic(ctx, 1, 1)
+    await gameLogic(ctx, 1, 1, CUSTOM_ROLES)
 
+################ ROLE SETTINGS ######################
 # Set the Settings for number of roles
 # Note has a writing error if number error is not at the end
 @bot.command(name="settings")
 async def set_settings(ctx, *args):
 
-    list_of_roles = ["werewolf", "camp_councellor", "wannabe", "introvert", "bffpair","camper"]
-    number_of_each_role = {"werewolf":0, "camp_councellor":0, "wannabe":0, "introvert":0, "bffpair":0, "camper":0}
+    list_of_roles = ["Werewolf", "Camp Councellor", "Wannabe", "Introvert", "bffpair","Camper"]
+    number_of_each_role =  {"Werewolf":0, "Camp Councellor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
     
     def check(message):
          return message.author == ctx.author and message.channel == ctx.channel
@@ -207,10 +217,31 @@ async def set_settings(ctx, *args):
                 break
 
     await ctx.send(f"Set settings successfully.\n" + 
-                    "**Werewolves:** " + str(number_of_each_role["werewolf"]) + "\t**CampCounsellor:** " + str(number_of_each_role["camp_councellor"]) +
-                    "\t**Wannabe:** "+ str(number_of_each_role["wannabe"]) + "\t**Introvert:** " + str(number_of_each_role["introvert"]) + "\t**Pairs of BFFs:** " + str(number_of_each_role["bffpair"]) +
-                    "\t**Campers:** " + str(number_of_each_role["camper"]))
+                    "**Werewolves:** " + str(number_of_each_role["Werewolf"]) + "\t**CampCounsellor:** " + str(number_of_each_role["Camp Councellor"]) +
+                    "\t**Wannabe:** "+ str(number_of_each_role["Wannabe"]) + "\t**Introvert:** " + str(number_of_each_role["Introvert"]) + "\t**Pairs of BFFs:** " + str(number_of_each_role["bffpair"]) +
+                    "\t**Campers:** " + str(number_of_each_role["Camper"]))
     print(f"New role lmits are: {number_of_each_role}")
+    global NUM_OF_EACH_ROLE
+    NUM_OF_EACH_ROLE = number_of_each_role
+    global CUSTOM_ROLES
+    CUSTOM_ROLES = True
+
+@bot.command(name="see_roles")
+async def see_settings_roles(ctx):
+    #await ctx.send("HERE")
+    await ctx.send("Current Number of Each Role: \n" + 
+                    "**Werewolves:** " + str(NUM_OF_EACH_ROLE["Werewolf"]) + "\t**CampCounsellor:** " + str(NUM_OF_EACH_ROLE["Camp Councellor"]) +
+                    "\t**Wannabe:** "+ str(NUM_OF_EACH_ROLE["Wannabe"]) + "\t**Introvert:** " + str(NUM_OF_EACH_ROLE["Introvert"]) + 
+                    "\t**Pairs of BFFs:** " + str(NUM_OF_EACH_ROLE["bffpair"]) + "\t**Campers:** " + str(NUM_OF_EACH_ROLE["Camper"]))
+
+@bot.command(name="reset_roles")
+async def see_settings_roles(ctx):
+    #await ctx.send("HERE")
+    global CUSTOM_ROLES
+    CUSTOM_ROLES = False
+    global NUM_OF_EACH_ROLE
+    NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Councellor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
+    await ctx.send("Roles have been reset to default values")
 
 ################ TESTING POLL ###################
 channel_list=[]
@@ -309,6 +340,25 @@ async def printlist(ctx):
         msg = await channel.send(embed=embed)
         await ctx.send("Your role has been sent %s" %wannabe.name)
 
+@bot.command(name='dmcampcounsellor', help='send dm to camp counsellor')
+async def printlist(ctx):
+    # userlist.pop(0)
+    # userlist.pop(0)
+    # userlist.pop(0)
+    embed = create_camp_counsellor_msg(userlist)
+    for cc in userlist:
+        channel = await cc.create_dm()
+        msg = await channel.send(embed=embed)
+        await ctx.send("Your role has been sent %s" %cc.name)
+        message = await channel.send(embed=embed)
+        await message.add_reaction(unicode_letters[0])
+        await message.add_reaction(unicode_letters[1])
+
+        # print(message.count)
+        # if(message.reaction[0].count > message.reaction[1].count):
+        #     print(message.reaction[0].count) 
+        #     print(message.reaction[1].count)
+
 def create_camper_msg():
     embed = discord.Embed(
         title = "You are a Camper!",
@@ -368,6 +418,17 @@ def create_wannabe_msg(wolf_list):
     return embed
 
 def create_camp_counsellor_msg(userlist):
+    embed = discord.Embed(
+        title = "You are a Camp Counsellor!",
+        description = "You will have a good trip if you get rid of any werewolves and don't accidentally get rid of camper. Luckily, you have extra privileges and can figure out who one camper is or who two of the missing ones were.\n\n",
+        color = discord.Color.blue()
+    )
+    embed.set_image(url='https://i.imgur.com/FnS0HP5.jpg')
+    return embed
+
+def create_camp_counsellor_choice(userlist):
+    
+
     embed = discord.Embed(
         title = "You are a Camp Counsellor!",
         description = "You will have a good trip if you get rid of any werewolves and don't accidentally get rid of camper. Luckily, you have extra privileges and can figure out who one camper is or who two of the missing ones were.\n\n",
