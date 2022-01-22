@@ -42,16 +42,64 @@ class Player:
     
 
 class GameState:
-    def __init__(self, player_names, extra_roles=False):
+    def __init__(self, player_names, custom_role_dict, extra_roles=False, custom_roles=False, ):
         self.num_players = len(player_names)
         self.time = "Night"
         print("before nigth")
-        random_roles, self.picked_roles = self.set_random_roles(extra_roles)
+
+        if custom_roles:
+            random_roles, self.picked_roles = self.set_custom_roles(custom_role_dict)
+        # Default roles
+        else:
+            random_roles, self.picked_roles = self.set_random_roles(extra_roles)
         print("after night")
         #Assigning roles
         self.players = [Player(player_names[person], random_roles[person]) for person in range(self.num_players)]
         
-    
+    def set_custom_roles(self, custom_role_dict):
+
+        picked_roles = []
+        players_roles = []
+
+        picked_roles=custom_role_dict.keys()
+
+        print(picked_roles)
+        
+        # If best friends is a role, replace with bff_1 or bff_2
+        # Make sure only bestfriends know each other (only pairs know each other)
+        if custom_role_dict["bffpair"] != 0:
+            picked_roles.remove('bffpair')
+            picked_roles.append("bff_1")
+            picked_roles.append("bff_2")
+            num_bff_pairs = custom_role_dict["bffpair"]
+            custom_role_dict.pop("bffpair")
+            new_bff_roles = {'bff_1': num_bff_pairs, 'bff_2': num_bff_pairs}
+            custom_role_dict.update(new_bff_roles)
+
+        # If camp councellor is one of the roles, make sure theres 3 extra roles.
+            
+        for role in custom_role_dict:
+                num_of_each_role_available = custom_role_dict[role]
+                while num_of_each_role_available != 0:
+                    players_roles.append(role)
+                    num_of_each_role_available-=1
+
+        random.shuffle(players_roles)
+
+        # If number of roles > number of players, remove excess roles
+        if self.num_players < len(players_roles):
+            n = self.num_players - len(players_roles) 
+            players_roles = players_roles[:len(players_roles)-n]
+        
+        # If number of players > number of roles, add access campers
+        if self.num_players < len(players_roles):
+            n = len(players_roles) - self.num_players
+            while n != 0:
+                players_roles.append("Camper")
+                n -=1 
+        
+        return players_roles, picked_roles
+
     def set_random_roles(self, extra_roles=False):
 
         roles = {}
