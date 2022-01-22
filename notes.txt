@@ -1,0 +1,44 @@
+===PROLLY SOME IMPORTANT VARIABLES===
+
+timer_value
+
+min_num_players?
+max_num_players?
+
+num_campers
+num_werewolfs
+num_introvert
+num_campcouncellors
+num_bestfriends 
+
+===FUNCTIONALITY===
+timer countdown
+customize settings (number of roles, customize timer countdown... etc etc)
+way for people to join a game 
+randomize roles
+voting system (use reacts? to count votes)
+message individual their role
+game logic obviously
+
+===GAME FLOWCHART THINGY=== (how the game would usually go?)
+
+#need to find a way to figure out how people would join a game
+
+#maybe use arguments to enter settings like this?
+!werewolfStart <timer> <num_campers> <num_werewolfs> <num_introverts> <num_campcouncellors> <num_bestfriends>
+
+> bot would start countdown 
+> bot would send roles to individual players
+> bot would somehow show camp counsellor ANOTHER PLAYERS ROLE or REVEAL TWO ROLES THAT ARE IN THE GAME (if applicable)
+> then people playing would play n stuff
+
+#when the bot is done the countdown, bot would send message with voting system
+
+> bot sends message with emoji reacts that correspond to each player kind like that bot in discord we have in our server
+:regional_indicator_a: :regional_indicator_b: :regional_indicator_c: IN DISCORD
+
+>clean up and exit
+
+===COMMANDS TO IMPLEMENT===
+!werewolfStart
+!werewolfEnd
