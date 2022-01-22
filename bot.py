@@ -112,7 +112,7 @@ async def reactlist(ctx):
     await message.add_reaction('✅')
 
     # Waits 5 seconds for people to react
-    await asyncio.sleep(3)
+    await asyncio.sleep(5)
     message = await ctx.channel.fetch_message(message.id)
     reaction = message.reactions[0] # checkmark reactions only
     
