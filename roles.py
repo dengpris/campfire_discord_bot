@@ -1,4 +1,5 @@
 import random
+import time
 
 ROLE_INFO = {"Werewolf": {"About": "see the other werewolves","Limit": 1, "Required": True},
              "Camper": {"About": "we vibing fham", "Limit": 7, "Required": True},
@@ -43,6 +44,7 @@ class Player:
 
 class GameState:
     def __init__(self, player_names, extra_roles=False):
+        random.seed(time.time())
         self.num_players = len(player_names)
         self.time = "Night"
         print("before nigth")
@@ -190,9 +192,23 @@ class GameState:
             return True
         return False
     
-    def camp_counsellor_looks(self, player_name):
-        pass
-    
+    def camp_counsellor_looks(self, player_name, chosen_player):
+        for player in self.players:
+            if player.name == player_name:
+                if player.role == "Camp Counselor":
+                    break
+                else:
+                    print("you are not a camp counsellor")
+                    return False
+                
+        for player in self.players:
+            if player.name == chosen_player:
+                print(f'This player is a {player.role}')
+                return player.role
+        
+        print("Chosen player name does not exist")
+        return False
+                
     # get 2/3 unpicked roles from group
     def camp_counsellor_unpicked(self, player_name):
         # picked_roles = self.picked_roles
