@@ -85,3 +85,26 @@ Introvert -> Best Friends -> Wannabe -> Werewolves -> Campers
 ===COMMANDS TO IMPLEMENT===
 !werewolfStart
 !werewolfEnd
+
+============== simple logic (rough )================
+Global [Player] array
+React: appends players to array
+Unreact: removes players from array
+Game logic, if voted out: removes players from array
+
+2D Array (or global game role array)
+Maps player ID to role (randomized, game initial step)
+Removes role from array if voted out
+
+Check win conditions at the end of every turn
+See if roles in array/map conflict (aka. werewolf with camper)
+
+
+Timer logic
+Allows voting array/map (2D?) to be edited if timer > 0
+Array form: [[Player ID, # Votes], [Player ID2, # Votes]], etc
+Sorted by # votes
+At timer = 0, if array[0] > array[1], execute game logic
+Else end day
+
+Reacts change #votes in 2d array
