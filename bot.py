@@ -102,8 +102,8 @@ async def reactlist(ctx):
     reaction = message.reactions[0] # checkmark reactions only
     
     async for user in reaction.users():
-        userlist.append(user)
-        await ctx.send(user.name) 
+            userlist.append(user)
+            await ctx.send(user.name) 
 
 # Set the number of werewolves
 @bot.command(name="settings")
