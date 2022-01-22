@@ -1,4 +1,5 @@
 # bot.py
+from operator import mod
 import os
 import random
 import asyncio
@@ -25,23 +26,27 @@ async def nine_nine(ctx):
     response = random.choice(brooklyn_99_quotes)
     await ctx.send(response)
 
-@bot.command(name='timer', help='Responds with a random quote from Brooklyn 99')
-async def timer(ctx):#, seconds):
+@bot.command(name='timer', help='timer command. usage !timer <num of minutes>')
+async def timer(ctx, minutes):
     try:
-        secondint = int(15)
-        if secondint > 300:
-            await ctx.send("I dont think im allowed to do go above 300 seconds.")
+        minuteint = int(minutes)
+        totalseconds=minuteint*60
+        if minuteint > 60:
+            await ctx.send("I dont think im allowed to do go above 60 minutes.")
             raise BaseException
-        if secondint <= 0:
+        if minuteint <= 0:
             await ctx.send("I dont think im allowed to do negatives")
             raise BaseException
-        message = await ctx.send("Timer: {seconds}")
+        
+        message = await ctx.send("Timer: {minuteint} minutes")
         while True:
-            secondint -= 1
-            if secondint == 0:
+            totalseconds -= 1
+            if totalseconds == 0:
                 await message.edit(content="Ended!")
                 break
-            await message.edit(content=f"Timer: {secondint}")
+            minuteLeft=totalseconds//60
+            secondsLeft=totalseconds%60
+            await message.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             await asyncio.sleep(1)
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
     except ValueError:
