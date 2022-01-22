@@ -1,8 +1,8 @@
 # bot.py
-from operator import mod
 import os
 import random
 import asyncio
+import roles
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -28,31 +28,53 @@ async def nine_nine(ctx):
     response = random.choice(brooklyn_99_quotes)
     await ctx.send(response)
 
-@bot.command(name='timer', help='timer command. usage !timer <num of minutes>')
-async def timer(ctx, minutes):
+@bot.command(name='timer', help='Responds with a random quote from Brooklyn 99')
+async def timer(ctx):#, seconds):
     try:
-        minuteint = int(minutes)
-        totalseconds=minuteint*60
-        if minuteint > 60:
-            await ctx.send("I dont think im allowed to do go above 60 minutes.")
+        secondint = int(15)
+        if secondint > 300:
+            await ctx.send("I dont think im allowed to do go above 300 seconds.")
             raise BaseException
-        if minuteint <= 0:
+        if secondint <= 0:
             await ctx.send("I dont think im allowed to do negatives")
             raise BaseException
-        
-        message = await ctx.send("Timer: {minuteint} minutes")
+        message = await ctx.send("Timer: {seconds}")
         while True:
-            totalseconds -= 1
-            if totalseconds == 0:
+            secondint -= 1
+            if secondint == 0:
                 await message.edit(content="Ended!")
                 break
-            minuteLeft=totalseconds//60
-            secondsLeft=totalseconds%60
-            await message.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            await message.edit(content=f"Timer: {secondint}")
             await asyncio.sleep(1)
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
     except ValueError:
         await ctx.send("Must be a number!")
+
+@bot.command(name='werewolfEnd', help='kill the game')
+async def werewolfEnd(ctx):
+    exit()
+
+async def gameLogic(ctx, minutes, seconds):
+
+    game=roles.GameState()
+    game.set_random_roles()
+    #night time timer
+    await timer(ctx, 0, 30)
+
+    # ensure camp councellor made choices (if applicalble)
+
+    # dm player to remind role and to vote
+
+    # start day time timer
+    await timer(ctx, minutes, seconds)
+
+    #players vote on werewolfs
+
+    #timer ends, initialze vote
+    player_booted, num_votes = game.tally_votes()
+
+    #determine winners
+    
 
 ################# JOIN FUNCTIONS ##################
 userlist=[]
@@ -68,6 +90,7 @@ async def removelist(ctx):
     userlist.remove(member)
     await ctx.send("<@" + str(member) + ">" + ", you've left the game!")
 
+<<<<<<< HEAD
 #@bot.command(name='players', help='current players')
 #async def printlist(ctx):
 #    await ctx.send("Players: ")
@@ -105,5 +128,24 @@ async def poll_test(ctx):
     i=0
     while i<len(userlist):
         await msg.add_reaction(unicode_letters[i])
+
+@bot.command(name='players', help='current players')
+async def printlist(ctx):
+    await ctx.send("Players: ")
+    for member in userlist:
+        await ctx.send("<@" + str(member) + ">")
+
+################# DIRECT MESSAGE FUNCTIONS ##################
+
+#Direct messages the list of mentions in message.
+mentionlist = []
+@bot.command(name='dm', help='direct message mentions')
+async def on_message(ctx):
+    if 'dm' in ctx.message.content:
+        mentionlist = ctx.message.mentions
+        await ctx.message.channel.send("A DM has been sent to your inboxes!")
+        for mention in mentionlist:
+            await mention.send("Hi! I'm here!")
+
 
 bot.run(TOKEN)
