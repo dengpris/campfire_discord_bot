@@ -12,7 +12,7 @@ from poll import *
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-bot = commands.Bot(command_prefix='~')
+bot = commands.Bot(command_prefix='*')
 
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
 async def timer(ctx, minutes, seconds=0):
@@ -49,7 +49,10 @@ async def werewolfEnd(ctx):
 
 async def gameLogic(ctx, minutes, seconds):
 
-    game=roles.GameState()
+    nameList=[member.name for member in userlist]
+    print(nameList)
+    game=roles.GameState(nameList)
+    print(game)
     game.set_random_roles()
     #night time timer
     await timer(ctx, 0, 30)
@@ -104,6 +107,7 @@ async def reactlist(ctx):
     async for user in reaction.users():
             userlist.append(user)
             await ctx.send(user.name) 
+    await gameLogic(ctx, 1, 1)
 
 # Set the number of werewolves
 @bot.command(name="settings")
