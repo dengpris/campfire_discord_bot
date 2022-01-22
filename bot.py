@@ -12,14 +12,10 @@ from poll import *
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-<<<<<<< HEAD
-bot = commands.Bot(command_prefix='!')
-=======
 intents = discord.Intents.default()
 intents.members = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
->>>>>>> 42c589f926269a6789eedafb51723d71383780c8
 
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
 async def timer(ctx, minutes, seconds=0):
