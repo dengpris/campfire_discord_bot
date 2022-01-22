@@ -12,7 +12,7 @@ from poll import *
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-bot = commands.Bot(command_prefix='~')
+bot = commands.Bot(command_prefix='!')
 
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
 async def timer(ctx, minutes, seconds=0):
@@ -138,7 +138,7 @@ async def poll_test(ctx):
 
     embed = create_poll(userlist)
     #member = ctx.message.author
-
+    userlist.pop(0)
     for user in userlist:
         if user.bot == False: # do not send messages to yourself
             channel = await user.create_dm()
@@ -148,6 +148,108 @@ async def poll_test(ctx):
             while i<len(userlist):
                 await msg.add_reaction(unicode_letters[i])
                 i = i+1
+
+@bot.command(name='dmcamper', help='send dm to campers')
+async def printlist(ctx):
+    camperlist = []
+
+    userlist.pop(0)
+    embed = create_camper_msg(userlist)
+    for camper in userlist:
+        channel = await camper.create_dm()
+        msg = await channel.send(embed=embed)
+        await ctx.send("Your role has been sent %s" %camper.name)
+
+@bot.command(name='dmwerewolf', help='send dm to werewolves')
+async def printlist(ctx):
+    werewolflist = []
+
+    userlist.pop(0)
+    print(userlist)
+    embed = create_werewolf_msg(userlist)
+    for werewolf in userlist:
+        channel = await werewolf.create_dm()
+        msg = await channel.send(embed=embed)
+        await ctx.send("Your role has been sent %s" %werewolf.name)
+
+@bot.command(name='dmintrovert', help='send dm to introvert')
+async def printlist(ctx):
+    userlist.pop(0)
+    userlist.pop(0)
+    userlist.pop(0)
+    embed = create_introvert_msg(userlist)
+    for introvert in userlist:
+        channel = await introvert.create_dm()
+        msg = await channel.send(embed=embed)
+        await ctx.send("Your role has been sent %s" %introvert.name)
+
+@bot.command(name='dmbestfriend', help='send dm to bestfriends')
+async def printlist(ctx):
+    userlist.pop(0)
+    embed = create_best_friend_msg(userlist)
+    for best_friend in userlist:
+        channel = await best_friend.create_dm()
+        msg = await channel.send(embed=embed)
+        await ctx.send("Your role has been sent %s" %best_friend.name)
+
+@bot.command(name='dmwannabe', help='send dm to wannabe')
+async def printlist(ctx):
+    userlist.pop(0)
+    userlist.pop(0)
+    userlist.pop(0)
+    embed = create_wannabe_msg(userlist)
+    for wannabe in userlist:
+        channel = await wannabe.create_dm()
+        msg = await channel.send(embed=embed)
+        await ctx.send("Your role has been sent %s" %wannabe.name)
+
+def create_camper_msg(userlist):
+    embed = discord.Embed(
+        title = "You are a Camper!",
+        description = "You will have a great time at camp if you get rid of any werewolves and don't accidentally kick out a fellow camper. You just want to have fun at camp.",
+        color = discord.Color.blue()
+    )
+    embed.set_image(url='https://i.imgur.com/4AYKSl3.jpg')
+    return embed
+
+def create_werewolf_msg(userlist):
+    werewolf_str = "Your fellow wolf is %s." %userlist[-1]
+    embed = discord.Embed(
+        title = "You are a Werewolf!",
+        description = "You will have a good trip as long as no one from your misunderstood wolf pack gets kicked out.\n\n" + werewolf_str,
+        color = discord.Color.red()
+    )
+    embed.set_image(url='https://i.imgur.com/VP45oFp.jpg')
+    return embed
+
+def create_introvert_msg(userlist):
+    embed = discord.Embed(
+        title = "You are an Introvert!",
+        description = "You do not like camp, but your mom made you come. You have to figure out a way to go home without her blaming you. You will have a good trip if you get kicked out in the morning.",
+        color = discord.Color.gold()
+    )
+    embed.set_image(url='https://i.imgur.com/UFh7Xsp.jpg')
+    return embed
+
+def create_best_friend_msg(userlist):
+    best_friend_str = "Your fellow wolf is %s." %userlist[-1]
+    embed = discord.Embed(
+        title = "You are a Best Friend!",
+        description = "You will have a good time at camp if you get rid of any werewolves and don't accidentally get rid of your best friend - who you know isn't a werewolf.\n\n""" + best_friend_str,
+        color = discord.Color.blue()
+    )
+    embed.set_image(url='https://i.imgur.com/wHgG64a.jpg')
+    return embed
+
+def create_wannabe_msg(userlist):
+    werewolf_str = "Your fellow wolf is %s." %userlist[-1]
+    embed = discord.Embed(
+        title = "You are a Wannabe!",
+        description = "You really want the werewolves to like you... even though they don't know who you are. Your goal is for none of them to get kicked out, even if that means you have to go instead.\n\n" + werewolf_str,
+        color = discord.Color.red()
+    )
+    embed.set_image(url='https://i.imgur.com/XZSDOEU.jpg')
+    return embed
 
 @bot.command(name='players', help='current players')
 async def printlist(ctx):
