@@ -39,6 +39,10 @@ async def timer(ctx, minutes, seconds=0):
     except ValueError:
         await ctx.send("Must be a number!")
 
+@bot.command(name='werewolfEnd', help='kill the game')
+async def werewolfEnd(ctx):
+    exit()
+
 ################# JOIN FUNCTIONS ##################
 userlist=[]
 @bot.command(name='join', help='returns list of people who joined')
