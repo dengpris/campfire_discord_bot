@@ -14,37 +14,28 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 
 bot = commands.Bot(command_prefix='!')
 
-@bot.command(name='99', help='Responds with a random quote from Brooklyn 99')
-async def nine_nine(ctx):
-    brooklyn_99_quotes = [
-        'I\'m the human form of the 💯 emoji.',
-        'Bingpot!',
-        (
-            'Cool. Cool cool cool cool cool cool cool, '
-            'no doubt no doubt no doubt no doubt.'
-        ),
-    ]
-
-    response = random.choice(brooklyn_99_quotes)
-    await ctx.send(response)
-
-@bot.command(name='timer', help='Responds with a random quote from Brooklyn 99')
-async def timer(ctx):#, seconds):
+@bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
+async def timer(ctx, minutes, seconds=0):
     try:
-        secondint = int(15)
-        if secondint > 300:
-            await ctx.send("I dont think im allowed to do go above 300 seconds.")
+        minuteint = int(minutes)
+        secondsint=int(seconds)
+        totalseconds=minuteint*60 + secondsint
+        if totalseconds > 3600:
+            await ctx.send("I dont think im allowed to do go above 60 minutes.")
             raise BaseException
-        if secondint <= 0:
+        if totalseconds <= 0:
             await ctx.send("I dont think im allowed to do negatives")
             raise BaseException
-        message = await ctx.send("Timer: {seconds}")
+        
+        message = await ctx.send("Timer: {minuteint} minutes {secondsint} seconds")
         while True:
-            secondint -= 1
-            if secondint == 0:
+            totalseconds -= 1
+            if totalseconds == 0:
                 await message.edit(content="Ended!")
                 break
-            await message.edit(content=f"Timer: {secondint}")
+            minuteLeft=totalseconds//60
+            secondsLeft=totalseconds%60
+            await message.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             await asyncio.sleep(1)
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
     except ValueError:
@@ -52,6 +43,8 @@ async def timer(ctx):#, seconds):
 
 @bot.command(name='werewolfEnd', help='kill the game')
 async def werewolfEnd(ctx):
+    await ctx.send("imma kil l myself")
+
     exit()
 
 async def gameLogic(ctx, minutes, seconds):
