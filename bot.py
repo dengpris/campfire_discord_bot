@@ -7,6 +7,8 @@ import asyncio
 from discord.ext import commands
 from dotenv import load_dotenv
 
+from poll import poll
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
@@ -88,6 +90,20 @@ async def reactlist(ctx):
     async for user in reaction.users():
         userlist.append(user)
         await ctx.send("<@" + str(user) + ">")
-        await ctx.send(user.id)   
+        # await ctx.send(user.id)   
+
+################ TESTING POLL ###################
+@bot.command(name='poll')
+async def poll_test(ctx):
+    p1 = poll("OptionA", 1)
+    embed = p1.create_poll(userlist)
+    member = ctx.message.author
+
+    channel = await member.create_dm()
+    msg = await channel.send(embed=embed)
+
+    i=0
+    while i<len(userlist):
+        await msg.add_reaction(unicode_letters[i])
 
 bot.run(TOKEN)
