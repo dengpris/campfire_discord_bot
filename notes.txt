@@ -35,6 +35,8 @@ We need a way to parse arguments.
 The arguments account for the total number of roles in the game (players + missing roles).
 Error-catching (balancing) - at the end
 
+Number of roles need to be 3 more than actually required. (there must always be 3 missing roles. This only applies if there are 5 or more participants)
+
 ===ROLES===
 
 Werewolf - See the other werewolves.
@@ -53,7 +55,8 @@ First Use of Timer Preset (30 sec)
 Camp Counselor (in their DMs)
 Has a choice - React once
 A. Pick a player to know their role.
-B. Pick 1/3 unpicked roles to know (random).
+B. Pick 2/3 unpicked roles to know (random).
+
 
 If timer runs out, (i.e. the camp counselor did not react in time - reveal) the game ends (i.e. bot kills itself).
 
