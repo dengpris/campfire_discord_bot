@@ -47,4 +47,24 @@ async def timer(ctx):#, seconds):
     except ValueError:
         await ctx.send("Must be a number!")
 
+################# JOIN FUNCTIONS ##################
+userlist=[]
+@bot.command(name='join', help='returns list of people who joined')
+async def addlist(ctx):
+    member = ctx.message.author.id
+    userlist.append(member)
+    await ctx.send("<@" + str(member) + ">" + ", you've joined the game!")
+
+@bot.command(name='unjoin', help='unjoin the game')
+async def removelist(ctx):
+    member = ctx.message.author.id
+    userlist.remove(member)
+    await ctx.send("<@" + str(member) + ">" + ", you've left the game!")
+
+@bot.command(name='players', help='current players')
+async def printlist(ctx):
+    await ctx.send("Players: ")
+    for member in userlist:
+        await ctx.send("<@" + str(member) + ">")
+
 bot.run(TOKEN)
