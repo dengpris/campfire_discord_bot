@@ -1,4 +1,5 @@
 import random
+import time
 
 ROLE_INFO = {"Werewolf": {"About": "see the other werewolves","Limit": 1, "Required": True},
              "Camper": {"About": "we vibing fham", "Limit": 7, "Required": True},
@@ -45,6 +46,7 @@ class Player:
 
 class GameState:
     def __init__(self, player_names, extra_roles=False):
+        random.seed(time.time())
         self.num_players = len(player_names)
         self.time = "Night"
         print("before nigth")
