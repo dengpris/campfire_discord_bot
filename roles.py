@@ -47,7 +47,9 @@ class GameState:
     def __init__(self, player_names, extra_roles=False):
         self.num_players = len(player_names)
         self.time = "Night"
+        print("before nigth")
         random_roles, self.picked_roles = self.set_random_roles(extra_roles)
+        
         self.players = [Player(player_names[person], random_roles[person]) for person in range(self.num_players)]
         
     
@@ -56,7 +58,7 @@ class GameState:
         picked_roles=[]
         if not extra_roles:
             for role in ROLE_INFO:
-                if role['Required']:
+                if ROLE_INFO[role]["Required"]:
                     roles[role]= ROLE_INFO[role]
         else: 
             roles = ROLE_INFO.copy()
@@ -82,7 +84,7 @@ class GameState:
             for role in role_limits:
                 limit = role_limits[role]
                 while limit != 0:
-                    players.append[role]
+                    players.append(role)
         elif self.num_players>5 and not extra_roles:
             role_limits = {"Werewolf":2, "Camper":0}
             picked_roles=role_limits.keys()
@@ -95,7 +97,7 @@ class GameState:
             for role in role_limits:
                 limit = role_limits[role]
                 while limit != 0:
-                    players.append[role]
+                    players.append(role)
         else: 
             role_limits = {"Werewolf":1, "Camper":0}
             picked_roles=role_limits.keys()
@@ -108,7 +110,7 @@ class GameState:
             for role in role_limits:
                 limit = role_limits[role]
                 while limit != 0:
-                    players.append[role]
+                    players.append(role)
                     
         random.shuffle(players)
         return players, picked_roles

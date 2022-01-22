@@ -54,6 +54,10 @@ async def gameLogic(ctx, minutes, seconds):
     game=roles.GameState(nameList)
     print(game)
     game.set_random_roles()
+    print("printing game.players")
+    print(game.players)
+    print("printing game object")
+    print(game)
     #night time timer
     await timer(ctx, 0, 30)
 
