@@ -53,8 +53,11 @@ async def gameLogic(ctx, minutes, seconds):
     print(nameList)
     game=roles.GameState(nameList)
     print(game)
-    game.set_random_roles()
+    # game.set_random_roles()
     print("printing game.players")
+
+    for player in game.players:
+        print(player.name + " "+ player.get_role_info())
     print(game.players)
     print("printing game object")
     print(game)

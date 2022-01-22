@@ -17,13 +17,13 @@ def increment_round(self):
 class Player:
     def __init__(self,name, role=None):
         self.name = name
-        self.role = ROLE_INFO[role]
+        self.role = role
         self.time = "Night"
         self.round = 0
         
     def get_role_info(self):
         if self.role is not None:
-            return ROLE_INFO[self.role]["About"]
+            return self.role
         else: 
             return "You Do not have a role attached to this player"
     
@@ -49,12 +49,12 @@ class GameState:
         self.time = "Night"
         print("before nigth")
         random_roles, self.picked_roles = self.set_random_roles(extra_roles)
-        
+        print("after night")
         #Assigning roles
         self.players = [Player(player_names[person], random_roles[person]) for person in range(self.num_players)]
         
     
-    def set_random_roles(self, extra_roles):
+    def set_random_roles(self, extra_roles=False):
 
         roles = {}
         picked_roles=[]
@@ -106,6 +106,7 @@ class GameState:
                 limit = role_min_limits[role]
                 while limit != 0:
                     players.append(role)
+                    limit -=1
 
         # Greater than 5 players, but we only want werewolf and camper
         elif self.num_players>5 and not extra_roles:
@@ -121,23 +122,28 @@ class GameState:
             players = []
             for role in role_min_limits:
                 limit = role_min_limits[role]
+                print(limit)
                 while limit != 0:
                     players.append(role)
+                    limit-=1
         
         else: 
             # if players <=5 then you're only allowed 1 werewolf, everyone else is campers (no additional roles besides werewolf or camper)
+            print("less than5")
             role_min_limits = {"Werewolf":1, "Camper":0}
             picked_roles=role_min_limits.keys()
             players_left -= role_min_limits["Werewolf"]   
             if players_left != 0:
                 role_min_limits['Camper'] += players_left
                 players_left -= role_min_limits['Camper']
-
+            print("test")
             players = []
             for role in role_min_limits:
                 limit = role_min_limits[role]
                 while limit != 0:
+                    print("test")
                     players.append(role)
+                    limit-=1
         
         #shuffles order of player roles
         random.shuffle(players)
