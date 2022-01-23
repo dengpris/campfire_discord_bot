@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from poll import *
 
 #GLOBAL VARIABLES
-NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Councellor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
+NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
 CUSTOM_ROLES = False
 
 load_dotenv()
@@ -71,7 +71,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     #night time timer
     await timer(ctx, 0, 30)
 
-    # ensure camp councellor made choices (if applicalble)
+    # ensure camp Counselor made choices (if applicalble)
 
     # dm player to remind role and to vote
 
@@ -186,19 +186,19 @@ async def reactlist(ctx):
 ################ ROLE SETTINGS ######################
 # Set the Settings for number of roles
 # Note has a writing error if number error is not at the end
-@bot.command(name="settings")
+@bot.command(name="settings", help='Set a custom number of each role, run !settings to see usage')
 async def set_settings(ctx, *args):
 
-    list_of_roles = ["Werewolf", "Camp Councellor", "Wannabe", "Introvert", "bffpair","Camper"]
-    number_of_each_role =  {"Werewolf":0, "Camp Councellor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
+    list_of_roles = ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
+    number_of_each_role =  {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
     
     def check(message):
          return message.author == ctx.author and message.channel == ctx.channel
 
     if len(args) !=6 :
         await ctx.send("You need **6** arguments. Please enter 6 numbers, each will correspond to the number of each roles to be used during the game\n"
-                        + "Do `$settings <num of werewolf> <num of councellor> <num of wannabe> <num of introverts> <num of bffpair> <num of camper>`\n"
-                        + "For example: **$settings 1 1 0 0 1 3** for 1 werewolf, 1 councellor, 0 wannabes, 0 introverts, 1 pair of bffs(ie 2 players can have this role), 3 campers. ")
+                        + "Do `$settings <num of werewolf> <num of Counselor> <num of wannabe> <num of introverts> <num of bffpair> <num of camper>`\n"
+                        + "For example: **$settings 1 1 0 0 1 3** for 1 werewolf, 1 Counselor, 0 wannabes, 0 introverts, 1 pair of bffs(ie 2 players can have this role), 3 campers. ")
         raise BaseException
     
     NOT_A_NUMBER = 1
@@ -218,7 +218,7 @@ async def set_settings(ctx, *args):
                 break
 
     await ctx.send(f"Set settings successfully.\n" + 
-                    "**Werewolves:** " + str(number_of_each_role["Werewolf"]) + "\t**CampCounsellor:** " + str(number_of_each_role["Camp Councellor"]) +
+                    "**Werewolves:** " + str(number_of_each_role["Werewolf"]) + "\t**CampCounsellor:** " + str(number_of_each_role["Camp Counselor"]) +
                     "\t**Wannabe:** "+ str(number_of_each_role["Wannabe"]) + "\t**Introvert:** " + str(number_of_each_role["Introvert"]) + "\t**Pairs of BFFs:** " + str(number_of_each_role["bffpair"]) +
                     "\t**Campers:** " + str(number_of_each_role["Camper"]))
     print(f"New role lmits are: {number_of_each_role}")
@@ -227,22 +227,25 @@ async def set_settings(ctx, *args):
     global CUSTOM_ROLES
     CUSTOM_ROLES = True
 
-@bot.command(name="see_roles")
+@bot.command(name="see_roles", help='see current custom role number settings (note that default will set all to 0)')
 async def see_settings_roles(ctx):
     #await ctx.send("HERE")
     await ctx.send("Current Number of Each Role: \n" + 
-                    "**Werewolves:** " + str(NUM_OF_EACH_ROLE["Werewolf"]) + "\t**CampCounsellor:** " + str(NUM_OF_EACH_ROLE["Camp Councellor"]) +
+                    "**Werewolves:** " + str(NUM_OF_EACH_ROLE["Werewolf"]) + "\t**CampCounsellor:** " + str(NUM_OF_EACH_ROLE["Camp Counselor"]) +
                     "\t**Wannabe:** "+ str(NUM_OF_EACH_ROLE["Wannabe"]) + "\t**Introvert:** " + str(NUM_OF_EACH_ROLE["Introvert"]) + 
                     "\t**Pairs of BFFs:** " + str(NUM_OF_EACH_ROLE["bffpair"]) + "\t**Campers:** " + str(NUM_OF_EACH_ROLE["Camper"]))
 
-@bot.command(name="reset_roles")
+@bot.command(name="reset_roles", help='reset the roles to have default values')
 async def see_settings_roles(ctx):
     #await ctx.send("HERE")
     global CUSTOM_ROLES
     CUSTOM_ROLES = False
     global NUM_OF_EACH_ROLE
-    NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Councellor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
-    await ctx.send("Roles have been reset to default values")
+    NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
+    await ctx.send("**ROLES HAVE BEEN RESET TO DEFAULT VALUES**.\n" +
+                    "**If less than or equal to 5 players:** 1 werewolf, 4 or less campers.\n" + 
+                    "**If 6 players:** 2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 1 camper\n" + 
+                    "**If 7 or more players:**  2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 2 or more campers")
 
 ################ TESTING POLL ###################
 channel_list=[]
