@@ -58,7 +58,6 @@ async def werewolfEnd(ctx):
     exit()
 
 ###### ASK FOR ROLE SETTINGS HERE 
-
 def settings_usage_text():
     return "You need **6** arguments. Please enter 6 numbers, each will correspond to the number of each roles to be used during the game\n" + "Do `<num of werewolf> <num of Counselor> <num of wannabe> <num of introverts> <num of bffpair> <num of camper>`\n" + "For example: **1 1 0 0 1 3** for 1 werewolf, 1 Counselor, 0 wannabes, 0 introverts, 1 pair of bffs(ie 2 players can have this role), 3 campers."
 
@@ -155,9 +154,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     print("printing game object")
     print(game)
     #night time timer
-    await timer(ctx, 0, 5)
-    await ctx.send("Werewolf list")
-    await ctx.send(werewolf_list)
+    await timer(ctx, 0, 15)
     # ensure camp Counselor made choices (if applicalble)
 
     # dm player to remind role and to vote
@@ -175,6 +172,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             while i<len(userlist):
                 await message.add_reaction(unicode_letters[i])
                 i = i+1
+    
     # start day time timer
     await timer(ctx, 0, 5)
 
@@ -233,8 +231,7 @@ async def send_role(game,ctx):
         else: #camp_counselor
             for user in userlist:
                 if user.name == player.name:
-                    camp_counselor_list.append(user)
-            print("kldsjkl;jsdflk;asjdflk;fasjdfk")        
+                    camp_counselor_list.append(user)      
 
     for camper in camper_list:
         embed = create_camper_msg()
@@ -284,53 +281,43 @@ async def send_role(game,ctx):
                     await message.add_reaction(unicode_letters[emoji_idx])
                     player_emoji_dic[unicode_letters[emoji_idx]]=u.name
                     emoji_idx+=1
-
             
             await message.add_reaction(unicode_letters[emoji_idx])
-
             await ctx.send("Your role has been sent %s" %cc.name)
+    
     def check(reaction, user):
-        print(userlist)
-        print(user.name in userlist)
         return user in userlist and str(reaction.emoji) in unicode_letters
-        
 
     campCounsellorsCheckedIn=[]
+    camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
     while True:
         reaction, user = await bot.wait_for('reaction_add', check=check)
-
-        for letters in unicode_letters:
-            
-            if str(reaction.emoji) == str(unicode_letters[emoji_idx]):
-                #get missing roles
-                await reaction.message.channel.send("These roles are missing")
-                campCounsellorsCheckedIn.append(user.name)
-                break
-            elif str(reaction.emoji) == str(letters):
-                print(player_emoji_dic)
-
-                r=""
-                for p in game.players:
-                    if p.name==player_emoji_dic[str(reaction.emoji)]:
-                        r=p.role
+        # if camp counsellor is reacting the first time
+        if user.name not in campCounsellorsCheckedIn:
+            for letters in unicode_letters:
+                if str(reaction.emoji) == str(unicode_letters[emoji_idx]) :
+                    #get missing roles
+                    await reaction.message.channel.send("These roles are missing")
+                    campCounsellorsCheckedIn.append(user.name)
+                    break
                 
+                elif str(reaction.emoji) == str(letters):
 
-                for p in userlist:
-                    if p.name==player_emoji_dic[str(reaction.emoji)]:
-                        profilePic=p.avatar_url
-                        await reaction.message.channel.send(profilePic)
-                        await reaction.message.channel.send(player_emoji_dic[str(reaction.emoji)]+ " is a " +r+ "!")
-                
-                
-                campCounsellorsCheckedIn.append(user.name)
-                break
-
-        camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
-        print("========")
-        print(campCounsellorsCheckedIn)
-        print(camp_counselor_list_names)
+                    r=""
+                    for p in game.players:
+                        if p.name==player_emoji_dic[str(reaction.emoji)]:
+                            r=p.role
+                    
+                    for p in userlist:
+                        if p.name==player_emoji_dic[str(reaction.emoji)]:
+                            profilePic=p.avatar_url
+                            await reaction.message.channel.send(profilePic)
+                            await reaction.message.channel.send(player_emoji_dic[str(reaction.emoji)]+ " is a " +r+ "!")
+                    
+                    campCounsellorsCheckedIn.append(user.name)
+                    break
+        
         if all(elem in campCounsellorsCheckedIn for elem in camp_counselor_list_names):
-            print("im breaking out")
             break
 
 ################ START GAME ######################
@@ -420,7 +407,6 @@ async def reset_roles(ctx):
                     "**If 7 or more players:**\t2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 2 or more campers")
 
 
-
 @bot.event
 async def on_reaction_add(reaction, user):
     # make sure this is in DMs
@@ -457,9 +443,13 @@ async def win_conditions(ctx, eliminated):
             win_roles.append("Campers")
             for player in camper_list:
                 winners.append(player.name)
+            for player in camp_counselor_list:
+                winners.append(player.name)
+            for player in best_friend_list:
+                winners.apend(player.name)
             break
-        #if wannabe voted
-        elif player.role == "Wannabe" or player.role == "Camper":
+        #if wannabe or camper voted
+        elif player.role == "Wannabe" or player.role == "Camper" or player.role == "Best Friend" or player.role == "Camp Counsellor":
             # If wannabes exist
             if wannabe_list:
                 win_roles.append("Wannabe")
@@ -476,6 +466,14 @@ async def win_conditions(ctx, eliminated):
         color = discord.Color.red()
     )
     await ctx.send(embed = embed)
-    
+
+###################### REVEAL LOGIC ######################
+async def reveal_roles(ctx):
+    # camper
+    # camp counsellor
+    # best friend
+    # werewolves
+    # wannabe
+    # introvert    
 
 bot.run(TOKEN)
