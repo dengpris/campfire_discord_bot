@@ -366,9 +366,17 @@ async def send_role(game,ctx):
                 for p in game.players:
                     if p.name==player_emoji_dic[str(reaction.emoji)]:
                         r=p.role
+                
 
-                await reaction.message.channel.send(player_emoji_dic[str(reaction.emoji)]+ " is a " +r+ "!")
+                for p in userlist:
+                    if p.name==player_emoji_dic[str(reaction.emoji)]:
+                        profilePic=p.avatar_url
+                        await reaction.message.channel.send(profilePic)
+                        await reaction.message.channel.send(player_emoji_dic[str(reaction.emoji)]+ " is a " +r+ "!")
+                
+                
                 campCounsellorsCheckedIn.append(user.name)
+                break
 
         camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
         print("========")
