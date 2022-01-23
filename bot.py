@@ -6,6 +6,7 @@ import random
 import asyncio
 from tabnanny import check
 import roles
+import sys
 
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -167,72 +168,73 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
         CUSTOM_ROLES = False
 
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
+    while(BOT_RUNNING):
+        while(GAME_RUNNING):
+            print('Game Start!')
+            nameList=[member.name for member in userlist]
+            print(nameList)
 
-    nameList=[member.name for member in userlist]
-    print(nameList)
+            #number of players
+            num_players = len(nameList)
+            await show_current_roles(ctx, num_players,custom_roles)
 
-    #number of players
-    num_players = len(nameList)
-    await show_current_roles(ctx, num_players,custom_roles)
+            roles_dictionary = NUM_OF_EACH_ROLE
+            custom_roles = CUSTOM_ROLES
+            game=roles.GameState(nameList, roles_dictionary, True, custom_roles=custom_roles)
+            # game.set_random_roles()
 
-    roles_dictionary = NUM_OF_EACH_ROLE
-    custom_roles = CUSTOM_ROLES
-    game=roles.GameState(nameList, roles_dictionary, True, custom_roles=custom_roles)
-    # game.set_random_roles()
+            await send_role(game,ctx)
+            print(game.players)
+            print("printing game object")
+            print(game)
+            #night time timer
+            await timer(ctx, 0, 5)
+            await ctx.send("Werewolf list")
+            await ctx.send(werewolf_list)
+            # ensure camp Counselor made choices (if applicalble)
 
-    await send_role(game,ctx)
-    print(game.players)
-    print("printing game object")
-    print(game)
-    #night time timer
-    await timer(ctx, 0, 5)
-    await ctx.send("Werewolf list")
-    await ctx.send(werewolf_list)
-    # ensure camp Counselor made choices (if applicalble)
+            # dm player to remind role and to vote
 
-    # dm player to remind role and to vote
+            embed = create_poll(userlist, poll_list)
+            #member = ctx.message.author
+            for user in userlist:
+                if user.bot == False: # do not send messages to yourself
+                    channel = await user.create_dm()
+                    message = await channel.send(embed=embed)
 
-    embed = create_poll(userlist, poll_list)
-    #member = ctx.message.author
-    for user in userlist:
-        if user.bot == False: # do not send messages to yourself
-            channel = await user.create_dm()
-            message = await channel.send(embed=embed)
-            channel_list.append(channel)
+                # add reactions
+                    i=0
+                    while i<len(userlist):
+                        await message.add_reaction(unicode_letters[i])
+                        i = i+1
+            # start day time timer
+            await timer(ctx, 0, 5)
 
-        # add reactions
-            i=0
-            while i<len(userlist):
-                await message.add_reaction(unicode_letters[i])
-                i = i+1
-    # start day time timer
-    await timer(ctx, 0, 5)
+            #players vote on werewolfs
+            poll_list.sort(key=lambda x: x.votes, reverse=True)
+            
+            eliminated = []
+            highest_votes = poll_list[0].votes
+            print(f"highest votes {highest_votes}")
+            for poll in poll_list:     
+                if poll.votes == highest_votes:
+                    print(poll.user)
+                    for player in player_list:
+                        elim_player = player.find_player(poll.user)
+                        if elim_player:
+                            eliminated.append(elim_player)
+                else:
+                    break
 
-    #players vote on werewolfs
-    poll_list.sort(key=lambda x: x.votes, reverse=True)
-    
-    eliminated = []
-    highest_votes = poll_list[0].votes
-    print(f"highest votes {highest_votes}")
-    for poll in poll_list:     
-        if poll.votes == highest_votes:
-            print(poll.user)
-            for player in player_list:
-                elim_player = player.find_player(poll.user)
-                if elim_player:
-                    eliminated.append(elim_player)
-        else:
-            break
+            for player in eliminated:
+                await ctx.send(f"{player.name} has been voted out with {highest_votes} votes.")
 
-    for player in eliminated:
-        await ctx.send(f"{player.name} has been voted out with {highest_votes} votes.")
+            await win_conditions(ctx, eliminated)
 
-    await win_conditions(ctx, eliminated)
+        #timer ends, initialze vote
+        #player_booted, num_votes = game.tally_votes()
 
-    #timer ends, initialze vote
-    #player_booted, num_votes = game.tally_votes()
-
-    #determine winners
+        #determine winners
 
 ################ ROLE HANDOUT TO DMS ######################
 async def send_role(game,ctx):
@@ -365,23 +367,42 @@ async def send_role(game,ctx):
 
 ################ START GAME ######################
 @bot.command(name='start', help='start the game')
-async def reactlist(ctx):
+async def start(ctx):
+    global GAME_RUNNING
+    if(GAME_RUNNING == False):
+        GAME_RUNNING = True
+        # Send message React to Join Game then adds a check emoji
+        message = await ctx.send("React to join game!")
+        await message.add_reaction('✅')
 
-    # Send message React to Join Game then adds a check emoji
-    message = await ctx.send("React to join game!")
-    await message.add_reaction('✅')
+        # Waits 5 seconds for people to react
+        await asyncio.sleep(5)
+        message = await ctx.channel.fetch_message(message.id)
+        reaction = message.reactions[0] # checkmark reactions only
+        
+        async for user in reaction.users():
+                userlist.append(user)
+                await ctx.send(user.name) 
+        userlist.pop(0)
+        await gameLogic(ctx, 1, 1, CUSTOM_ROLES)
+    else:
+        await ctx.send("The game is running already! Type !reset if you want to restart the game.")
 
-    # Waits 5 seconds for people to react
-    await asyncio.sleep(5)
-    message = await ctx.channel.fetch_message(message.id)
-    reaction = message.reactions[0] # checkmark reactions only
-    
-    async for user in reaction.users():
-            userlist.append(user)
-            await ctx.send(user.name) 
-    userlist.pop(0)
-    await gameLogic(ctx, 1, 1, CUSTOM_ROLES)
+@bot.command(name="reset", help='reset bot')
+async def reset_bot(ctx):
+    global GAME_RUNNING
+    userlist.clear()
+    poll_list.clear()
+    player_list.clear()
+    werewolf_list.clear()
+    camper_list.clear()
+    wannabe_list.clear()
+    introvert_list.clear()
+    best_friend_list.clear()
+    camp_counselor_list.clear()
 
+    GAME_RUNNING = False
+    await ctx.send("Resetting!")
 
 ################ ROLE SETTINGS ######################
 # Set the Settings for number of roles
