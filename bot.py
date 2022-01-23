@@ -34,7 +34,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 
 ####### GLOBAL VARIABLES #########
@@ -162,12 +162,12 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
 
         print("WE'RE HERE!!!! ")
         set_start_settings(custom_role_numbers)
-        await ctx.send("DONE CUSTOM")
+        await see_settings_roles(ctx)
 
     else:
         await ctx.send("Alright! Let the Games BEGIN!!!")
-
-
+        global CUSTOM_ROLES
+        CUSTOM_ROLES = False
 
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
@@ -179,6 +179,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     await show_current_roles(ctx, num_players,custom_roles)
 
     roles_dictionary = NUM_OF_EACH_ROLE
+    custom_roles = CUSTOM_ROLES
     game=roles.GameState(nameList, roles_dictionary, custom_roles=custom_roles)
     # game.set_random_roles()
 
@@ -377,7 +378,7 @@ async def see_settings_roles(ctx):
                     "\t**Pairs of BFFs:** " + str(NUM_OF_EACH_ROLE["bffpair"]) + "\t**Campers:** " + str(NUM_OF_EACH_ROLE["Camper"]))
 
 @bot.command(name="reset_roles", help='reset the roles to have default values')
-async def see_settings_roles(ctx):
+async def reset_roles(ctx):
     #await ctx.send("HERE")
     global CUSTOM_ROLES
     CUSTOM_ROLES = False
