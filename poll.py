@@ -6,7 +6,6 @@ class poll:
     def __init__(self, user, emoji, votes=0):
         self.user = user
         self.emoji = emoji
-        # self.voted = False
         self.votes = votes
 
     def get_data(self):
@@ -17,7 +16,6 @@ class poll:
             return self.user
         else:
             return None
-
 
 def create_poll(userlist, poll_list):
     embed = discord.Embed(
@@ -38,4 +36,3 @@ def create_poll(userlist, poll_list):
     
     embed.add_field(name = "Options", value = value)
     return embed
-

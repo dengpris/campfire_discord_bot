@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 
 from poll import *
 
+
 #GLOBAL VARIABLES
 NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Councellor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
 CUSTOM_ROLES = False
@@ -20,8 +21,21 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='~', intents=intents)
 
+####### GLOBAL VARIABLES #########
+channel_list=[]
+userlist=[]
+poll_list=[]
+player_list=[]
+werewolf_list = []
+camper_list = []
+wannabe_list = []
+introvert_list = []
+best_friend_list = []
+camp_counselor_list = []
+
+#################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
 async def timer(ctx, minutes, seconds=0):
     try:
@@ -69,33 +83,61 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     print("printing game object")
     print(game)
     #night time timer
-    await timer(ctx, 0, 30)
+    await timer(ctx, 0, 5)
 
     # ensure camp councellor made choices (if applicalble)
 
     # dm player to remind role and to vote
 
+    embed = create_poll(userlist, poll_list)
+    #member = ctx.message.author
+    for user in userlist:
+        if user.bot == False: # do not send messages to yourself
+            channel = await user.create_dm()
+            message = await channel.send(embed=embed)
+            channel_list.append(channel)
+
+        # add reactions
+            i=0
+            while i<len(userlist):
+                await message.add_reaction(unicode_letters[i])
+                i = i+1
     # start day time timer
-    await timer(ctx, minutes, seconds)
+    await timer(ctx, 0, 5)
 
     #players vote on werewolfs
+    poll_list.sort(key=lambda x: x.votes, reverse=True)
+    
+    eliminated = []
+    highest_votes = poll_list[0].votes
+    print(f"highest votes {highest_votes}")
+    for poll in poll_list:     
+        if poll.votes == highest_votes:
+            print(poll.user)
+            for player in player_list:
+                elim_player = player.find_player(poll.user)
+                if elim_player:
+                    eliminated.append(elim_player)
+        else:
+            break
+
+    for player in eliminated:
+        await ctx.send(f"{player.name} has been voted out with {highest_votes} votes.")
+
+    await win_conditions(ctx, eliminated)
 
     #timer ends, initialze vote
-    player_booted, num_votes = game.tally_votes()
+    #player_booted, num_votes = game.tally_votes()
 
     #determine winners
     
 async def send_role(game,ctx):
-    werewolf_list = []
-    camper_list = []
-    wannabe_list = []
-    introvert_list = []
-    best_friend_list = []
-    camp_counselor_list = []
+
 
     for player in game.players:
+        player_list.append(roles.Player(player.name, player.get_role_info()))
         print(player.name + " "+ player.get_role_info())
-        if player.get_role_info() == "Werewolf":
+        if player.get_role_info() == "Werewolf": 
             for user in userlist:
                 if user.name == player.name:
                     werewolf_list.append(user)
@@ -141,29 +183,6 @@ async def send_role(game,ctx):
             msg = await channel.send(embed=embed)
             await ctx.send("Your role has been sent %s!" %wannabe.name)
     
-    
-
-################# JOIN FUNCTIONS ##################
-userlist=[]
-poll_list=[]
-
-@bot.command(name='join', help='returns list of people who joined')
-async def addlist(ctx):
-    member = ctx.message.author.id
-    userlist.append(member)
-    await ctx.send("<@" + str(member) + ">" + ", you've joined the game!")
-
-@bot.command(name='unjoin', help='unjoin the game')
-async def removelist(ctx):
-    member = ctx.message.author.id
-    userlist.remove(member)
-    await ctx.send("<@" + str(member) + ">" + ", you've left the game!")
-
-#@bot.command(name='players', help='current players')
-#async def printlist(ctx):
-#    await ctx.send("Players: ")
-#    for member in userlist:
-#        await ctx.send("<@" + str(member) + ">")
 
 ################ START GAME ######################
 @bot.command(name='start', help='start the game')
@@ -181,7 +200,9 @@ async def reactlist(ctx):
     async for user in reaction.users():
             userlist.append(user)
             await ctx.send(user.name) 
+    userlist.pop(0)
     await gameLogic(ctx, 1, 1, CUSTOM_ROLES)
+
 
 ################ ROLE SETTINGS ######################
 # Set the Settings for number of roles
@@ -244,62 +265,18 @@ async def see_settings_roles(ctx):
     NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Councellor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
     await ctx.send("Roles have been reset to default values")
 
-################ TESTING POLL ###################
-channel_list=[]
-@bot.command(name='poll')
-async def poll_test(ctx):
-    # vote_list = []
-    # for user in userlist:
-    #     vote_list.append(poll(user.name, 0))
-
-    embed = create_poll(userlist, poll_list)
-    #member = ctx.message.author
-    userlist.pop(0)
-    for user in userlist:
-        if user.bot == False: # do not send messages to yourself
-            channel = await user.create_dm()
-            message = await channel.send(embed=embed)
-            channel_list.append(channel)
-
-        # add reactions
-            i=0
-            while i<len(userlist):
-                await message.add_reaction(unicode_letters[i])
-                i = i+1
-
-@bot.command(name='tally')
-async def tally_votes(ctx):
-    poll_list.sort(key=lambda x: x.votes, reverse=True)
-    
-    eliminated = poll_list[0].user
-    eliminated_2 = poll_list[1].user
-    number = poll_list[0].votes
-    
-    for poll in poll_list:
-        print(poll.votes)
-    
-    if (poll_list[0].votes == poll_list[1].votes):
-        message = await ctx.send(f"Members: {eliminated}, {eliminated_2} have been voted out with {number} votes.")
-    else:
-        message = await ctx.send(f"Member: {eliminated} has been voted out with {number}.")
-
-        
+############# DM REACTION LOGIC #################    
 @bot.event
 async def on_reaction_add(reaction, user):
+    # make sure this is in DMs
     if not isinstance(reaction.message.channel, discord.DMChannel): return
-    #channel = await user.create_dm()
-    # reactions cannot be removed in DMs
-    # for reacts in reaction.message.reactions:
-    #     # do not delete if made by bot or if emoji was just created
-    #     if (user in await reacts.users().flatten() and not user.bot and str(reacts) != str(reaction.emoji)):
-    #         await message.remove_reaction(reaction, user)
+
     for poll in poll_list:
         name = poll.get_name_from_emoji(reaction.emoji)
         if (name): 
             await user.send("You are now voting for: " + reaction.emoji + " " + name)
             poll.votes = poll.votes+1
             print(poll.votes)
-
 
 @bot.event
 async def on_reaction_remove(reaction, user):
@@ -309,6 +286,9 @@ async def on_reaction_remove(reaction, user):
         if (name): 
             await user.send("You are no longer voting for: " + reaction.emoji + " " + name)
             poll.votes = poll.votes-1
+
+
+############################
 
 @bot.command(name='dmintrovert', help='send dm to introvert')
 async def printlist(ctx):
@@ -459,8 +439,6 @@ def create_camp_counsellor_msg(userlist):
     return embed
 
 def create_camp_counsellor_choice(userlist):
-    
-
     embed = discord.Embed(
         title = "You are a Camp Counsellor!",
         description = "You will have a good trip if you get rid of any werewolves and don't accidentally get rid of camper. Luckily, you have extra privileges and can figure out who one camper is or who two of the missing ones were.\n\n",
@@ -475,17 +453,40 @@ async def printlist(ctx):
     for user in userlist:
         await ctx.send(user.name)
 
-################# DIRECT MESSAGE FUNCTIONS ##################
+#################### WIN CONDITIONS LOGIC ###################
+async def win_conditions(ctx, eliminated):
+    winners = []
+    win_roles = []
+    for player in eliminated:
+        # if introvert is voted, everyone auto loses except introvert
+        if player.role == "Introvert":
+            win_roles.append("Introvert")
+            winners.append(introvert_list[0].name)
+            break
+        #if werewolf is voted, all campers win
+        elif player.role == "Werewolf":
+            win_roles.append("Campers")
+            for player in camper_list:
+                winners.append(player.name)
+            break
+        #if wannabe voted
+        elif player.role == "Wannabe" or player.role == "Camper":
+            # If wannabes exist
+            if wannabe_list:
+                win_roles.append("Wannabe")
+                winners.append(wannabe_list[0].name)
+            # If werewolves exist
+            if werewolf_list:
+                win_roles.append("Werewolf")
+                for player in werewolf_list:
+                    winners.append(player.name)
 
-#Direct messages the list of mentions in message.
-mentionlist = []
-@bot.command(name='dm', help='direct message mentions')
-async def on_message(ctx):
-    if 'dm' in ctx.message.content:
-        mentionlist = ctx.message.mentions
-        await ctx.message.channel.send("A DM has been sent to your inboxes!")
-        for mention in mentionlist:
-            await mention.send("Hi! I'm here!")
-
+    embed = discord.Embed(
+        title = (f"Winners: {winners}"),
+        description = (f"The {win_roles} has/have won! Congratulations!"),
+        color = discord.Color.red()
+    )
+    await ctx.send(embed = embed)
+    
 
 bot.run(TOKEN)
