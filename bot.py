@@ -3,16 +3,18 @@ import os
 from pickle import FALSE
 import random
 import asyncio
+from tabnanny import check
 import roles
 
 from discord.ext import commands
 from dotenv import load_dotenv
+from discord.utils import get
 
 from poll import *
 
 
 #GLOBAL VARIABLES
-NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Councellor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
+NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
 CUSTOM_ROLES = False
 
 load_dotenv()
@@ -21,7 +23,8 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='~', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
+
 
 ####### GLOBAL VARIABLES #########
 channel_list=[]
@@ -85,7 +88,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     #night time timer
     await timer(ctx, 0, 5)
 
-    # ensure camp councellor made choices (if applicalble)
+    # ensure camp Counselor made choices (if applicalble)
 
     # dm player to remind role and to vote
 
@@ -174,7 +177,7 @@ async def send_role(game,ctx):
         if not werewolf.bot:
             channel = await werewolf.create_dm()
             msg = await channel.send(embed=embed)
-            await ctx.send("Your role has been sent %s!" %werewolf.name)
+            await ctx.send("Your role has been sent %s!" %werewolf.name)    
 
     for wannabe in wannabe_list:
         embed = create_wannabe_msg(werewolf_list)
@@ -182,6 +185,21 @@ async def send_role(game,ctx):
             channel = await wannabe.create_dm()
             msg = await channel.send(embed=embed)
             await ctx.send("Your role has been sent %s!" %wannabe.name)
+    
+    for introvert in introvert_list:
+        embed = create_introvert_msg()
+        if not introvert.bot:
+            channel = await introvert.create_dm()
+            msg = await channel.send(embed=embed)
+            await ctx.send("Your role has been sent %s!" %introvert.name)
+
+    for best_friend in best_friend_list:
+        embed = create_best_friend_msg(best_friend_list)
+        if not best_friend.bot:
+            channel = await best_friend.create_dm()
+            msg = await channel.send(embed=embed)
+            await ctx.send("Your role has been sent %s!" %best_friend.name)
+    
     
 
 ################ START GAME ######################
@@ -207,19 +225,19 @@ async def reactlist(ctx):
 ################ ROLE SETTINGS ######################
 # Set the Settings for number of roles
 # Note has a writing error if number error is not at the end
-@bot.command(name="settings")
+@bot.command(name="settings", help='Set a custom number of each role, run !settings to see usage')
 async def set_settings(ctx, *args):
 
-    list_of_roles = ["Werewolf", "Camp Councellor", "Wannabe", "Introvert", "bffpair","Camper"]
-    number_of_each_role =  {"Werewolf":0, "Camp Councellor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
+    list_of_roles = ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
+    number_of_each_role =  {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
     
     def check(message):
          return message.author == ctx.author and message.channel == ctx.channel
 
     if len(args) !=6 :
         await ctx.send("You need **6** arguments. Please enter 6 numbers, each will correspond to the number of each roles to be used during the game\n"
-                        + "Do `$settings <num of werewolf> <num of councellor> <num of wannabe> <num of introverts> <num of bffpair> <num of camper>`\n"
-                        + "For example: **$settings 1 1 0 0 1 3** for 1 werewolf, 1 councellor, 0 wannabes, 0 introverts, 1 pair of bffs(ie 2 players can have this role), 3 campers. ")
+                        + "Do `$settings <num of werewolf> <num of Counselor> <num of wannabe> <num of introverts> <num of bffpair> <num of camper>`\n"
+                        + "For example: **$settings 1 1 0 0 1 3** for 1 werewolf, 1 Counselor, 0 wannabes, 0 introverts, 1 pair of bffs(ie 2 players can have this role), 3 campers. ")
         raise BaseException
     
     NOT_A_NUMBER = 1
@@ -239,7 +257,7 @@ async def set_settings(ctx, *args):
                 break
 
     await ctx.send(f"Set settings successfully.\n" + 
-                    "**Werewolves:** " + str(number_of_each_role["Werewolf"]) + "\t**CampCounsellor:** " + str(number_of_each_role["Camp Councellor"]) +
+                    "**Werewolves:** " + str(number_of_each_role["Werewolf"]) + "\t**CampCounsellor:** " + str(number_of_each_role["Camp Counselor"]) +
                     "\t**Wannabe:** "+ str(number_of_each_role["Wannabe"]) + "\t**Introvert:** " + str(number_of_each_role["Introvert"]) + "\t**Pairs of BFFs:** " + str(number_of_each_role["bffpair"]) +
                     "\t**Campers:** " + str(number_of_each_role["Camper"]))
     print(f"New role lmits are: {number_of_each_role}")
@@ -248,22 +266,25 @@ async def set_settings(ctx, *args):
     global CUSTOM_ROLES
     CUSTOM_ROLES = True
 
-@bot.command(name="see_roles")
+@bot.command(name="see_roles", help='see current custom role number settings (note that default will set all to 0)')
 async def see_settings_roles(ctx):
     #await ctx.send("HERE")
     await ctx.send("Current Number of Each Role: \n" + 
-                    "**Werewolves:** " + str(NUM_OF_EACH_ROLE["Werewolf"]) + "\t**CampCounsellor:** " + str(NUM_OF_EACH_ROLE["Camp Councellor"]) +
+                    "**Werewolves:** " + str(NUM_OF_EACH_ROLE["Werewolf"]) + "\t**CampCounsellor:** " + str(NUM_OF_EACH_ROLE["Camp Counselor"]) +
                     "\t**Wannabe:** "+ str(NUM_OF_EACH_ROLE["Wannabe"]) + "\t**Introvert:** " + str(NUM_OF_EACH_ROLE["Introvert"]) + 
                     "\t**Pairs of BFFs:** " + str(NUM_OF_EACH_ROLE["bffpair"]) + "\t**Campers:** " + str(NUM_OF_EACH_ROLE["Camper"]))
 
-@bot.command(name="reset_roles")
+@bot.command(name="reset_roles", help='reset the roles to have default values')
 async def see_settings_roles(ctx):
     #await ctx.send("HERE")
     global CUSTOM_ROLES
     CUSTOM_ROLES = False
     global NUM_OF_EACH_ROLE
-    NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Councellor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
-    await ctx.send("Roles have been reset to default values")
+    NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
+    await ctx.send("**ROLES HAVE BEEN RESET TO DEFAULT VALUES**.\n" +
+                    "**If less than or equal to 5 players:** 1 werewolf, 4 or less campers.\n" + 
+                    "**If 6 players:** 2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 1 camper\n" + 
+                    "**If 7 or more players:**  2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 2 or more campers")
 
 ############# DM REACTION LOGIC #################    
 @bot.event
@@ -351,26 +372,34 @@ async def printlist(ctx):
     # userlist.pop(0)
     embed = create_camp_counsellor_msg(userlist)
     for cc in userlist:
-        channel = await cc.create_dm()
-        msg = await channel.send(embed=embed)
-        await ctx.send("Your role has been sent %s" %cc.name)
-        message = await channel.send(embed=embed)
+        if not cc.bot:
+            channel = await cc.create_dm()
+            await ctx.send("Your role has been sent %s" %cc.name)
 
-        
-        await message.add_reaction(unicode_letters[0])
-        await message.add_reaction(unicode_letters[1])
+            embed.add_field(name = "Options", value = unicode_letters[0] + " Choose a person to expose their role\n"+unicode_letters[1]+" Find out two roles that are not in the camp\n")
+            message = await channel.send(embed=embed)
+            await message.add_reaction(unicode_letters[0])
+            await message.add_reaction(unicode_letters[1])
 
-        message = await channel.fetch_message(message.id)
+            message = await channel.fetch_message(message.id)
 
-        print("==================================")
-        print(message)
+            reaction, user = await bot.wait_for('reaction_add', timeout=1.0, check=check)
 
-        await on_reaction_choose(ctx)
-        # print(message.count)
-        # if(message.reaction[0].count > message.reaction[1].count):
-        #     print(message.reaction[0].count) 
-        #     print(message.reaction[1].count)
-
+            reactionTest=get(message.reactions, emoji=unicode_letters[0])
+            reactionTest2=get(message.reactions, emoji=unicode_letters[1])
+            print(reactionTest.count)
+            print(reactionTest2.count)
+            print("==================================")
+            print(str(message.reactions[0]))
+            print(str(message.reactions[1]))
+            if(message.reactions[0].count > message.reactions[1].count):
+                print(str(message.reactions[0]))
+                print(str(message.reactions[1]))
+                print("A better")
+            elif (message.reactions[0].count < message.reactions[1].count):
+                print(str(message.reactions[0]))
+                print(str(message.reactions[1].count))
+                print("B better")
 def create_camper_msg():
     embed = discord.Embed(
         title = "You are a Camper!",
@@ -384,9 +413,17 @@ def create_werewolf_msg(wolf_list):
     names = []
     delimeter = '\n'
     for wolf in wolf_list:
-        names.append(wolf.name)
+        if wolf.bot:
+            continue
+        else:
+            names.append(wolf.name)
     list_wolves = delimeter.join(names)
-    werewolf_str = "Your fellow wolves are:\n" + list_wolves
+
+    if list_wolves:
+        werewolf_str = "Your fellow wolves are:\n" + list_wolves
+    else:
+        werewolf_str = "Unfortunately, you have no fellow wolves with you... You're on your own!"
+
     embed = discord.Embed(
         title = "You are a Werewolf!",
         description = "You will have a good trip as long as no one from your misunderstood wolf pack gets kicked out.\n\n" + werewolf_str,
@@ -404,8 +441,21 @@ def create_introvert_msg():
     embed.set_image(url='https://i.imgur.com/UFh7Xsp.jpg')
     return embed
 
-def create_best_friend_msg(userlist):
-    best_friend_str = "Your fellow wolf is %s." %userlist[-1]
+def create_best_friend_msg(bestie_list):
+    names = []
+    delimeter = '\n'
+    for bestie in bestie_list:
+        if bestie.bot:
+            continue
+        else:
+            names.append(bestie.name)
+    list_besties = delimeter.join(names)
+
+    if list_besties:
+        best_friend_str = "The best friends are:\n" + list_besties
+    else:
+        best_friend_str = "Unfortunately, your best friend isn't here with you... Try making some friends with the campers!"
+
     embed = discord.Embed(
         title = "You are a Best Friend!",
         description = "You will have a good time at camp if you get rid of any werewolves and don't accidentally get rid of your best friend - who you know isn't a werewolf.\n\n""" + best_friend_str,
@@ -418,9 +468,16 @@ def create_wannabe_msg(wolf_list):
     names = []
     delimeter = '\n'
     for wolf in wolf_list:
-        names.append(wolf.name)
+        if wolf.bot:
+            continue
+        else:
+            names.append(wolf.name)
     list_wolves = delimeter.join(names)
-    werewolf_str = "Your fellow wolves are:\n" + list_wolves
+
+    if list_wolves:
+        werewolf_str = "Your fellow wolves are:\n" + list_wolves
+    else:
+        werewolf_str = "Unfortunately, you have no fellow wolves to cover for... You're on your own!"
     embed = discord.Embed(
         title = "You are a Wannabe!",
         description = "You really want the werewolves to like you... even though they don't know who you are. Your goal is for none of them to get kicked out, even if that means you have to go instead.\n\n" + werewolf_str,

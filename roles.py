@@ -83,16 +83,20 @@ class GameState:
         # If best friends is a role, replace with bff_1 or bff_2
         # Make sure only bestfriends know each other (only pairs know each other)
         if custom_role_dict["bffpair"] != 0:
-            picked_roles.remove('bffpair')
-            picked_roles.append("bff_1")
-            picked_roles.append("bff_2")
+            #picked_roles.remove('bffpair')
+            #picked_roles.append("bff_1")
+            #picked_roles.append("bff_2")
             num_bff_pairs = custom_role_dict["bffpair"]
             custom_role_dict.pop("bffpair")
             new_bff_roles = {'bff_1': num_bff_pairs, 'bff_2': num_bff_pairs}
             custom_role_dict.update(new_bff_roles)
 
-        # If camp councellor is one of the roles, make sure theres 3 extra roles.
-            
+        # If camp Counselor is one of the roles, make sure theres 3 extra roles.
+        
+        #if custom_role_dict["Camp Counselor"] != 0:
+        #    if self.num_players < len(players_roles):
+
+
         for role in custom_role_dict:
                 num_of_each_role_available = custom_role_dict[role]
                 while num_of_each_role_available != 0:
@@ -101,7 +105,7 @@ class GameState:
 
         random.shuffle(players_roles)
 
-        # If number of roles > number of players, remove excess roles
+        # If number of players < number of roles, remove excess roles
         if self.num_players < len(players_roles):
             n = len(players_roles) - self.num_players
             players_roles = players_roles[:len(players_roles)-n]
@@ -137,7 +141,7 @@ class GameState:
         #If more than num of players and we want more roles:
         if self.num_players>5 and extra_roles:
             # Minimum required amount of each role for MORE THAN 5 players
-            role_min_limits = {"Werewolf":2, "Camp Councellor":1, "Wannabe":1, "Introvert":1, "bff_1":0, "bff_2":0, "Camper":0}
+            role_min_limits = {"Werewolf":2, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bff_1":0, "bff_2":0, "Camper":0}
             picked_roles=role_min_limits.keys()
             
             # Assign roles based on number of players (based on only 5 or 6 or 7=<); remove 5 players to account for the minimum required amount of players
