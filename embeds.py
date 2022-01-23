@@ -1,5 +1,7 @@
 # embeds.py
 import discord
+from globalvar import *
+
 # all functions to create embeds go here
 def create_welcome_camper_msg(role_list):
     embed = discord.Embed(
@@ -120,13 +122,4 @@ def create_wannabe_msg(wolf_list):
         color = discord.Color.red()
     )
     embed.set_image(url='https://i.imgur.com/XZSDOEU.jpg')
-    return embed
-
-def create_welcome_camper_msg(role_list):
-    embed = discord.Embed(
-       title = "Welcome to the CAMP!",
-        description = "These are the list of roles!\n\n **Note:** Not all roles may be used during this game session!\n\n" + role_list,
-        color = discord.Color.blue()
-    )
-    embed.set_image(url='https://i.imgur.com/OPCZSjx.png')
     return embed

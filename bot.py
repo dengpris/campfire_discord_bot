@@ -13,10 +13,7 @@ from discord.utils import get
 
 from poll import *
 from embeds import *
-
-#GLOBAL VARIABLES
-NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
-CUSTOM_ROLES = False
+from globalvar import *
 
 #Default MAXIMUM role values per each number (Note cannot play with 3 players or less)
 DEFAULT_ROLE_VALUES = {  "3": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":2},
@@ -56,19 +53,6 @@ intents.members = True
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-
-####### GLOBAL VARIABLES #########
-unicode_letters = ["🇦", "🇧", "🇨", "🇩", "🇪", "🇫", "🇬", "🇭", "🇮"]
-channel_list=[]
-userlist=[]
-poll_list=[]
-player_list=[]
-werewolf_list = []
-camper_list = []
-wannabe_list = []
-introvert_list = []
-best_friend_list = []
-camp_counselor_list = []
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
