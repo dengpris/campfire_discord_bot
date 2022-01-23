@@ -90,7 +90,8 @@ async def send_role(game,ctx):
     camper_list = []
     wannabe_list = []
     introvert_list = []
-    best_friend_list = []
+    best_friend1_list = []
+    best_friend2_list = []
     camp_counselor_list = []
 
     for player in game.players:
@@ -113,8 +114,10 @@ async def send_role(game,ctx):
                     introvert_list.append(user)
         elif (player.get_role_info() == "bff_1" or player.get_role_info() == "bff_2"):
             for user in userlist:
-                if user.name == player.name:
-                    best_friend_list.append(user)
+                if (user.name == player.name and player.get_role_info() == "bff_1"):
+                    best_friend1_list.append(user)
+                else:
+                    best_friend2_list.append(user)
         else: #camp_counselor
             for user in userlist:
                 if user.name == player.name:
@@ -132,7 +135,7 @@ async def send_role(game,ctx):
         if not werewolf.bot:
             channel = await werewolf.create_dm()
             msg = await channel.send(embed=embed)
-            await ctx.send("Your role has been sent %s!" %werewolf.name)
+            await ctx.send("Your role has been sent %s!" %werewolf.name)    
 
     for wannabe in wannabe_list:
         embed = create_wannabe_msg(werewolf_list)
@@ -140,6 +143,27 @@ async def send_role(game,ctx):
             channel = await wannabe.create_dm()
             msg = await channel.send(embed=embed)
             await ctx.send("Your role has been sent %s!" %wannabe.name)
+    
+    for introvert in introvert_list:
+        embed = create_introvert_msg()
+        if not introvert.bot:
+            channel = await introvert.create_dm()
+            msg = await channel.send(embed=embed)
+            await ctx.send("Your role has been sent %s!" %introvert.name)
+
+    for best_friend in best_friend1_list:
+        embed = create_best_friend_msg(best_friend2_list)
+        if not best_friend.bot:
+            channel = await best_friend.create_dm()
+            msg = await channel.send(embed=embed)
+            await ctx.send("Your role has been sent %s!" %best_friend.name)
+
+    for best_friend in best_friend2_list:
+        embed = create_best_friend_msg(best_friend1_list)
+        if not best_friend.bot:
+            channel = await best_friend.create_dm()
+            msg = await channel.send(embed=embed)
+            await ctx.send("Your role has been sent %s!" %best_friend.name)
     
     
 
@@ -404,9 +428,17 @@ def create_werewolf_msg(wolf_list):
     names = []
     delimeter = '\n'
     for wolf in wolf_list:
-        names.append(wolf.name)
+        if wolf.bot:
+            continue
+        else:
+            names.append(wolf.name)
     list_wolves = delimeter.join(names)
-    werewolf_str = "Your fellow wolves are:\n" + list_wolves
+
+    if list_wolves:
+        werewolf_str = "Your fellow wolves are:\n" + list_wolves
+    else:
+        werewolf_str = "Unfortunately, you have no fellow wolves with you... You're on your own!"
+
     embed = discord.Embed(
         title = "You are a Werewolf!",
         description = "You will have a good trip as long as no one from your misunderstood wolf pack gets kicked out.\n\n" + werewolf_str,
@@ -424,8 +456,21 @@ def create_introvert_msg():
     embed.set_image(url='https://i.imgur.com/UFh7Xsp.jpg')
     return embed
 
-def create_best_friend_msg(userlist):
-    best_friend_str = "Your fellow wolf is %s." %userlist[-1]
+def create_best_friend_msg(bestie_list):
+    names = []
+    delimeter = '\n'
+    for bestie in bestie_list:
+        if bestie.bot:
+            continue
+        else:
+            names.append(bestie.name)
+    list_besties = delimeter.join(names)
+
+    if list_besties:
+        best_friend_str = "Your fellow best friend is:\n" + list_besties
+    else:
+        best_friend_str = "Unfortunately, your best friend isn't here with you... Try making some friends with the campers!"
+
     embed = discord.Embed(
         title = "You are a Best Friend!",
         description = "You will have a good time at camp if you get rid of any werewolves and don't accidentally get rid of your best friend - who you know isn't a werewolf.\n\n""" + best_friend_str,
@@ -438,9 +483,16 @@ def create_wannabe_msg(wolf_list):
     names = []
     delimeter = '\n'
     for wolf in wolf_list:
-        names.append(wolf.name)
+        if wolf.bot:
+            continue
+        else:
+            names.append(wolf.name)
     list_wolves = delimeter.join(names)
-    werewolf_str = "Your fellow wolves are:\n" + list_wolves
+
+    if list_wolves:
+        werewolf_str = "Your fellow wolves are:\n" + list_wolves
+    else:
+        werewolf_str = "Unfortunately, you have no fellow wolves to cover for... You're on your own!"
     embed = discord.Embed(
         title = "You are a Wannabe!",
         description = "You really want the werewolves to like you... even though they don't know who you are. Your goal is for none of them to get kicked out, even if that means you have to go instead.\n\n" + werewolf_str,
