@@ -11,6 +11,15 @@ ROLE_INFO = {"Werewolf": {"About": "see the other werewolves","Limit": 1, "Requi
     
 }
 
+#Default MAXIMUM role values per each number (Note cannot play with 3 players or less)
+# ROLE_MAX_LIMITS = { "3": {"Werewolf":1, "Camp Counselor":0, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":2},
+#                     "4": {"Werewolf":1, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3},
+#                     "5": {"Werewolf":2, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3},
+#                     "6": {"Werewolf":2, "Camp Counselor":2, "Wannabe":1, "Introvert":1, "bffpair":1, "Camper":4},
+#                     "7": {"Werewolf":3, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":5},
+#                     "8": {"Werewolf":3, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":5},
+#                     "9": {"Werewolf":4, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":6},
+#                     "10": {"Werewolf":4, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":7}}
 
 def increment_round(self):
         self.round += 1
@@ -93,8 +102,10 @@ class GameState:
 
         # If camp Counselor is one of the roles, make sure theres 3 extra roles.
         
-        #if custom_role_dict["Camp Counselor"] != 0:
-        #    if self.num_players < len(players_roles):
+        # if custom_role_dict["Camp Counselor"] != 0:
+        #     if self.num_players < len(players_roles):
+        #         excess_roles = len(players_roles) - self.num_players 
+        #         if excess_roles < 3
 
 
         for role in custom_role_dict:

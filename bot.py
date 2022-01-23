@@ -1,4 +1,5 @@
 # bot.py
+from calendar import c
 import os
 from pickle import FALSE
 import random
@@ -17,13 +18,23 @@ from poll import *
 NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
 CUSTOM_ROLES = False
 
+#Default MAXIMUM role values per each number (Note cannot play with 3 players or less)
+ROLE_MAX_LIMITS = { "3": {"Werewolf":1, "Camp Counselor":0, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":2},
+                    "4": {"Werewolf":1, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3},
+                    "5": {"Werewolf":2, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3},
+                    "6": {"Werewolf":2, "Camp Counselor":2, "Wannabe":1, "Introvert":1, "bffpair":1, "Camper":4},
+                    "7": {"Werewolf":3, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":5},
+                    "8": {"Werewolf":3, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":5},
+                    "9": {"Werewolf":4, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":6},
+                    "10": {"Werewolf":4, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":7}}
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='~', intents=intents)
 
 
 ####### GLOBAL VARIABLES #########
@@ -72,10 +83,92 @@ async def werewolfEnd(ctx):
 
     exit()
 
+###### ASK FOR ROLE SETTINGS HERE 
+def create_welcome_camper_msg(role_list):
+    embed = discord.Embed(
+        title = "Welcome to the CAMP!",
+        description = "These are the list of roles! Note: not all roles may be used during this game session!\n\n" + role_list,
+        color = discord.Color.blue()
+    )
+    embed.set_image(url='https://i.imgur.com/OPCZSjx.png')
+    return embed
+
+def settings_usage_text():
+    return "You need **6** arguments. Please enter 6 numbers, each will correspond to the number of each roles to be used during the game\n" + "Do `<num of werewolf> <num of Counselor> <num of wannabe> <num of introverts> <num of bffpair> <num of camper>`\n" + "For example: **1 1 0 0 1 3** for 1 werewolf, 1 Counselor, 0 wannabes, 0 introverts, 1 pair of bffs(ie 2 players can have this role), 3 campers."
+
+#def set_settings(custom_role_numbers):
+#    list_of_roles = ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
+#    number_of_each_role =  {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
+    
+
+async def show_current_roles(ctx, num_players, custom_roles=False):
+    
+    # num_players = 3
+    if num_players < 3:
+        await ctx.send("Not enough players... maybe find more friends?")
+        #exit()
+    
+    if not custom_roles:
+        if num_players > 10:
+            num_players = 10
+        
+        max_num_roles = ROLE_MAX_LIMITS[str(num_players)] 
+        role_list = "Current Number of Each Role: \n" + "**Werewolves:** " + str(max_num_roles["Werewolf"]) + "\t**CampCounsellor:** " + str(max_num_roles["Camp Counselor"]) + "\t**Wannabe:** "+ str(max_num_roles["Wannabe"]) + "\t**Introvert:** " + str(max_num_roles["Introvert"]) +  "\t**Pairs of BFFs:** " + str(max_num_roles["bffpair"]) + "\t**Campers:** " + str(max_num_roles["Camper"]) +  "\nPlease remember that not all roles may be used during this game session!" 
+    
+    embed = create_welcome_camper_msg(role_list)
+    await ctx.send(embed)
+
+    # await ctx.send("Do you want to customize roles? please enter **y** or **n**")
+
+    # def check_y_n(msg):
+    #     return msg.author == ctx.author and msg.channel == ctx.channel and \
+    #     msg.content.lower() in ["y", "n"]
+
+    # def check(msg):
+    #     return msg.author == ctx.author and msg.channel == ctx.channel 
+
+    # msg = await bot.wait_for("message", check=check_y_n)
+    # if msg.content.lower() == "y":
+    #     await ctx.send("**You said yes!**\n" + settings_usage_text())
+    #     custom_role_numbers = await bot.wait_for("message",check=check)
+    #     custom_role_numbers = custom_role_numbers.content.split()
+    #     print(f"Custom_role_numbers is: {custom_role_numbers} with length {len(custom_role_numbers)}")
+    #     while len(custom_role_numbers)!=6:
+    #         await ctx.send(settings_usage_text())
+    #         custom_role_numbers = await bot.wait_for("message",check=check)
+    #         custom_role_numbers = custom_role_numbers.content.split()
+
+    #     NOT_A_NUMBER = 1
+    #     while (NOT_A_NUMBER):    
+    #         print(f"The args are: ", custom_role_numbers)
+    #         for i in range(6):
+    #             try:
+    #                 int(custom_role_numbers[i])
+    #             except ValueError:
+    #                 await ctx.send("Must be a number!")
+    #                 custom_role_numbers = await bot.wait_for("message",check=check)
+    #                 print(f'New arguments are: {custom_role_numbers.content}')
+    #                 custom_role_numbers = custom_role_numbers.content.split()
+    #                 NOT_A_NUMBER = 1
+    #                 break
+    #         NOT_A_NUMBER = 0
+
+    #     print("WE'RE HERE!!!! ")
+    #     await set_settings(ctx, custom_role_numbers)
+
+    # else:
+    #     await ctx.send("Alright! Let the Games BEGIN!!!")
+
+
+
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
     nameList=[member.name for member in userlist]
     print(nameList)
+
+    #number of players
+    num_players = len(nameList)
+    await show_current_roles(ctx, num_players,custom_roles)
 
     roles_dictionary = NUM_OF_EACH_ROLE
     game=roles.GameState(nameList, roles_dictionary, custom_roles=custom_roles)
@@ -163,6 +256,7 @@ async def send_role(game,ctx):
             for user in userlist:
                 if user.name == player.name:
                     camp_counselor_list.append(user)
+            print("kldsjkl;jsdflk;asjdflk;fasjdfk")        
 
     for camper in camper_list:
         embed = create_camper_msg()
@@ -224,6 +318,7 @@ async def reactlist(ctx):
 ################ ROLE SETTINGS ######################
 # Set the Settings for number of roles
 # Note has a writing error if number error is not at the end
+
 @bot.command(name="settings", help='Set a custom number of each role, run !settings to see usage')
 async def set_settings(ctx, *args):
 
@@ -280,12 +375,14 @@ async def see_settings_roles(ctx):
     CUSTOM_ROLES = False
     global NUM_OF_EACH_ROLE
     NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
+    ## Wrong information
     await ctx.send("**ROLES HAVE BEEN RESET TO DEFAULT VALUES**.\n" +
-                    "**If less than or equal to 5 players:** 1 werewolf, 4 or less campers.\n" + 
-                    "**If 6 players:** 2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 1 camper\n" + 
-                    "**If 7 or more players:**  2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 2 or more campers")
+                    "**If less than or equal to 5 players:**\t1 werewolf, 4 or less campers.\n" + 
+                    "**If 6 players:**\t2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 1 camper\n" + 
+                    "**If 7 or more players:**\t2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 2 or more campers")
 
-############# DM REACTION LOGIC #################    
+
+
 @bot.event
 async def on_reaction_add(reaction, user):
     # make sure this is in DMs
@@ -341,22 +438,22 @@ async def printlist(ctx):
         msg = await channel.send(embed=embed)
         await ctx.send("Your role has been sent %s" %wannabe.name)
 
-@bot.event
-async def on_reaction_choose(ctx):
-    print("herherherherehherherher")
-    if not isinstance(ctx.message.channel, discord.DMChannel): return
-    #channel = await user.create_dm()
-    # reactions cannot be removed in DMs
-    # for reacts in reaction.message.reactions:
-    #     # do not delete if made by bot or if emoji was just created
-    #     if (user in await reacts.users().flatten() and not user.bot and str(reacts) != str(reaction.emoji)):
-    #         await message.remove_reaction(reaction, user)
+# @bot.event
+# async def on_reaction_choose(ctx):
+#     print("herherherherehherherher")
+#     if not isinstance(ctx.message.channel, discord.DMChannel): return
+#     #channel = await user.create_dm()
+#     # reactions cannot be removed in DMs
+#     # for reacts in reaction.message.reactions:
+#     #     # do not delete if made by bot or if emoji was just created
+#     #     if (user in await reacts.users().flatten() and not user.bot and str(reacts) != str(reaction.emoji)):
+#     #         await message.remove_reaction(reaction, user)
 
-    print(ctx.message.emoji)
-    if(ctx.message.emoji == unicode_letters[0]):
-        print("emji 0")
-    else:
-        print("emoji1")
+#     print(ctx.message.emoji)
+#     if(ctx.message.emoji == unicode_letters[0]):
+#         print("emji 0")
+#     else:
+#         print("emoji1")
     # for poll in poll_list:
     #     name = poll.get_name_from_emoji(reaction.emoji)
     #     if (name): 
@@ -403,6 +500,7 @@ async def on_reaction_choose(ctx):
 @bot.command(name='dmcc', help='send dm to camp counsellor')
 async def printlist(ctx):
     embed = create_camp_counsellor_msg(userlist)
+    
     for cc in userlist:
         if not cc.bot:
             channel = await cc.create_dm()
@@ -410,16 +508,31 @@ async def printlist(ctx):
 
             embed.add_field(name = "Options", value = unicode_letters[0] + " Choose a person to expose their role\n"+unicode_letters[1]+" Find out two roles that are not in the camp\n")
             message = await channel.send(embed=embed)
+            await message.add_reaction(unicode_letters[0])
+            await message.add_reaction(unicode_letters[1])
 
-            def check(reaction, user):
-                return user==ctx.author and str(reaction.emoji) is in unicode_letters
+    def check(reaction, user):
+        print(userlist)
+        print(user.name in userlist)
+        return user in userlist and str(reaction.emoji) in unicode_letters
+        
 
-            try: reaction, user = await bot.wait_for('reaction_add', timeout=10.0, check=check)
-            if (str(reaction.emoji) == unicode_letters[0])):
-                print("A was chosen")
-            else:
-                print("B was chosen")
-                
+    while True:
+        reaction, user = await bot.wait_for('reaction_add', check=check)
+
+        #reaction.author
+        for letters in unicode_letters:
+            if str(reaction.emoji) == str(letters):
+                await reaction.message.channel.send("Option " +reaction.emoji + " was chosen")
+
+        if (str(reaction.emoji) == unicode_letters[0]):
+            print("A was chosen")
+            
+        elif (str(reaction.emoji) == unicode_letters[1]):
+            print("B was chosen")
+
+
+
 def create_camper_msg():
     embed = discord.Embed(
         title = "You are a Camper!",
