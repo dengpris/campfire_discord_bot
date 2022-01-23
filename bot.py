@@ -87,7 +87,7 @@ async def werewolfEnd(ctx):
 def create_welcome_camper_msg(role_list):
     embed = discord.Embed(
         title = "Welcome to the CAMP!",
-        description = "These are the list of roles! Note: not all roles may be used during this game session!\n\n" + role_list,
+        description = "These are the list of roles!\n\n **Note:** Not all roles may be used during this game session!\n\n" + role_list,
         color = discord.Color.blue()
     )
     embed.set_image(url='https://i.imgur.com/OPCZSjx.png')
@@ -113,10 +113,10 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
             num_players = 10
         
         max_num_roles = ROLE_MAX_LIMITS[str(num_players)] 
-        role_list = "Current Number of Each Role: \n" + "**Werewolves:** " + str(max_num_roles["Werewolf"]) + "\t**CampCounsellor:** " + str(max_num_roles["Camp Counselor"]) + "\t**Wannabe:** "+ str(max_num_roles["Wannabe"]) + "\t**Introvert:** " + str(max_num_roles["Introvert"]) +  "\t**Pairs of BFFs:** " + str(max_num_roles["bffpair"]) + "\t**Campers:** " + str(max_num_roles["Camper"]) +  "\nPlease remember that not all roles may be used during this game session!" 
+        role_list = "Current Number of Each Role: \n" + "**Werewolves:** " + str(max_num_roles["Werewolf"]) + "\t\n**Camp Counselor:** " + str(max_num_roles["Camp Counselor"]) + "\t\n**Wannabe:** "+ str(max_num_roles["Wannabe"]) + "\t\n**Introvert:** " + str(max_num_roles["Introvert"]) +  "\t\n**Pairs of BFFs:** " + str(max_num_roles["bffpair"]) + "\t\n**Campers:** " + str(max_num_roles["Camper"]) +  "\n\nPlease remember that not all roles may be used during this game session!" 
     
-    embed = create_welcome_camper_msg(role_list)
-    await ctx.send(embed)
+        embed = create_welcome_camper_msg(role_list)
+        await ctx.send(embed=embed)
 
     # await ctx.send("Do you want to customize roles? please enter **y** or **n**")
 
