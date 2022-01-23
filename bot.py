@@ -96,17 +96,24 @@ def create_welcome_camper_msg(role_list):
 def settings_usage_text():
     return "You need **6** arguments. Please enter 6 numbers, each will correspond to the number of each roles to be used during the game\n" + "Do `<num of werewolf> <num of Counselor> <num of wannabe> <num of introverts> <num of bffpair> <num of camper>`\n" + "For example: **1 1 0 0 1 3** for 1 werewolf, 1 Counselor, 0 wannabes, 0 introverts, 1 pair of bffs(ie 2 players can have this role), 3 campers."
 
-#def set_settings(custom_role_numbers):
-#    list_of_roles = ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
-#    number_of_each_role =  {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
-    
+def set_start_settings(custom_role_numbers):
+    list_of_roles = ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
+    number_of_each_role =  {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
+    for i in range(6):
+            role_int = int(custom_role_numbers[i])
+            number_of_each_role[list_of_roles[i]] = role_int
+    global NUM_OF_EACH_ROLE
+    NUM_OF_EACH_ROLE = number_of_each_role
+    print("NUM OF EACH ROLE", NUM_OF_EACH_ROLE)
+    global CUSTOM_ROLES
+    CUSTOM_ROLES = True
 
 async def show_current_roles(ctx, num_players, custom_roles=False):
     
-    # num_players = 3
+    num_players = 3
     if num_players < 3:
         await ctx.send("Not enough players... maybe find more friends?")
-        exit()
+        #exit()
     
     if not custom_roles:
         if num_players > 10:
@@ -118,46 +125,47 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
         embed = create_welcome_camper_msg(role_list)
         await ctx.send(embed=embed)
 
-    # await ctx.send("Do you want to customize roles? please enter **y** or **n**")
+    await ctx.send("Do you want to customize roles? please enter **y** or **n**")
 
-    # def check_y_n(msg):
-    #     return msg.author == ctx.author and msg.channel == ctx.channel and \
-    #     msg.content.lower() in ["y", "n"]
+    def check_y_n(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel and \
+        msg.content.lower() in ["y", "n"]
 
-    # def check(msg):
-    #     return msg.author == ctx.author and msg.channel == ctx.channel 
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel 
 
-    # msg = await bot.wait_for("message", check=check_y_n)
-    # if msg.content.lower() == "y":
-    #     await ctx.send("**You said yes!**\n" + settings_usage_text())
-    #     custom_role_numbers = await bot.wait_for("message",check=check)
-    #     custom_role_numbers = custom_role_numbers.content.split()
-    #     print(f"Custom_role_numbers is: {custom_role_numbers} with length {len(custom_role_numbers)}")
-    #     while len(custom_role_numbers)!=6:
-    #         await ctx.send(settings_usage_text())
-    #         custom_role_numbers = await bot.wait_for("message",check=check)
-    #         custom_role_numbers = custom_role_numbers.content.split()
+    msg = await bot.wait_for("message", check=check_y_n)
+    if msg.content.lower() == "y":
+        await ctx.send("**You said yes!**\n" + settings_usage_text())
+        custom_role_numbers = await bot.wait_for("message",check=check)
+        custom_role_numbers = custom_role_numbers.content.split()
+        print(f"Custom_role_numbers is: {custom_role_numbers} with length {len(custom_role_numbers)}")
+        while len(custom_role_numbers)!=6:
+            await ctx.send(settings_usage_text())
+            custom_role_numbers = await bot.wait_for("message",check=check)
+            custom_role_numbers = custom_role_numbers.content.split()
 
-    #     NOT_A_NUMBER = 1
-    #     while (NOT_A_NUMBER):    
-    #         print(f"The args are: ", custom_role_numbers)
-    #         for i in range(6):
-    #             try:
-    #                 int(custom_role_numbers[i])
-    #             except ValueError:
-    #                 await ctx.send("Must be a number!")
-    #                 custom_role_numbers = await bot.wait_for("message",check=check)
-    #                 print(f'New arguments are: {custom_role_numbers.content}')
-    #                 custom_role_numbers = custom_role_numbers.content.split()
-    #                 NOT_A_NUMBER = 1
-    #                 break
-    #         NOT_A_NUMBER = 0
+        NOT_A_NUMBER = 1
+        while (NOT_A_NUMBER):    
+            print(f"The args are: ", custom_role_numbers)
+            for i in range(6):
+                try:
+                    int(custom_role_numbers[i])
+                except ValueError:
+                    await ctx.send("Must be a number!")
+                    custom_role_numbers = await bot.wait_for("message",check=check)
+                    print(f'New arguments are: {custom_role_numbers.content}')
+                    custom_role_numbers = custom_role_numbers.content.split()
+                    NOT_A_NUMBER = 1
+                    break
+            NOT_A_NUMBER = 0
 
-    #     print("WE'RE HERE!!!! ")
-    #     await set_settings(ctx, custom_role_numbers)
+        print("WE'RE HERE!!!! ")
+        set_start_settings(custom_role_numbers)
+        await ctx.send("DONE CUSTOM")
 
-    # else:
-    #     await ctx.send("Alright! Let the Games BEGIN!!!")
+    else:
+        await ctx.send("Alright! Let the Games BEGIN!!!")
 
 
 
