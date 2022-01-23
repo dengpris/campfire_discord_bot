@@ -1,7 +1,4 @@
 import discord 
-
-unicode_letters = ["🇦", "🇧", "🇨", "🇩", "🇪", "🇫", "🇬", "🇭", "🇮"]
-
 class poll:
     def __init__(self, user, emoji, votes=0):
         self.user = user

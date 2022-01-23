@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 from discord.utils import get
 
 from poll import *
-
+from embeds import *
 
 #GLOBAL VARIABLES
 NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
@@ -58,6 +58,7 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 
 
 ####### GLOBAL VARIABLES #########
+unicode_letters = ["🇦", "🇧", "🇨", "🇩", "🇪", "🇫", "🇬", "🇭", "🇮"]
 channel_list=[]
 userlist=[]
 poll_list=[]
@@ -101,18 +102,9 @@ async def timer(ctx, minutes, seconds=0):
 @bot.command(name='werewolfEnd', help='kill the game')
 async def werewolfEnd(ctx):
     await ctx.send("imma kil l myself")
-
     exit()
 
 ###### ASK FOR ROLE SETTINGS HERE 
-def create_welcome_camper_msg(role_list):
-    embed = discord.Embed(
-        title = "Welcome to the CAMP!",
-        description = "These are the list of roles!\n\n **Note:** Not all roles may be used during this game session!\n\n" + role_list,
-        color = discord.Color.blue()
-    )
-    embed.set_image(url='https://i.imgur.com/OPCZSjx.png')
-    return embed
 
 def settings_usage_text():
     return "You need **6** arguments. Please enter 6 numbers, each will correspond to the number of each roles to be used during the game\n" + "Do `<num of werewolf> <num of Counselor> <num of wannabe> <num of introverts> <num of bffpair> <num of camper>`\n" + "For example: **1 1 0 0 1 3** for 1 werewolf, 1 Counselor, 0 wannabes, 0 introverts, 1 pair of bffs(ie 2 players can have this role), 3 campers."
@@ -210,7 +202,8 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     print(game)
     #night time timer
     await timer(ctx, 0, 5)
-
+    await ctx.send("Werewolf list")
+    await ctx.send(werewolf_list)
     # ensure camp Counselor made choices (if applicalble)
 
     # dm player to remind role and to vote
@@ -259,7 +252,6 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
 ################ ROLE HANDOUT TO DMS ######################
 async def send_role(game,ctx):
-
     for player in game.players:
         player_list.append(roles.Player(player.name, player.get_role_info()))
         print(player.name + " "+ player.get_role_info())
@@ -267,6 +259,7 @@ async def send_role(game,ctx):
             for user in userlist:
                 if user.name == player.name:
                     werewolf_list.append(user)
+            await ctx.send(werewolf_list)
         elif player.get_role_info() == "Camper":
             for user in userlist:
                 if user.name == player.name:
@@ -494,128 +487,6 @@ async def on_reaction_remove(reaction, user):
         if (name): 
             await user.send("You are no longer voting for: " + reaction.emoji + " " + name)
             poll.votes = poll.votes-1
-
-
-################ DIRECT MESSAGE SETTINGS ######################
-# Direct message embed links
-
-async def create_camp_counsellor_msg(userlist, channel):
-                
-    embed = discord.Embed(
-        title = "You are a Camp Counsellor!",
-        description = "You will have a good trip if you get rid of any werewolves and don't accidentally get rid of camper. Luckily, you have extra privileges and can figure out who one camper is or who two of the missing ones were.\n\n",
-        color = discord.Color.blue()
-    )
-
-    emoji_idx=0
-    value = ""
-    for u in userlist:
-        if not u.bot:
-            name = u.name
-            emoji = unicode_letters[emoji_idx]
-            value = value + emoji + " " + name + "\n" 
-            # update global variable poll_list, which maps emojis to names
-            # choice_list.append(poll(name, emoji))
-            emoji_idx+=1
-    value = value + unicode_letters[emoji_idx] + " Expose two roles not in the game\n"
-    embed.add_field(name = "Options", value = value)
-
-    # embed.add_field(name = "Options", value = unicode_letters[0] + " Choose a person to expose their role\n"+unicode_letters[1]+" Find out two roles that are not in the camp\n")
-    embed.set_image(url='https://i.imgur.com/FnS0HP5.jpg')
-
-    return embed
-
-def create_camper_msg():
-    embed = discord.Embed(
-        title = "You are a Camper!",
-        description = "You will have a great time at camp if you get rid of any werewolves and don't accidentally kick out a fellow camper. You just want to have fun at camp.",
-        color = discord.Color.blue()
-    )
-    embed.set_image(url='https://i.imgur.com/4AYKSl3.jpg')
-    return embed
-
-def create_werewolf_msg(wolf_list):
-    names = []
-    delimeter = '\n'
-    for wolf in wolf_list:
-        if wolf.bot:
-            continue
-        else:
-            names.append(wolf.name)
-    list_wolves = delimeter.join(names)
-
-    if list_wolves:
-        werewolf_str = "Your fellow wolves are:\n" + list_wolves
-    else:
-        werewolf_str = "Unfortunately, you have no fellow wolves with you... You're on your own!"
-
-    embed = discord.Embed(
-        title = "You are a Werewolf!",
-        description = "You will have a good trip as long as no one from your misunderstood wolf pack gets kicked out.\n\n" + werewolf_str,
-        color = discord.Color.red()
-    )
-    embed.set_image(url='https://i.imgur.com/VP45oFp.jpg')
-    return embed
-
-def create_introvert_msg():
-    embed = discord.Embed(
-        title = "You are an Introvert!",
-        description = "You do not like camp, but your mom made you come. You have to figure out a way to go home without her blaming you. You will have a good trip if you get kicked out in the morning.",
-        color = discord.Color.gold()
-    )
-    embed.set_image(url='https://i.imgur.com/UFh7Xsp.jpg')
-    return embed
-
-def create_best_friend_msg(bestie_list, me):
-    names = []
-    delimeter = '\n'
-    for bestie in bestie_list:
-        if bestie.bot or bestie==me:
-            continue
-        else:
-            names.append(bestie.name)
-    list_besties = delimeter.join(names)
-
-    if list_besties:
-        best_friend_str = "The best friends are:\n" + list_besties
-    else:
-        best_friend_str = "Unfortunately, your best friend isn't here with you... Try making some friends with the campers!"
-
-    embed = discord.Embed(
-        title = "You are a Best Friend!",
-        description = "You will have a good time at camp if you get rid of any werewolves and don't accidentally get rid of your best friend - who you know isn't a werewolf.\n\n""" + best_friend_str,
-        color = discord.Color.blue()
-    )
-    embed.set_image(url='https://i.imgur.com/wHgG64a.jpg')
-    return embed
-
-def create_wannabe_msg(wolf_list):
-    names = []
-    delimeter = '\n'
-    for wolf in wolf_list:
-        if wolf.bot:
-            continue
-        else:
-            names.append(wolf.name)
-    list_wolves = delimeter.join(names)
-
-    if list_wolves:
-        werewolf_str = "Your fellow wolves are:\n" + list_wolves
-    else:
-        werewolf_str = "Unfortunately, you have no fellow wolves to cover for... You're on your own!"
-    embed = discord.Embed(
-        title = "You are a Wannabe!",
-        description = "You really want the werewolves to like you... even though they don't know who you are. Your goal is for none of them to get kicked out, even if that means you have to go instead.\n\n" + werewolf_str,
-        color = discord.Color.red()
-    )
-    embed.set_image(url='https://i.imgur.com/XZSDOEU.jpg')
-    return embed
-
-@bot.command(name='players', help='current players')
-async def printlist(ctx):
-    await ctx.send("Players: ")
-    for user in userlist:
-        await ctx.send(user.name)
 
 #################### WIN CONDITIONS LOGIC ###################
 async def win_conditions(ctx, eliminated):
