@@ -302,8 +302,8 @@ async def send_role(game,ctx):
             await ctx.send("Your role has been sent %s!" %best_friend.name)
 
     player_emoji_dic={}
-    emoji_idx=0
     for cc in userlist:
+        emoji_idx=0
         if not cc.bot:
             channel = await cc.create_dm()
             embed = await create_camp_counsellor_msg(userlist, channel)
