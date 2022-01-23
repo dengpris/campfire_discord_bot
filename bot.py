@@ -67,7 +67,7 @@ camper_list = []
 wannabe_list = []
 introvert_list = []
 best_friend_list = []
-camp_counselor_list = ['MangoMan', "Zalkyrie"]
+camp_counselor_list = []
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -89,6 +89,7 @@ async def timer(ctx, minutes, seconds=0):
             if totalseconds == 0:
                 await message.edit(content="Ended!")
                 break
+                #return True
             minuteLeft=totalseconds//60
             secondsLeft=totalseconds%60
             await message.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
@@ -200,7 +201,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
     roles_dictionary = NUM_OF_EACH_ROLE
     custom_roles = CUSTOM_ROLES
-    game=roles.GameState(nameList, roles_dictionary, custom_roles=custom_roles)
+    game=roles.GameState(nameList, roles_dictionary, True, custom_roles=custom_roles)
     # game.set_random_roles()
 
     await send_role(game,ctx)
@@ -322,8 +323,60 @@ async def send_role(game,ctx):
             channel = await best_friend.create_dm()
             msg = await channel.send(embed=embed)
             await ctx.send("Your role has been sent %s!" %best_friend.name)
-    
-    
+
+    player_emoji_dic={}
+    emoji_idx=0
+    for cc in userlist:
+        if not cc.bot:
+            channel = await cc.create_dm()
+            embed = await create_camp_counsellor_msg(userlist, channel)
+            message = await channel.send(embed=embed)
+
+            for u in userlist:
+                if not u.bot:
+                    await message.add_reaction(unicode_letters[emoji_idx])
+                    player_emoji_dic[unicode_letters[emoji_idx]]=u.name
+                    emoji_idx+=1
+
+            
+            await message.add_reaction(unicode_letters[emoji_idx])
+
+            await ctx.send("Your role has been sent %s" %cc.name)
+    def check(reaction, user):
+        print(userlist)
+        print(user.name in userlist)
+        return user in userlist and str(reaction.emoji) in unicode_letters
+        
+
+    campCounsellorsCheckedIn=[]
+    while True:
+        reaction, user = await bot.wait_for('reaction_add', check=check)
+
+        for letters in unicode_letters:
+            
+            if str(reaction.emoji) == str(unicode_letters[emoji_idx]):
+                #get missing roles
+                await reaction.message.channel.send("These roles are missing")
+                campCounsellorsCheckedIn.append(user.name)
+                break
+            elif str(reaction.emoji) == str(letters):
+                print(player_emoji_dic)
+
+                r=""
+                for p in game.players:
+                    if p.name==player_emoji_dic[str(reaction.emoji)]:
+                        r=p.role
+
+                await reaction.message.channel.send(player_emoji_dic[str(reaction.emoji)]+ " is a " +r+ "!")
+                campCounsellorsCheckedIn.append(user.name)
+
+        camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
+        print("========")
+        print(campCounsellorsCheckedIn)
+        print(camp_counselor_list_names)
+        if all(elem in campCounsellorsCheckedIn for elem in camp_counselor_list_names):
+            print("im breaking out")
+            break
 
 ################ START GAME ######################
 @bot.command(name='start', help='start the game')
@@ -438,92 +491,31 @@ async def on_reaction_remove(reaction, user):
 ################ DIRECT MESSAGE SETTINGS ######################
 # Direct message embed links
 
-async def create_camp_counsellor_msg(userlist):
+async def create_camp_counsellor_msg(userlist, channel):
                 
     embed = discord.Embed(
         title = "You are a Camp Counsellor!",
         description = "You will have a good trip if you get rid of any werewolves and don't accidentally get rid of camper. Luckily, you have extra privileges and can figure out who one camper is or who two of the missing ones were.\n\n",
         color = discord.Color.blue()
     )
-    embed.set_image(url='https://i.imgur.com/FnS0HP5.jpg')
-    return embed
 
-async def create_camp_counsellor_choice_a(channel):
-    poll_list=[]
-    create_poll(userlist, poll_list)
+    emoji_idx=0
+    value = ""
+    for u in userlist:
+        if not u.bot:
+            name = u.name
+            emoji = unicode_letters[emoji_idx]
+            value = value + emoji + " " + name + "\n" 
+            # update global variable poll_list, which maps emojis to names
+            # choice_list.append(poll(name, emoji))
+            emoji_idx+=1
+    value = value + unicode_letters[emoji_idx] + " Expose two roles not in the game\n"
+    embed.add_field(name = "Options", value = value)
 
-    embed = discord.Embed(
-        title = "You chose to expose the role of a person!",
-        description = "<insert role of person you expose>",
-        color = discord.Color.blue()
-    )
-
-    embed.set_image(url='https://i.imgur.com/FnS0HP5.jpg')
-
-    message = await channel.send(embed=embed)
-
-    # add reactions
-    i=0
-    while i<len(userlist):
-        await message.add_reaction(unicode_letters[i])
-        i = i+1
-
-    return embed
-
-async def create_camp_counsellor_choice_b(channel):
-    embed = discord.Embed(
-        title = "You chose two roles that are not in the camp!",
-        description = "<insert role of person you expose>",
-        color = discord.Color.blue()
-    )
+    # embed.add_field(name = "Options", value = unicode_letters[0] + " Choose a person to expose their role\n"+unicode_letters[1]+" Find out two roles that are not in the camp\n")
     embed.set_image(url='https://i.imgur.com/FnS0HP5.jpg')
 
-    message = await channel.send(embed=embed)
     return embed
-
-@bot.command(name='dmcc', help='send dm to camp counsellor')
-async def printlist(ctx):
-    embed = await create_camp_counsellor_msg(userlist)
-    
-    for cc in userlist:
-        if not cc.bot:
-            channel = await cc.create_dm()
-            await ctx.send("Your role has been sent %s" %cc.name)
-
-            embed.add_field(name = "Options", value = unicode_letters[0] + " Choose a person to expose their role\n"+unicode_letters[1]+" Find out two roles that are not in the camp\n")
-            message = await channel.send(embed=embed)
-            await message.add_reaction(unicode_letters[0])
-            await message.add_reaction(unicode_letters[1])
-
-    def check(reaction, user):
-        print(userlist)
-        print(user.name in userlist)
-        return user in userlist and str(reaction.emoji) in unicode_letters
-        
-
-    campCounsellorsCheckedIn=[]
-    while True:
-        reaction, user = await bot.wait_for('reaction_add', check=check)
-
-        #reaction.author
-        for letters in unicode_letters:
-            if str(reaction.emoji) == str(letters):
-                await reaction.message.channel.send("Option " +reaction.emoji + " was chosen")
-                campCounsellorsCheckedIn.append(user.name)
-
-        if (str(reaction.emoji) == unicode_letters[0]):
-            print("A was chosen")
-            embed = await create_camp_counsellor_choice_a(reaction.message.channel)
-        elif (str(reaction.emoji) == unicode_letters[1]):
-            print("B was chosen")
-            embed = await create_camp_counsellor_choice_b(reaction.message.channel)
-
-        print(campCounsellorsCheckedIn)
-        print(camp_counselor_list)
-        if all(elem in campCounsellorsCheckedIn for elem in camp_counselor_list):
-            print("im breaking out")
-            break
-
 
 def create_camper_msg():
     embed = discord.Embed(
