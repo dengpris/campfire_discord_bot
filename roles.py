@@ -1,28 +1,7 @@
 from email.policy import default
 import random
 import time
-
-ROLE_INFO = {"Werewolf": {"About": "see the other werewolves","Limit": 1, "Required": True},
-             "Camper": {"About": "we vibing fham", "Limit": 7, "Required": True},
-             "bff_1": {"About": "half of best friends", "Limit": 1, "Required": False},
-             "bff_2": {"About": "other half of best friends", "Limit": 1, "Required": False},
-             "Camp Counselor": {"About":"does counselling", "Limit": 1, "Required": False},
-             "Wannabe": {"About": "does something", "Limit": 1, "Required": False},
-             "Introvert": {"About": "we vibing fham 2.0", "Limit": 1, "Required": False}   
-    
-}
-
-
-
-# Default Roles that will always have 3 roles left over
-DEFAULT_ROLES = {   "3": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":2},
-                    "4": {"Werewolf":1, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3}, #7 -> 3
-                    "5": {"Werewolf":2, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3}, #8 -> 3
-                    "6": {"Werewolf":2, "Camp Counselor":1, "Wannabe":1, "Introvert":0, "bffpair":1, "Camper":3}, #9 -> 3
-                    "7": {"Werewolf":3, "Camp Counselor":1, "Wannabe":0, "Introvert":1, "bffpair":1, "Camper":3}, #10 
-                    "8": {"Werewolf":3, "Camp Counselor":2, "Wannabe":1, "Introvert":0, "bffpair":1, "Camper":3}, #11 
-                    "9": {"Werewolf":3, "Camp Counselor":1, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":3}, #12
-                    "10": {"Werewolf":4, "Camp Counselor":2, "Wannabe":1, "Introvert":1, "bffpair":1, "Camper":3}} #13
+from globalvar import *
 
 def increment_round(self):
         self.round += 1
@@ -64,7 +43,6 @@ class GameState:
     def __init__(self, player_names, custom_role_dict, extra_roles=False, custom_roles=False ):
         
         random.seed(time.time())
-        
         self.num_players = len(player_names)
         self.time = "Night"
         print("before nigth")

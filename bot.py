@@ -21,7 +21,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -68,7 +68,7 @@ def set_start_settings(custom_role_numbers):
             role_int = int(custom_role_numbers[i])
             number_of_each_role[list_of_roles[i]] = role_int
     global NUM_OF_EACH_ROLE
-    NUM_OF_EACH_ROLE = number_of_each_role
+    NUM_OF_EACH_ROLE = number_of_each_role.copy()
     print("NUM OF EACH ROLE", NUM_OF_EACH_ROLE)
     global CUSTOM_ROLES
     CUSTOM_ROLES = True
@@ -144,11 +144,10 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     num_players = len(nameList)
     await show_current_roles(ctx, num_players,custom_roles)
 
-    roles_dictionary = NUM_OF_EACH_ROLE
+    roles_dictionary = NUM_OF_EACH_ROLE.copy()
     custom_roles = CUSTOM_ROLES
     game=roles.GameState(nameList, roles_dictionary, True, custom_roles=custom_roles)
     # game.set_random_roles()
-
     await send_role(game,ctx)
     print(game.players)
     print("printing game object")
@@ -158,7 +157,6 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     # ensure camp Counselor made choices (if applicalble)
 
     # dm player to remind role and to vote
-
     embed = create_poll(userlist, poll_list)
     #member = ctx.message.author
     for user in userlist:
@@ -381,14 +379,14 @@ async def set_settings(ctx, *args):
                     "\t**Campers:** " + str(number_of_each_role["Camper"]))
     print(f"New role lmits are: {number_of_each_role}")
     global NUM_OF_EACH_ROLE
-    NUM_OF_EACH_ROLE = number_of_each_role
+    NUM_OF_EACH_ROLE = number_of_each_role.copy()
     global CUSTOM_ROLES
     CUSTOM_ROLES = True
 
 @bot.command(name="see_roles", help='see current custom role number settings (note that default will set all to 0)')
 async def see_settings_roles(ctx):
-    #await ctx.send("HERE")
-    await ctx.send("Current Number of Each Role: \n" + 
+    await ctx.send("HERE")
+    await ctx.send("Current Customized Number of Each Role: \n" + 
                     "**Werewolves:** " + str(NUM_OF_EACH_ROLE["Werewolf"]) + "\t**CampCounsellor:** " + str(NUM_OF_EACH_ROLE["Camp Counselor"]) +
                     "\t**Wannabe:** "+ str(NUM_OF_EACH_ROLE["Wannabe"]) + "\t**Introvert:** " + str(NUM_OF_EACH_ROLE["Introvert"]) + 
                     "\t**Pairs of BFFs:** " + str(NUM_OF_EACH_ROLE["bffpair"]) + "\t**Campers:** " + str(NUM_OF_EACH_ROLE["Camper"]))
