@@ -54,6 +54,7 @@ class GameState:
         
         if custom_roles:
             random_roles, self.picked_roles = self.set_custom_roles(custom_role_dict)
+            print("Length of random_roles: ", len(random_roles))
         # Default roles
         else:
             random_roles, self.picked_roles = self.set_random_roles(extra_roles)
@@ -94,16 +95,18 @@ class GameState:
 
         # If number of roles > number of players, remove excess roles
         if self.num_players < len(players_roles):
-            n = self.num_players - len(players_roles) 
+            n = len(players_roles) - self.num_players
             players_roles = players_roles[:len(players_roles)-n]
         
         # If number of players > number of roles, add access campers
-        if self.num_players < len(players_roles):
-            n = len(players_roles) - self.num_players
+                        
+        if self.num_players > len(players_roles):
+            n = self.num_players - len(players_roles)  
             while n != 0:
                 players_roles.append("Camper")
                 n -=1 
-        
+                
+        random.shuffle(players_roles)
         return players_roles, picked_roles
 
     def set_random_roles(self, extra_roles=False):
