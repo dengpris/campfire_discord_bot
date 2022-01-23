@@ -136,7 +136,6 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     
 async def send_role(game,ctx):
 
-
     for player in game.players:
         player_list.append(roles.Player(player.name, player.get_role_info()))
         print(player.name + " "+ player.get_role_info())
@@ -365,11 +364,44 @@ async def on_reaction_choose(ctx):
     #         poll.votes = poll.votes+1
     #         print(poll.votes)
 
+# @bot.command(name='dmcc', help='send dm to camp counsellor')
+# async def printlist(ctx):
+#     # userlist.pop(0)
+#     # userlist.pop(0)
+#     # userlist.pop(0)
+#     embed = create_camp_counsellor_msg(userlist)
+#     for cc in userlist:
+#         if not cc.bot:
+#             channel = await cc.create_dm()
+#             await ctx.send("Your role has been sent %s" %cc.name)
+
+#             embed.add_field(name = "Options", value = unicode_letters[0] + " Choose a person to expose their role\n"+unicode_letters[1]+" Find out two roles that are not in the camp\n")
+#             message = await channel.send(embed=embed)
+#             await message.add_reaction(unicode_letters[0])
+#             await message.add_reaction(unicode_letters[1])
+
+#             message = await channel.fetch_message(message.id)
+
+#             reaction, user = await bot.wait_for('reaction_add', timeout=1.0, check=check)
+
+#             reactionTest=get(message.reactions, emoji=unicode_letters[0])
+#             reactionTest2=get(message.reactions, emoji=unicode_letters[1])
+#             print(reactionTest.count)
+#             print(reactionTest2.count)
+#             print("==================================")
+#             print(str(message.reactions[0]))
+#             print(str(message.reactions[1]))
+#             if(message.reactions[0].count > message.reactions[1].count):
+#                 print(str(message.reactions[0]))
+#                 print(str(message.reactions[1]))
+#                 print("A better")
+#             elif (message.reactions[0].count < message.reactions[1].count):
+#                 print(str(message.reactions[0]))
+#                 print(str(message.reactions[1].count))
+#                 print("B better")
+
 @bot.command(name='dmcc', help='send dm to camp counsellor')
 async def printlist(ctx):
-    # userlist.pop(0)
-    # userlist.pop(0)
-    # userlist.pop(0)
     embed = create_camp_counsellor_msg(userlist)
     for cc in userlist:
         if not cc.bot:
@@ -378,28 +410,16 @@ async def printlist(ctx):
 
             embed.add_field(name = "Options", value = unicode_letters[0] + " Choose a person to expose their role\n"+unicode_letters[1]+" Find out two roles that are not in the camp\n")
             message = await channel.send(embed=embed)
-            await message.add_reaction(unicode_letters[0])
-            await message.add_reaction(unicode_letters[1])
 
-            message = await channel.fetch_message(message.id)
+            def check(reaction, user):
+                return user==ctx.author and str(reaction.emoji) is in unicode_letters
 
-            reaction, user = await bot.wait_for('reaction_add', timeout=1.0, check=check)
-
-            reactionTest=get(message.reactions, emoji=unicode_letters[0])
-            reactionTest2=get(message.reactions, emoji=unicode_letters[1])
-            print(reactionTest.count)
-            print(reactionTest2.count)
-            print("==================================")
-            print(str(message.reactions[0]))
-            print(str(message.reactions[1]))
-            if(message.reactions[0].count > message.reactions[1].count):
-                print(str(message.reactions[0]))
-                print(str(message.reactions[1]))
-                print("A better")
-            elif (message.reactions[0].count < message.reactions[1].count):
-                print(str(message.reactions[0]))
-                print(str(message.reactions[1].count))
-                print("B better")
+            try: reaction, user = await bot.wait_for('reaction_add', timeout=10.0, check=check)
+            if (str(reaction.emoji) == unicode_letters[0])):
+                print("A was chosen")
+            else:
+                print("B was chosen")
+                
 def create_camper_msg():
     embed = discord.Embed(
         title = "You are a Camper!",
