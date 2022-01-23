@@ -135,7 +135,7 @@ async def send_role(game,ctx):
             await ctx.send("Your role has been sent %s!" %werewolf.name)
 
     for wannabe in wannabe_list:
-        embed = create_wannabe_msg(wannabe_list)
+        embed = create_wannabe_msg(werewolf_list)
         if not wannabe.bot:
             channel = await wannabe.create_dm()
             msg = await channel.send(embed=embed)
