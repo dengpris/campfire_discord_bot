@@ -255,7 +255,8 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     #player_booted, num_votes = game.tally_votes()
 
     #determine winners
-    
+
+################ ROLE HANDOUT TO DMS ######################
 async def send_role(game,ctx):
 
     for player in game.players:
@@ -434,38 +435,8 @@ async def on_reaction_remove(reaction, user):
             poll.votes = poll.votes-1
 
 
-############################
-
-@bot.command(name='dmintrovert', help='send dm to introvert')
-async def printlist(ctx):
-    userlist.pop(0)
-    userlist.pop(0)
-    userlist.pop(0)
-    embed = create_introvert_msg(userlist)
-    for introvert in userlist:
-        channel = await introvert.create_dm()
-        msg = await channel.send(embed=embed)
-        await ctx.send("Your role has been sent %s" %introvert.name)
-
-@bot.command(name='dmbestfriend', help='send dm to bestfriends')
-async def printlist(ctx):
-    userlist.pop(0)
-    embed = create_best_friend_msg(userlist)
-    for best_friend in userlist:
-        channel = await best_friend.create_dm()
-        msg = await channel.send(embed=embed)
-        await ctx.send("Your role has been sent %s" %best_friend.name)
-
-@bot.command(name='dmwannabe', help='send dm to wannabe')
-async def printlist(ctx):
-    userlist.pop(0)
-    userlist.pop(0)
-    userlist.pop(0)
-    embed = create_wannabe_msg(userlist)
-    for wannabe in userlist:
-        channel = await wannabe.create_dm()
-        msg = await channel.send(embed=embed)
-        await ctx.send("Your role has been sent %s" %wannabe.name)
+################ DIRECT MESSAGE SETTINGS ######################
+# Direct message embed links
 
 async def create_camp_counsellor_msg(userlist):
                 
