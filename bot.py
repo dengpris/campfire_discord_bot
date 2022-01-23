@@ -475,5 +475,5 @@ async def reveal_roles(ctx):
     # werewolves
     # wannabe
     # introvert    
-
+    return 
 bot.run(TOKEN)
