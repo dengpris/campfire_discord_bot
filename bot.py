@@ -3,10 +3,12 @@ import os
 from pickle import FALSE
 import random
 import asyncio
+from tabnanny import check
 import roles
 
 from discord.ext import commands
 from dotenv import load_dotenv
+from discord.utils import get
 
 from poll import *
 
@@ -20,7 +22,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
 async def timer(ctx, minutes, seconds=0):
@@ -371,26 +373,34 @@ async def printlist(ctx):
     # userlist.pop(0)
     embed = create_camp_counsellor_msg(userlist)
     for cc in userlist:
-        channel = await cc.create_dm()
-        msg = await channel.send(embed=embed)
-        await ctx.send("Your role has been sent %s" %cc.name)
-        message = await channel.send(embed=embed)
+        if not cc.bot:
+            channel = await cc.create_dm()
+            await ctx.send("Your role has been sent %s" %cc.name)
 
-        
-        await message.add_reaction(unicode_letters[0])
-        await message.add_reaction(unicode_letters[1])
+            embed.add_field(name = "Options", value = unicode_letters[0] + " Choose a person to expose their role\n"+unicode_letters[1]+" Find out two roles that are not in the camp\n")
+            message = await channel.send(embed=embed)
+            await message.add_reaction(unicode_letters[0])
+            await message.add_reaction(unicode_letters[1])
 
-        message = await channel.fetch_message(message.id)
+            message = await channel.fetch_message(message.id)
 
-        print("==================================")
-        print(message)
+            reaction, user = await bot.wait_for('reaction_add', timeout=1.0, check=check)
 
-        await on_reaction_choose(ctx)
-        # print(message.count)
-        # if(message.reaction[0].count > message.reaction[1].count):
-        #     print(message.reaction[0].count) 
-        #     print(message.reaction[1].count)
-
+            reactionTest=get(message.reactions, emoji=unicode_letters[0])
+            reactionTest2=get(message.reactions, emoji=unicode_letters[1])
+            print(reactionTest.count)
+            print(reactionTest2.count)
+            print("==================================")
+            print(str(message.reactions[0]))
+            print(str(message.reactions[1]))
+            if(message.reactions[0].count > message.reactions[1].count):
+                print(str(message.reactions[0]))
+                print(str(message.reactions[1]))
+                print("A better")
+            elif (message.reactions[0].count < message.reactions[1].count):
+                print(str(message.reactions[0]))
+                print(str(message.reactions[1].count))
+                print("B better")
 def create_camper_msg():
     embed = discord.Embed(
         title = "You are a Camper!",
