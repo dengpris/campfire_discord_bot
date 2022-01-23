@@ -90,8 +90,7 @@ async def send_role(game,ctx):
     camper_list = []
     wannabe_list = []
     introvert_list = []
-    best_friend1_list = []
-    best_friend2_list = []
+    best_friend_list = []
     camp_counselor_list = []
 
     for player in game.players:
@@ -114,10 +113,8 @@ async def send_role(game,ctx):
                     introvert_list.append(user)
         elif (player.get_role_info() == "bff_1" or player.get_role_info() == "bff_2"):
             for user in userlist:
-                if (user.name == player.name and player.get_role_info() == "bff_1"):
-                    best_friend1_list.append(user)
-                else:
-                    best_friend2_list.append(user)
+                if user.name == player.name:
+                    best_friend_list.append(user)
         else: #camp_counselor
             for user in userlist:
                 if user.name == player.name:
@@ -151,15 +148,8 @@ async def send_role(game,ctx):
             msg = await channel.send(embed=embed)
             await ctx.send("Your role has been sent %s!" %introvert.name)
 
-    for best_friend in best_friend1_list:
-        embed = create_best_friend_msg(best_friend2_list)
-        if not best_friend.bot:
-            channel = await best_friend.create_dm()
-            msg = await channel.send(embed=embed)
-            await ctx.send("Your role has been sent %s!" %best_friend.name)
-
-    for best_friend in best_friend2_list:
-        embed = create_best_friend_msg(best_friend1_list)
+    for best_friend in best_friend_list:
+        embed = create_best_friend_msg(best_friend_list)
         if not best_friend.bot:
             channel = await best_friend.create_dm()
             msg = await channel.send(embed=embed)
@@ -470,7 +460,7 @@ def create_best_friend_msg(bestie_list):
     list_besties = delimeter.join(names)
 
     if list_besties:
-        best_friend_str = "Your fellow best friend is:\n" + list_besties
+        best_friend_str = "The best friends are:\n" + list_besties
     else:
         best_friend_str = "Unfortunately, your best friend isn't here with you... Try making some friends with the campers!"
 
