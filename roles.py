@@ -25,7 +25,7 @@ def increment_round(self):
         self.round += 1
 
 class Player:
-    def __init__(self,name, role=None):
+    def __init__(self, name, role=None):
         self.name = name
         self.role = role
         
@@ -39,9 +39,15 @@ class Player:
         if self.role is None:
             self.role = Role
 
-    def vote_player(self, name):
-        self.last_voted = name
-        return self.last_voted
+    # def vote_player(self, name):
+    #     self.last_voted = name
+    #     return self.last_voted
+
+    def find_player(self, name):
+        if self.name == name:
+            return self
+        else:
+            return None
                 
         
 # camp counsellor can look at 1 persons role at night
@@ -49,7 +55,7 @@ class Player:
 # have time state in gamestate
 # get 2/3 unpicked roles from group
 
-    
+ 
 
 class GameState:
     def __init__(self, player_names, custom_role_dict, extra_roles=False, custom_roles=False ):
@@ -71,6 +77,8 @@ class GameState:
         print("after night")
         #Assigning roles
         self.players = [Player(player_names[person], random_roles[person]) for person in range(self.num_players)]
+
+        
         
     def set_custom_roles(self, custom_role_dict):
 
@@ -220,30 +228,30 @@ class GameState:
         #picked roles is just the different roles for the game
         return players, picked_roles
                 
-    def tally_votes(self):
-        votes={}
-        for player in self.players:
-            if player.last_voted in votes:
-                votes[player.last_voted] +=1
-            else:
-                votes[player.last_voted] = 1
+    # def tally_votes(self):
+    #     votes={}
+    #     for player in self.players:
+    #         if player.last_voted in votes:
+    #             votes[player.last_voted] +=1
+    #         else:
+    #             votes[player.last_voted] = 1
 
-        players_booted = [key  for (key, value) in votes.items() if value == max(votes.values())]        
+    #     players_booted = [key  for (key, value) in votes.items() if value == max(votes.values())]        
 
-        return players_booted, max(votes.values())
+    #     return players_booted, max(votes.values())
     
-    def check_votes(self):
-        players_booted, votes = self.tally_votes()
-        win=False
-        for player in self.players:
-            if player.name in players_booted and player.role=="Werewolf":
-                print(f"You voted the werewolf {player.name} with {votes} votes")
-                win=True
+    # def check_votes(self):
+    #     players_booted, votes = self.tally_votes()
+    #     win=False
+    #     for player in self.players:
+    #         if player.name in players_booted and player.role=="Werewolf":
+    #             print(f"You voted the werewolf {player.name} with {votes} votes")
+    #             win=True
                 
-        if not win:
-            print("you did not catch the werewolf. RIP")
+    #     if not win:
+    #         print("you did not catch the werewolf. RIP")
             
-        return win
+    #     return win
             
 
     def set_night(self):
