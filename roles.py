@@ -1,3 +1,4 @@
+from email.policy import default
 import random
 import time
 
@@ -11,15 +12,17 @@ ROLE_INFO = {"Werewolf": {"About": "see the other werewolves","Limit": 1, "Requi
     
 }
 
-#Default MAXIMUM role values per each number (Note cannot play with 3 players or less)
-# ROLE_MAX_LIMITS = { "3": {"Werewolf":1, "Camp Counselor":0, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":2},
-#                     "4": {"Werewolf":1, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3},
-#                     "5": {"Werewolf":2, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3},
-#                     "6": {"Werewolf":2, "Camp Counselor":2, "Wannabe":1, "Introvert":1, "bffpair":1, "Camper":4},
-#                     "7": {"Werewolf":3, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":5},
-#                     "8": {"Werewolf":3, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":5},
-#                     "9": {"Werewolf":4, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":6},
-#                     "10": {"Werewolf":4, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":7}}
+
+
+# Default Roles that will always have 3 roles left over
+DEFAULT_ROLES = {   "3": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":2},
+                    "4": {"Werewolf":1, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3}, #7 -> 3
+                    "5": {"Werewolf":2, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3}, #8 -> 3
+                    "6": {"Werewolf":2, "Camp Counselor":1, "Wannabe":1, "Introvert":0, "bffpair":1, "Camper":3}, #9 -> 3
+                    "7": {"Werewolf":3, "Camp Counselor":1, "Wannabe":0, "Introvert":1, "bffpair":1, "Camper":3}, #10 
+                    "8": {"Werewolf":3, "Camp Counselor":2, "Wannabe":1, "Introvert":0, "bffpair":1, "Camper":3}, #11 
+                    "9": {"Werewolf":3, "Camp Counselor":1, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":3}, #12
+                    "10": {"Werewolf":4, "Camp Counselor":2, "Wannabe":1, "Introvert":1, "bffpair":1, "Camper":3}} #13
 
 def increment_round(self):
         self.round += 1
@@ -68,11 +71,11 @@ class GameState:
         self.extra_roles=extra_roles
         
         if custom_roles:
-            random_roles, self.picked_roles = self.set_custom_roles(custom_role_dict)
+            random_roles, self.unused_roles = self.set_custom_roles(custom_role_dict)
             print("Length of random_roles: ", len(random_roles))
         # Default roles
         else:
-            random_roles, self.picked_roles = self.set_random_roles(extra_roles)
+            random_roles, self.unused_roles = self.set_default_roles()
 
         print("after night")
         #Assigning roles
@@ -86,15 +89,10 @@ class GameState:
         players_roles = []
 
         picked_roles=custom_role_dict.keys()
-
-        print(picked_roles)
         
         # If best friends is a role, replace with bff_1 or bff_2
         # Make sure only bestfriends know each other (only pairs know each other)
         if custom_role_dict["bffpair"] != 0:
-            #picked_roles.remove('bffpair')
-            #picked_roles.append("bff_1")
-            #picked_roles.append("bff_2")
             num_bff_pairs = custom_role_dict["bffpair"]
             custom_role_dict.pop("bffpair")
             new_bff_roles = {'bff_1': num_bff_pairs, 'bff_2': num_bff_pairs}
@@ -106,7 +104,6 @@ class GameState:
         #     if self.num_players < len(players_roles):
         #         excess_roles = len(players_roles) - self.num_players 
         #         if excess_roles < 3
-
 
         for role in custom_role_dict:
                 num_of_each_role_available = custom_role_dict[role]
@@ -131,6 +128,45 @@ class GameState:
                 
         random.shuffle(players_roles)
         return players_roles, picked_roles
+
+    def set_default_roles(self):
+        default_role_dict = {}
+        
+        # Can't test this tho rip
+        if self.num_players > 10 :
+            default_role_dict = DEFAULT_ROLES["10"]
+            extra_players = self.num_players - 10
+            default_role_dict["Camper"] = default_role_dict["Camper"] + extra_players
+        else: 
+            default_role_dict = DEFAULT_ROLES[str(self.num_players)]
+
+        #picked_roles = default_role_dict.keys()
+        players_roles = []
+        unused_roles = []
+
+        if default_role_dict["bffpair"] != 0:
+            num_bff_pairs = default_role_dict["bffpair"]
+            default_role_dict.pop("bffpair")
+            new_bff_roles = {'bff_1': num_bff_pairs, 'bff_2': num_bff_pairs}
+            default_role_dict.update(new_bff_roles)
+
+        for role in default_role_dict:
+            num_of_each_role_available = default_role_dict[role]
+            while num_of_each_role_available != 0:
+                players_roles.append(role)
+                num_of_each_role_available-=1
+        
+        random.shuffle(players_roles)
+
+        if self.num_players < len(players_roles):
+            #if this happens, it should only happen 3 times
+            n = len(players_roles) - self.num_players  
+            for i in range(n):
+                #Always pop index 2
+                res = unused_roles.append(players_roles.pop(2))
+
+        random.shuffle(players_roles)
+        return players_roles, unused_roles      
 
     def set_random_roles(self, extra_roles=False):
 
