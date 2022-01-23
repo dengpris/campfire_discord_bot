@@ -93,8 +93,6 @@ async def send_role(game,ctx):
     best_friend_list = []
     camp_counselor_list = []
 
-    userlist.pop(0)
-    userlist.pop(0)
     for player in game.players:
         print(player.name + " "+ player.get_role_info())
         if player.get_role_info() == "Werewolf":
@@ -124,21 +122,24 @@ async def send_role(game,ctx):
 
     for camper in camper_list:
         embed = create_camper_msg()
-        channel = await camper.create_dm()
-        msg = await channel.send(embed=embed)
-        await ctx.send("Your role has been sent %s!" %camper.name)
+        if not camper.bot:
+            channel = await camper.create_dm()
+            msg = await channel.send(embed=embed)
+            await ctx.send("Your role has been sent %s!" %camper.name)
     
     for werewolf in werewolf_list:
         embed = create_werewolf_msg(werewolf_list)
-        channel = await werewolf.create_dm()
-        msg = await channel.send(embed=embed)
-        await ctx.send("Your role has been sent %s!" %werewolf.name)
+        if not werewolf.bot:
+            channel = await werewolf.create_dm()
+            msg = await channel.send(embed=embed)
+            await ctx.send("Your role has been sent %s!" %werewolf.name)
 
     for wannabe in wannabe_list:
         embed = create_wannabe_msg(wannabe_list)
-        channel = await wannabe.create_dm()
-        msg = await channel.send(embed=embed)
-        await ctx.send("Your role has been sent %s!" %wannabe.name)
+        if not wannabe.bot:
+            channel = await wannabe.create_dm()
+            msg = await channel.send(embed=embed)
+            await ctx.send("Your role has been sent %s!" %wannabe.name)
     
     
 

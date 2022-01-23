@@ -50,7 +50,7 @@ class GameState:
         self.num_players = len(player_names)
         self.time = "Night"
         print("before nigth")
-        self.extra_roles=extra_rolesi
+        self.extra_roles=extra_roles
         
         if custom_roles:
             random_roles, self.picked_roles = self.set_custom_roles(custom_role_dict)
