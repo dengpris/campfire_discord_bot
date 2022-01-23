@@ -341,7 +341,30 @@ async def printlist(ctx):
         msg = await channel.send(embed=embed)
         await ctx.send("Your role has been sent %s" %wannabe.name)
 
-@bot.command(name='dmcampcounsellor', help='send dm to camp counsellor')
+@bot.event
+async def on_reaction_choose(ctx):
+    print("herherherherehherherher")
+    if not isinstance(ctx.message.channel, discord.DMChannel): return
+    #channel = await user.create_dm()
+    # reactions cannot be removed in DMs
+    # for reacts in reaction.message.reactions:
+    #     # do not delete if made by bot or if emoji was just created
+    #     if (user in await reacts.users().flatten() and not user.bot and str(reacts) != str(reaction.emoji)):
+    #         await message.remove_reaction(reaction, user)
+
+    print(ctx.message.emoji)
+    if(ctx.message.emoji == unicode_letters[0]):
+        print("emji 0")
+    else:
+        print("emoji1")
+    # for poll in poll_list:
+    #     name = poll.get_name_from_emoji(reaction.emoji)
+    #     if (name): 
+    #         await user.send("You are now voting for: " + reaction.emoji + " " + name)
+    #         poll.votes = poll.votes+1
+    #         print(poll.votes)
+
+@bot.command(name='dmcc', help='send dm to camp counsellor')
 async def printlist(ctx):
     # userlist.pop(0)
     # userlist.pop(0)
@@ -352,9 +375,17 @@ async def printlist(ctx):
         msg = await channel.send(embed=embed)
         await ctx.send("Your role has been sent %s" %cc.name)
         message = await channel.send(embed=embed)
+
+        
         await message.add_reaction(unicode_letters[0])
         await message.add_reaction(unicode_letters[1])
 
+        message = await channel.fetch_message(message.id)
+
+        print("==================================")
+        print(message)
+
+        await on_reaction_choose(ctx)
         # print(message.count)
         # if(message.reaction[0].count > message.reaction[1].count):
         #     print(message.reaction[0].count) 
