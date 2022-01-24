@@ -74,9 +74,10 @@ def submit_start_settings(number_of_each_role):
 async def show_current_roles(ctx, num_players, custom_roles=False):
     
     #num_players = 3
+    roles_listed_out = ""
 
     if num_players < 3:
-        num_players = 4
+        #num_players = 4
         await ctx.send(f"Not enough players... maybe find more friends? {num_players}")
         #exit()
     
@@ -90,10 +91,12 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
         else:
             max_num_roles = DEFAULT_ROLE_VALUES[str(num_players)].copy()
 
-        role_list = "Current Number of Each Role: \n" + "**Werewolves:** " + str(max_num_roles["Werewolf"]) + "\t\n**Camp Counselor:** " + str(max_num_roles["Camp Counselor"]) + "\t\n**Wannabe:** "+ str(max_num_roles["Wannabe"]) + "\t\n**Introvert:** " + str(max_num_roles["Introvert"]) +  "\t\n**Pairs of BFFs:** " + str(max_num_roles["bffpair"]) + "\t\n**Campers:** " + str(max_num_roles["Camper"]) +  "\n\nPlease remember that not all roles may be used during this game session!" 
-    
-        embed = create_welcome_camper_msg(role_list)
-        await ctx.send(embed=embed)
+        roles_listed_out = "Current Number of Each Role: \n" + "**Werewolves:** " + str(max_num_roles["Werewolf"]) + "\t\n**Camp Counselor:** " + str(max_num_roles["Camp Counselor"]) + "\t\n**Wannabe:** "+ str(max_num_roles["Wannabe"]) + "\t\n**Introvert:** " + str(max_num_roles["Introvert"]) +  "\t\n**Pairs of BFFs:** " + str(max_num_roles["bffpair"]) + "\t\n**Campers:** " + str(max_num_roles["Camper"]) +  "\n\nPlease remember that not all roles may be used during this game session!" 
+    else:
+        roles_listed_out = "Current Number of Each Role: \n" + "**Werewolves:** " + str(NUM_OF_EACH_ROLE["Werewolf"]) + "\t\n**Camp Counselor:** " + str(NUM_OF_EACH_ROLE["Camp Counselor"]) + "\t\n**Wannabe:** "+ str(NUM_OF_EACH_ROLE["Wannabe"]) + "\t\n**Introvert:** " + str(NUM_OF_EACH_ROLE["Introvert"]) +  "\t\n**Pairs of BFFs:** " + str(NUM_OF_EACH_ROLE["bffpair"]) + "\t\n**Campers:** " + str(NUM_OF_EACH_ROLE["Camper"]) +  "\n\nPlease remember that not all roles may be used during this game session!" 
+
+    embed = create_welcome_camper_msg(roles_listed_out)
+    await ctx.send(embed=embed)
 
     await ctx.send("Do you want to change the number of each role? please enter **y** or **n**")
 
@@ -126,7 +129,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
         while(GAME_RUNNING):
             print('Game Start!')
             nameList=[member.name for member in userlist]
-            nameList=["A", "B", "C", "D"]
+            #nameList=["A", "B", "C", "D"]
             print(nameList)
 
             #number of players
@@ -137,7 +140,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             roles_dictionary = NUM_OF_EACH_ROLE
             custom_roles = CUSTOM_ROLES
             game=roles.GameState(nameList, roles_dictionary, True, custom_roles=custom_roles)
-            nameList=[member.name for member in userlist]
+            #nameList=[member.name for member in userlist]
             # game.set_random_roles()
             global UNUSED_ROLES
             UNUSED_ROLES = game.get_unused_roles()
