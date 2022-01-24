@@ -3,7 +3,6 @@ from calendar import c
 from email.errors import FirstHeaderLineIsContinuationDefect
 
 from numpy import maximum
-from campfire_discord_bot.globalvar import CUSTOM_ROLE_MAX_LIMIT, CUSTOM_ROLE_MIN_LIMIT
 import os
 from pickle import FALSE
 import random
@@ -26,7 +25,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -156,8 +155,8 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
         return msg.author == ctx.author and msg.channel == ctx.channel and \
         msg.content.lower() in ["y", "n"]
 
-    #def check(msg):
-    #    return msg.author == ctx.author and msg.channel == ctx.channel 
+    def check(msg):
+        return msg.author == ctx.author and msg.channel == ctx.channel 
 
     msg = await bot.wait_for("message", check=check_y_n)
     if msg.content.lower() == "y":
