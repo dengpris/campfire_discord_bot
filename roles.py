@@ -59,14 +59,13 @@ class GameState:
         #Assigning roles
         self.players = [Player(player_names[person], random_roles[person]) for person in range(self.num_players)]
 
-        
-        
+    def get_unused_roles(self):
+        return self.unused_roles
+
     def set_custom_roles(self, custom_role_dict):
 
-        picked_roles = []
         players_roles = []
-
-        picked_roles=custom_role_dict.keys()
+        unused_roles = []
         
         # If best friends is a role, replace with bff_1 or bff_2
         # Make sure only bestfriends know each other (only pairs know each other)
@@ -77,11 +76,6 @@ class GameState:
             custom_role_dict.update(new_bff_roles)
 
         # If camp Counselor is one of the roles, make sure theres 3 extra roles.
-        
-        # if custom_role_dict["Camp Counselor"] != 0:
-        #     if self.num_players < len(players_roles):
-        #         excess_roles = len(players_roles) - self.num_players 
-        #         if excess_roles < 3
 
         for role in custom_role_dict:
                 num_of_each_role_available = custom_role_dict[role]
@@ -91,21 +85,27 @@ class GameState:
 
         random.shuffle(players_roles)
 
-        # If number of players < number of roles, remove excess roles
-        if self.num_players < len(players_roles):
-            n = len(players_roles) - self.num_players
-            players_roles = players_roles[:len(players_roles)-n]
+        ### Wouldn't be used with the current logic but save for the future
+        ## If number of players < number of roles, remove excess roles
+        # if self.num_players < len(players_roles):
+        #     n = len(players_roles) - self.num_players
+        #     players_roles = players_roles[:len(players_roles)-n]
+        ## If number of players > number of roles, add access campers
+        # if self.num_players > len(players_roles):
+        #     n = self.num_players - len(players_roles)  
+        #     while n != 0:
+        #         players_roles.append("Camper")
+        #         n -=1 
         
-        # If number of players > number of roles, add access campers
-                        
-        if self.num_players > len(players_roles):
-            n = self.num_players - len(players_roles)  
-            while n != 0:
-                players_roles.append("Camper")
-                n -=1 
+        if self.num_players < len(players_roles):
+            #if this happens, it should only happen 3 times
+            n = len(players_roles) - self.num_players  
+            for i in range(n):
+                #Always pop index 2
+                res = unused_roles.append(players_roles.pop(0))
                 
         random.shuffle(players_roles)
-        return players_roles, picked_roles
+        return players_roles, unused_roles
 
     def set_default_roles(self):
         default_role_dict = {}
@@ -141,7 +141,7 @@ class GameState:
             n = len(players_roles) - self.num_players  
             for i in range(n):
                 #Always pop index 2
-                res = unused_roles.append(players_roles.pop(2))
+                res = unused_roles.append(players_roles.pop(0))
 
         random.shuffle(players_roles)
         return players_roles, unused_roles      
