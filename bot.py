@@ -1,6 +1,7 @@
 # bot.py
 from calendar import c
 from email.errors import FirstHeaderLineIsContinuationDefect
+from tkinter import N
 
 from numpy import maximum
 import os
@@ -8,6 +9,7 @@ from pickle import FALSE
 import random
 import asyncio
 from tabnanny import check
+from webbrowser import Elinks
 import roles
 import sys
 
@@ -68,6 +70,7 @@ def settings_usage_text():
 def set_start_settings(custom_role_numbers):
     list_of_roles = ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
     number_of_each_role =  {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
+    print(f"CUSTOM ROLE NUMBERS IS {custom_role_numbers}")
     for i in range(6):
             role_int = int(custom_role_numbers[i])
             number_of_each_role[list_of_roles[i]] = role_int
@@ -83,7 +86,7 @@ def turn_strList_to_intList(strList):
         intList.append(int(str))
     return intList
 
-def check_settings_validity(num_players, custom_role_numbers):
+def valid_role_settings(num_players, custom_role_numbers):
     
     custom_role_numbers = turn_strList_to_intList(custom_role_numbers)
     minimum_limit = []
@@ -99,38 +102,70 @@ def check_settings_validity(num_players, custom_role_numbers):
         maximum_limit = [num_players-2, num_players-2, num_players-1, num_players-1, int(num_players//2), num_players-1]
     else:
     # Note that these global variables also follow same logic as above, but it will give you the opportunity to edit each one.
-        minimum_limit = CUSTOM_ROLE_MIN_LIMIT[str(num_players)].values()
-        maximum_limit = CUSTOM_ROLE_MAX_LIMIT[str(num_players)].values()
+        minimum_limit = list(CUSTOM_ROLE_MIN_LIMIT[str(num_players)].values())
+        maximum_limit = list(CUSTOM_ROLE_MAX_LIMIT[str(num_players)].values())
 
     for i in range(6):
         
         if minimum_limit[i] > custom_role_numbers[i]:
-            error_line += "`ERROR! The " + role_names[i] + " amount: **" + str(custom_role_numbers[i]) + "** does not meet the MINIMUM requirement of **" + str(minimum_limit[i]) + "`\n"
+            error_line += "**ERROR!** The " + role_names[i] + " amount: **" + str(custom_role_numbers[i]) + "** does not meet the __MINIMUM__ requirement of **" + str(minimum_limit[i]) + "** " + role_names[i] + "\n"
         if maximum_limit[i] < custom_role_numbers[i]:
-            error_line += "`ERROR! The " + role_names[i] + " amount: **" + str(custom_role_numbers[i]) + "** does not meet the MAXIMUM requirement of **" + str(minimum_limit[i]) + "`\n"
+            error_line += "**ERROR!** The " + role_names[i] + " amount: **" + str(custom_role_numbers[i]) + "** does not meet the __MAXIMUM__ requirement of **" + str(minimum_limit[i]) + "** " + role_names[i] + "\n"
         if role_names[i] == "bffpair":
             role_count += custom_role_numbers[i]*2
         else:
             role_count += custom_role_numbers[i]
 
     #Check if they sellected atleast 1 Camp Counselor
-    if custom_role_numbers[2] != 0:
+    if custom_role_numbers[1] != 0:
         #If 1 Camp Counselor is selected, make sure we have an extra 3 roles
         required_role_count = num_players+3
         if role_count != (required_role_count):
-            error_line += "`ERROR! Currently, there are only **" + str(role_count) + "** roles. We require exactly **" + str(required_role_count) + "** because you want a Camp Counselor`\n"
+            error_line += "**ERROR!** Currently, there are **" + str(role_count) + "** roles. We require __exactly__ **" + str(required_role_count) + "** because you want a Camp Counselor\n"
     
-    return error_line
+    if error_line != "":
+        return False, error_line
+    else:
+        return True, error_line
 
-# def check_settings_input(msg):
-#     if msg.author == ctx.author and msg.channel == ctx.channel:
-#         msg_string = msg.content.split()
-#         num_args = len(msg_string)
-#         if num_args != 6:
-            
-#     else:
-#         return False
+async def send_Error(ctx, error):
+    error_dict = {"1": ("**ERROR!** "+ settings_usage_text()), "2": "**ERROR!** Must be numbers only!"}
 
+    try:
+        int(error)
+    except(ValueError):
+        error_line = error
+    else:
+        if int(error) >2 or int(error) < 0:
+            error_line = "**ERROR!** Unknown Error"
+        else:
+            error_line = error_dict[str(error)]
+
+    await ctx.send(error_line)
+
+def all_numbers(settings_input_list):
+    for i in range(6):
+            try:
+                int(settings_input_list[i])
+            except ValueError:
+                return False
+    return True
+
+async def correct_settings_input(ctx, num_players, settings_input):
+    settings_input_list = settings_input.content.split()
+    num_args = len(settings_input_list)
+    if num_args != 6:
+        await send_Error(ctx, 1)
+        return False
+    elif not all_numbers(settings_input_list):
+        await send_Error(ctx, 2)
+        return False
+    else:
+        valid_settings, error_msg =valid_role_settings(num_players,settings_input_list)
+        if not valid_settings:
+            await send_Error(ctx, error_msg)
+            return False
+    return True
 
 async def show_current_roles(ctx, num_players, custom_roles=False):
     
@@ -162,30 +197,11 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
     if msg.content.lower() == "y":
         await ctx.send("**You said yes!**\n" + settings_usage_text())
         custom_role_numbers = await bot.wait_for("message",check=check)
-        custom_role_numbers = custom_role_numbers.content.split()
-        print(f"Custom_role_numbers is: {custom_role_numbers} with length {len(custom_role_numbers)}")
-        while len(custom_role_numbers)!=6:
-            await ctx.send(settings_usage_text())
+
+        while not await correct_settings_input(ctx, num_players, custom_role_numbers):
             custom_role_numbers = await bot.wait_for("message",check=check)
-            custom_role_numbers = custom_role_numbers.content.split()
 
-        NOT_A_NUMBER = 1
-        while (NOT_A_NUMBER):    
-            print(f"The args are: ", custom_role_numbers)
-            for i in range(6):
-                try:
-                    int(custom_role_numbers[i])
-                except ValueError:
-                    await ctx.send("Must be a number!")
-                    custom_role_numbers = await bot.wait_for("message",check=check)
-                    print(f'New arguments are: {custom_role_numbers.content}')
-                    custom_role_numbers = custom_role_numbers.content.split()
-                    NOT_A_NUMBER = 1
-                    break
-            NOT_A_NUMBER = 0
-
-        print("WE'RE HERE!!!! ")
-        set_start_settings(custom_role_numbers)
+        set_start_settings(custom_role_numbers.content.split())
         await see_settings_roles(ctx)
 
     else:
@@ -255,10 +271,13 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             for player in eliminated:
                 await ctx.send(f"{player.name} has been voted out with {highest_votes} votes.")
 
+            await reveal_roles(ctx, eliminated, poll_list)
             await win_conditions(ctx, eliminated)
 
-        #timer ends, initialze vote
-        #player_booted, num_votes = game.tally_votes()
+            
+
+    #timer ends, initialze vote
+    #player_booted, num_votes = game.tally_votes()
 
         #determine winners
 
@@ -288,7 +307,7 @@ async def send_role(game,ctx):
             for user in userlist:
                 if user.name == player.name:
                     best_friend_list.append(user)
-        else: #camp_counselor
+        elif  (player.get_role_info() == "Camp Counselor"): #camp_counselor
             for user in userlist:
                 if user.name == player.name:
                     camp_counselor_list.append(user)      
@@ -329,7 +348,7 @@ async def send_role(game,ctx):
             await ctx.send("Your role has been sent %s!" %best_friend.name)
 
     player_emoji_dic={}
-    for cc in userlist:
+    for cc in camp_counselor_list:
         emoji_idx=0
         if not cc.bot:
             channel = await cc.create_dm()
@@ -353,37 +372,41 @@ async def send_role(game,ctx):
     campCounsellorsCheckedIn=[]
     camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
     while True:
-        reaction, user = await bot.wait_for('reaction_add', timeout=15.0, check=check)
-        # if camp counsellor is reacting the first time
-        if user.name not in campCounsellorsCheckedIn:
-            for letters in unicode_letters:
-                if str(reaction.emoji) == str(unicode_letters[emoji_idx]) :
-                    #get missing roles
-                    await reaction.message.channel.send("These roles are missing")
-                    # UNCOMMENT THIS WHEN MISSING ROLES LOGIC STARTS WORKING
-                    # embed = create_cc_missing_reveal_msg(role_one)
-                    # await reaction.message.channel.send(embed=embed)
-                    # embed = create_cc_missing_reveal_msg(role_two)
-                    # await reaction.message.channel.send(embed=embed)
-                    campCounsellorsCheckedIn.append(user.name)
-                    break
-                
-                elif str(reaction.emoji) == str(letters):
-                    r=""
-                    for p in game.players:
-                        if p.name==player_emoji_dic[str(reaction.emoji)]:
-                            r=p.role
+        try:
+            reaction, user = await bot.wait_for('reaction_add', timeout=15.0, check=check)
+            # if camp counsellor is reacting the first time
+            if user.name not in campCounsellorsCheckedIn:
+                for letters in unicode_letters:
+                    if str(reaction.emoji) == str(unicode_letters[emoji_idx]) :
+                        #get missing roles
+                        await reaction.message.channel.send("These roles are missing")
+                        # UNCOMMENT THIS WHEN MISSING ROLES LOGIC STARTS WORKING
+                        # embed = create_cc_missing_reveal_msg(role_one)
+                        # await reaction.message.channel.send(embed=embed)
+                        # embed = create_cc_missing_reveal_msg(role_two)
+                        # await reaction.message.channel.send(embed=embed)
+                        campCounsellorsCheckedIn.append(user.name)
+                        break
                     
-                    for p in userlist:
-                        if p.name==player_emoji_dic[str(reaction.emoji)]:
-                            embed = create_cc_role_reveal_msg(p, r)
-                            await reaction.message.channel.send(embed=embed)
-                    campCounsellorsCheckedIn.append(user.name)
-                    break
-        
-        if all(elem in campCounsellorsCheckedIn for elem in camp_counselor_list_names):
+                    elif str(reaction.emoji) == str(letters):
+                        r=""
+                        for p in game.players:
+                            if p.name==player_emoji_dic[str(reaction.emoji)]:
+                                r=p.role
+                        
+                        for p in userlist:
+                            if p.name==player_emoji_dic[str(reaction.emoji)]:
+                                embed = create_cc_role_reveal_msg(p, r)
+                                await reaction.message.channel.send(embed=embed)
+                        campCounsellorsCheckedIn.append(user.name)
+                        break
+            
+            if all(elem in campCounsellorsCheckedIn for elem in camp_counselor_list_names):
+                break
+        except asyncio.TimeoutError:
+            print("break heare istg")
             break
-
+            
 ################ START GAME ######################
 @bot.command(name='start', help='start the game')
 async def start(ctx):
@@ -407,9 +430,11 @@ async def start(ctx):
         reaction = message.reactions[0] # checkmark reactions only
         
         async for user in reaction.users():
+            if user.bot:
+                continue
+            else:
                 userlist.append(user)
                 await ctx.send(user.name) 
-        userlist.pop(0)
         await gameLogic(ctx, 1, 1, CUSTOM_ROLES)
     else:
         await ctx.send("The game is running already! Type !reset if you want to restart the game.")
@@ -477,7 +502,6 @@ async def set_settings(ctx, *args):
 
 @bot.command(name="see_roles", help='see current custom role number settings (note that default will set all to 0)')
 async def see_settings_roles(ctx):
-    await ctx.send("HERE")
     await ctx.send("Current Customized Number of Each Role: \n" + 
                     "**Werewolves:** " + str(NUM_OF_EACH_ROLE["Werewolf"]) + "\t**CampCounsellor:** " + str(NUM_OF_EACH_ROLE["Camp Counselor"]) +
                     "\t**Wannabe:** "+ str(NUM_OF_EACH_ROLE["Wannabe"]) + "\t**Introvert:** " + str(NUM_OF_EACH_ROLE["Introvert"]) + 
@@ -485,7 +509,6 @@ async def see_settings_roles(ctx):
 
 @bot.command(name="reset_roles", help='reset the roles to have default values')
 async def reset_roles(ctx):
-    #await ctx.send("HERE")
     global CUSTOM_ROLES
     CUSTOM_ROLES = False
     global NUM_OF_EACH_ROLE
@@ -547,7 +570,7 @@ async def win_conditions(ctx, eliminated):
             for player in camp_counselor_list:
                 winners.append(player.name)
             for player in best_friend_list:
-                winners.apend(player.name)
+                winners.append(player.name)
             break
         #if wannabe or camper voted
         elif player.role == "Wannabe" or player.role == "Camper" or player.role == "Best Friend" or player.role == "Camp Counsellor":
@@ -568,13 +591,50 @@ async def win_conditions(ctx, eliminated):
     )
     await ctx.send(embed = embed)
 
+    text=""
+    for u in player_list:
+        text=text+u.name+" is a "+u.role+"\n"
+
+    embed = discord.Embed(
+        title = ("All Roles Revealed:"),
+        description = (text),
+        color = discord.Color.blurple()
+    )
+    await ctx.send(embed = embed)
+
 ###################### REVEAL LOGIC ######################
-async def reveal_roles(ctx):
-    # camper
-    # camp counsellor
-    # best friend
-    # werewolves
-    # wannabe
-    # introvert    
+async def reveal_roles(ctx, eliminated, poll_list):
+    poll_list.sort(key=lambda x: x.votes, reverse=False)
+
+    text=""
+    voteVal=0
+    for p in poll_list:
+        print(p.user+"  "+str(p.votes))
+        if p.votes==voteVal:
+            text=text+p.user+"\n"
+        if p.votes!=voteVal:    
+            embed = discord.Embed(
+                    title = (f"People with "+ str(voteVal) +" votes"),
+                    description = (text),
+                    color = discord.Color.blurple()
+                )
+            await ctx.send(embed=embed)
+
+            text=""
+            text=text+p.user+"\n"
+            voteVal=p.votes
+    embed = discord.Embed(
+        title = (f"People voted off"),
+        description = (text),
+        color = discord.Color.red()
+    )
+    await ctx.send(embed=embed)
+    
+# (ppl who weren't voted off)
+# (ppl who were voted off AND their roles) 
+# (which and how many camper roles that were used) 
+# (which and how many werewolves/wannabe roles that were used) 
+# (missing roles)
+# (who won campers or werewolves)
     return 
 bot.run(TOKEN)
