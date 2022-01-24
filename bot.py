@@ -1,5 +1,8 @@
 # bot.py
 from calendar import c
+from email.errors import FirstHeaderLineIsContinuationDefect
+
+from numpy import maximum
 import os
 from pickle import FALSE
 import random
@@ -70,9 +73,64 @@ def set_start_settings(custom_role_numbers):
             number_of_each_role[list_of_roles[i]] = role_int
     global NUM_OF_EACH_ROLE
     NUM_OF_EACH_ROLE = number_of_each_role.copy()
-    print("NUM OF EACH ROLE", NUM_OF_EACH_ROLE)
     global CUSTOM_ROLES
     CUSTOM_ROLES = True
+
+# Assume list_of_roles are all valid numbers
+def turn_strList_to_intList(strList):
+    intList = []
+    for str in strList:
+        intList.append(int(str))
+    return intList
+
+def check_settings_validity(num_players, custom_role_numbers):
+    
+    custom_role_numbers = turn_strList_to_intList(custom_role_numbers)
+    minimum_limit = []
+    maximum_limit = []
+    role_names = ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
+    error_line = ""
+    role_count = 0
+
+    #if more than 10 players, return a different set of max
+    if num_players > 10:
+        # ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
+        minimum_limit = [1, 0, 0, 0, 0, 0]
+        maximum_limit = [num_players-2, num_players-2, num_players-1, num_players-1, int(num_players//2), num_players-1]
+    else:
+    # Note that these global variables also follow same logic as above, but it will give you the opportunity to edit each one.
+        minimum_limit = CUSTOM_ROLE_MIN_LIMIT[str(num_players)].values()
+        maximum_limit = CUSTOM_ROLE_MAX_LIMIT[str(num_players)].values()
+
+    for i in range(6):
+        
+        if minimum_limit[i] > custom_role_numbers[i]:
+            error_line += "`ERROR! The " + role_names[i] + " amount: **" + str(custom_role_numbers[i]) + "** does not meet the MINIMUM requirement of **" + str(minimum_limit[i]) + "`\n"
+        if maximum_limit[i] < custom_role_numbers[i]:
+            error_line += "`ERROR! The " + role_names[i] + " amount: **" + str(custom_role_numbers[i]) + "** does not meet the MAXIMUM requirement of **" + str(minimum_limit[i]) + "`\n"
+        if role_names[i] == "bffpair":
+            role_count += custom_role_numbers[i]*2
+        else:
+            role_count += custom_role_numbers[i]
+
+    #Check if they sellected atleast 1 Camp Counselor
+    if custom_role_numbers[2] != 0:
+        #If 1 Camp Counselor is selected, make sure we have an extra 3 roles
+        required_role_count = num_players+3
+        if role_count != (required_role_count):
+            error_line += "`ERROR! Currently, there are only **" + str(role_count) + "** roles. We require exactly **" + str(required_role_count) + "** because you want a Camp Counselor`\n"
+    
+    return error_line
+
+# def check_settings_input(msg):
+#     if msg.author == ctx.author and msg.channel == ctx.channel:
+#         msg_string = msg.content.split()
+#         num_args = len(msg_string)
+#         if num_args != 6:
+            
+#     else:
+#         return False
+
 
 async def show_current_roles(ctx, num_players, custom_roles=False):
     
@@ -136,6 +194,7 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
 
     await ctx.send("Alright! Let the Games BEGIN!!!")
 
+################# GAME LOGIC #####################
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     while(BOT_RUNNING):
         while(GAME_RUNNING):
