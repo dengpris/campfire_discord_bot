@@ -545,6 +545,7 @@ async def on_reaction_remove(reaction, user):
 async def win_conditions(ctx, eliminated):
     winners = []
     win_roles = []
+    global GAME_RUNNING
     for player in eliminated:
         # if introvert is voted, everyone auto loses except introvert
         if player.role == "Introvert":
@@ -590,6 +591,7 @@ async def win_conditions(ctx, eliminated):
         color = discord.Color.blurple()
     )
     await ctx.send(embed = embed)
+    GAME_RUNNING=False
 
 ###################### REVEAL LOGIC ######################
 async def reveal_roles(ctx, eliminated, poll_list):
