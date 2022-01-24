@@ -5,6 +5,7 @@ from pickle import FALSE
 import random
 import asyncio
 from tabnanny import check
+from webbrowser import Elinks
 import roles
 
 from discord.ext import commands
@@ -197,6 +198,8 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
     await win_conditions(ctx, eliminated)
 
+    await reveal_roles(ctx, eliminated)
+
     #timer ends, initialze vote
     #player_booted, num_votes = game.tally_votes()
 
@@ -228,7 +231,7 @@ async def send_role(game,ctx):
             for user in userlist:
                 if user.name == player.name:
                     best_friend_list.append(user)
-        else: #camp_counselor
+        elif  (player.get_role_info() == "Camp Counselor"): #camp_counselor
             for user in userlist:
                 if user.name == player.name:
                     camp_counselor_list.append(user)      
@@ -269,7 +272,7 @@ async def send_role(game,ctx):
             await ctx.send("Your role has been sent %s!" %best_friend.name)
 
     player_emoji_dic={}
-    for cc in userlist:
+    for cc in camp_counselor_list:
         emoji_idx=0
         if not cc.bot:
             channel = await cc.create_dm()
@@ -468,12 +471,37 @@ async def win_conditions(ctx, eliminated):
     await ctx.send(embed = embed)
 
 ###################### REVEAL LOGIC ######################
-async def reveal_roles(ctx):
-    # camper
-    # camp counsellor
-    # best friend
-    # werewolves
-    # wannabe
-    # introvert    
+async def reveal_roles(ctx, eliminated):
+    allUserNames=[e.name for e in userlist]
+    eliminatedNames=[e.name for e in eliminated]
+    notEliminatedNames= list(set(eliminatedNames).symmetric_difference(set(allUserNames)))
+    
+    print(allUserNames)
+    print(eliminatedNames)
+    print(notEliminatedNames)
+
+    await ctx.send(allUserNames)
+    await ctx.send(eliminatedNames)
+    await ctx.send(notEliminatedNames)
+
+    countCampers=len(camper_list)
+    countCampCounsellors=len(camp_counselor_list)
+    countBestFriends=len(best_friend_list)
+    countIntroverts=len(introvert_list)
+    countWerewolves=len(werewolf_list)
+    countWannabes=len(wannabe_list)
+
+    await ctx.send("camper : "+str(countCampers))
+    await ctx.send("camp counsellros : "+str(countCampCounsellors))
+    await ctx.send("bestfirends : "+str(countBestFriends))
+    await ctx.send("camp introverts : "+str(countIntroverts))
+    await ctx.send("camp werewolves : "+str(countWerewolves))
+    await ctx.send("camp wannabe : "+str(countWannabes))
+# (ppl who weren't voted off)
+# (ppl who were voted off AND their roles) 
+# (which and how many camper roles that were used) 
+# (which and how many werewolves/wannabe roles that were used) 
+# (missing roles)
+# (who won campers or werewolves)
     return 
 bot.run(TOKEN)
