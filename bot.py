@@ -162,63 +162,6 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             await ctx.send(werewolf_list)
             # ensure camp Counselor made choices (if applicalble)
 
-<<<<<<< HEAD
-            # dm player to remind role and to vote
-=======
-    nameList=[member.name for member in userlist]
-    print(nameList)
-
-    #number of players
-    num_players = len(nameList)
-    await show_current_roles(ctx, num_players,custom_roles)
-
-    roles_dictionary = NUM_OF_EACH_ROLE.copy()
-    custom_roles = CUSTOM_ROLES
-    game=roles.GameState(nameList, roles_dictionary, True, custom_roles=custom_roles)
-    # game.set_random_roles()
-    await send_role(game,ctx)
-    print(game.players)
-    print("printing game object")
-    print(game)
-    #night time timer
-    await timer(ctx, 0, 15)
-    # ensure camp Counselor made choices (if applicalble)
-
-    # dm player to remind role and to vote
-    embed = create_poll(userlist, poll_list)
-    #member = ctx.message.author
-    for user in userlist:
-        if user.bot == False: # do not send messages to yourself
-            channel = await user.create_dm()
-            message = await channel.send(embed=embed)
-            channel_list.append(channel)
-
-        # add reactions
-            i=0
-            while i<len(userlist):
-                await message.add_reaction(unicode_letters[i])
-                i = i+1
-    
-    # start day time timer
-    await timer(ctx, 0, 5)
-
-    #players vote on werewolfs
-    poll_list.sort(key=lambda x: x.votes, reverse=True)
-    
-    eliminated = []
-    highest_votes = poll_list[0].votes
-    print(f"highest votes {highest_votes}")
-    for poll in poll_list:     
-        if poll.votes == highest_votes:
-            print(poll.user)
-            for player in player_list:
-                elim_player = player.find_player(poll.user)
-                if elim_player:
-                    eliminated.append(elim_player)
-        else:
-            break
->>>>>>> 3554eb15bbab45de79cf30425e30b35d619eea4f
-
             embed = create_poll(userlist, poll_list)
             #member = ctx.message.author
             for user in userlist:
