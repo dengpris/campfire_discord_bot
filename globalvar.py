@@ -11,6 +11,17 @@ introvert_list = []
 best_friend_list = []
 camp_counselor_list = []
 
+########## ROLE IMAGE URLS ###########
+welcome_url = 'https://i.imgur.com/OPCZSjx.png'
+camper_url = 'https://i.imgur.com/4AYKSl3.jpg'
+cc_url = 'https://i.imgur.com/FnS0HP5.jpg'
+best_friend_url = 'https://i.imgur.com/wHgG64a.jpg'
+werewolf_url = 'https://i.imgur.com/VP45oFp.jpg'
+introvert_url = 'https://i.imgur.com/UFh7Xsp.jpg'
+wannabe_url = 'https://i.imgur.com/XZSDOEU.jpg'
+
+###############################################
+
 NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
 CUSTOM_ROLES = False
 

@@ -9,7 +9,7 @@ def create_welcome_camper_msg(role_list):
         description = "These are the list of roles!\n\n **Note:** Not all roles may be used during this game session!\n\n" + role_list,
         color = discord.Color.blue()
     )
-    embed.set_image(url='https://i.imgur.com/OPCZSjx.png')
+    embed.set_image(url=welcome_url)
     return embed
 
 async def create_camp_counsellor_msg(userlist, channel):
@@ -34,8 +34,7 @@ async def create_camp_counsellor_msg(userlist, channel):
     embed.add_field(name = "Options", value = value)
 
     # embed.add_field(name = "Options", value = unicode_letters[0] + " Choose a person to expose their role\n"+unicode_letters[1]+" Find out two roles that are not in the camp\n")
-    embed.set_image(url='https://i.imgur.com/FnS0HP5.jpg')
-
+    embed.set_image(url=cc_url)
     return embed
 
 def create_camper_msg():
@@ -44,7 +43,7 @@ def create_camper_msg():
         description = "You will have a great time at camp if you get rid of any werewolves and don't accidentally kick out a fellow camper. You just want to have fun at camp.",
         color = discord.Color.blue()
     )
-    embed.set_image(url='https://i.imgur.com/4AYKSl3.jpg')
+    embed.set_image(url=camper_url)
     return embed
 
 def create_werewolf_msg(wolf_list):
@@ -67,7 +66,7 @@ def create_werewolf_msg(wolf_list):
         description = "You will have a good trip as long as no one from your misunderstood wolf pack gets kicked out.\n\n" + werewolf_str,
         color = discord.Color.red()
     )
-    embed.set_image(url='https://i.imgur.com/VP45oFp.jpg')
+    embed.set_image(url=werewolf_url)
     return embed
 
 def create_introvert_msg():
@@ -76,7 +75,7 @@ def create_introvert_msg():
         description = "You do not like camp, but your mom made you come. You have to figure out a way to go home without her blaming you. You will have a good trip if you get kicked out in the morning.",
         color = discord.Color.gold()
     )
-    embed.set_image(url='https://i.imgur.com/UFh7Xsp.jpg')
+    embed.set_image(url=introvert_url)
     return embed
 
 def create_best_friend_msg(bestie_list, me):
@@ -99,7 +98,7 @@ def create_best_friend_msg(bestie_list, me):
         description = "You will have a good time at camp if you get rid of any werewolves and don't accidentally get rid of your best friend - who you know isn't a werewolf.\n\n""" + best_friend_str,
         color = discord.Color.blue()
     )
-    embed.set_image(url='https://i.imgur.com/wHgG64a.jpg')
+    embed.set_image(url=best_friend_url)
     return embed
 
 def create_wannabe_msg(wolf_list):
@@ -121,5 +120,66 @@ def create_wannabe_msg(wolf_list):
         description = "You really want the werewolves to like you... even though they don't know who you are. Your goal is for none of them to get kicked out, even if that means you have to go instead.\n\n" + werewolf_str,
         color = discord.Color.red()
     )
-    embed.set_image(url='https://i.imgur.com/XZSDOEU.jpg')
+    embed.set_image(url=wannabe_url)
+    return embed
+
+############ EMBEDS FOR CAMP COUNSELLOR REVEAL ##############
+def create_cc_role_reveal_msg(user, role):
+    color = discord.Color.blurple()
+    description = ""
+    # camper team is blue
+    if role == "Camper" or role == "Best Friend" or role == "Camp Counselor" or role == "Camp Counsellor":
+        color = discord.Color.blue()
+        description = "This player is a fellow teammate! Make sure they aren't voted off!"
+    # werewolf team is red
+    if role == "Werewolf":
+        color = discord.Color.dark_red()
+        description = "Uh oh! This player is a werewolf! Make sure they are voted off in the morning!"
+    if role == "Wannabe":
+        color = discord.Color.dark_orange()
+        description = "This person wants to be friends with the werewolves and will protect them at all costs. Don't let them fool you!"
+    # introvert yellow
+    if role == "Introvert":
+        color = discord.Color.gold()
+        description = "This player is an introvert and will try to go home no matter what! Do not send them home!"
+
+    embed = discord.Embed(
+        title = f"{user.name} is a {role}!",
+        description = f"{description}",
+        color = color
+    )
+    embed.set_image(url=user.avatar_url)
+    return embed
+
+def create_cc_missing_reveal_msg(role):
+    color = discord.Color.blurple()
+    url = ""
+    # camper team is blue
+    if role == "Camper":
+        color = discord.Color.blue()
+        url = camper_url
+    elif role == "Best Friend":
+        color == discord.Color.blue()
+        url = best_friend_url
+    elif role == "Camp Counselor" or role == "Camp Counsellor":
+        color = discord.Color.blue()
+        color = cc_url
+    # werewolf team is red
+    elif role == "Werewolf":
+        color = discord.Color.dark_red()
+        url = werewolf_url
+    elif role == "Wannabe":
+        color = discord.Color.dark_orange()
+        url = wannabe_url
+    # introvert yellow
+    elif role == "Introvert":
+        color = discord.Color.gold()
+        url = introvert_url
+    
+    embed = discord.Embed(
+        title = f"A {role} is missing!",
+        description = f"One of the missing roles is a {role}.",
+        color = color
+    )
+    embed.set_image(url=url)
     return embed

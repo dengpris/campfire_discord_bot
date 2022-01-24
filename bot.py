@@ -285,24 +285,30 @@ async def send_role(game,ctx):
             await message.add_reaction(unicode_letters[emoji_idx])
             await ctx.send("Your role has been sent %s" %cc.name)
     
+
+    ############### CAMP COUNSELLOR SELECTION ################
     def check(reaction, user):
         return user in userlist and str(reaction.emoji) in unicode_letters
 
     campCounsellorsCheckedIn=[]
     camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
     while True:
-        reaction, user = await bot.wait_for('reaction_add', check=check)
+        reaction, user = await bot.wait_for('reaction_add', timeout=15.0, check=check)
         # if camp counsellor is reacting the first time
         if user.name not in campCounsellorsCheckedIn:
             for letters in unicode_letters:
                 if str(reaction.emoji) == str(unicode_letters[emoji_idx]) :
                     #get missing roles
                     await reaction.message.channel.send("These roles are missing")
+                    # UNCOMMENT THIS WHEN MISSING ROLES LOGIC STARTS WORKING
+                    # embed = create_cc_missing_reveal_msg(role_one)
+                    # await reaction.message.channel.send(embed=embed)
+                    # embed = create_cc_missing_reveal_msg(role_two)
+                    # await reaction.message.channel.send(embed=embed)
                     campCounsellorsCheckedIn.append(user.name)
                     break
                 
                 elif str(reaction.emoji) == str(letters):
-
                     r=""
                     for p in game.players:
                         if p.name==player_emoji_dic[str(reaction.emoji)]:
@@ -310,10 +316,8 @@ async def send_role(game,ctx):
                     
                     for p in userlist:
                         if p.name==player_emoji_dic[str(reaction.emoji)]:
-                            profilePic=p.avatar_url
-                            await reaction.message.channel.send(profilePic)
-                            await reaction.message.channel.send(player_emoji_dic[str(reaction.emoji)]+ " is a " +r+ "!")
-                    
+                            embed = create_cc_role_reveal_msg(p, r)
+                            await reaction.message.channel.send(embed=embed)
                     campCounsellorsCheckedIn.append(user.name)
                     break
         
