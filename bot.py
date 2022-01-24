@@ -27,7 +27,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -99,7 +99,7 @@ def valid_role_settings(num_players, custom_role_numbers):
     if num_players > 10:
         # ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
         minimum_limit = [1, 0, 0, 0, 0, 0]
-        maximum_limit = [num_players-2, num_players-2, num_players-1, num_players-1, int(num_players//2), num_players-1]
+        maximum_limit = [num_players-2, num_players-2, num_players-1, 1, 1, num_players-1]
     else:
     # Note that these global variables also follow same logic as above, but it will give you the opportunity to edit each one.
         minimum_limit = list(CUSTOM_ROLE_MIN_LIMIT[str(num_players)].values())
@@ -120,8 +120,12 @@ def valid_role_settings(num_players, custom_role_numbers):
     if custom_role_numbers[1] != 0:
         #If 1 Camp Counselor is selected, make sure we have an extra 3 roles
         required_role_count = num_players+3
-        if role_count != (required_role_count):
-            error_line += "**ERROR!** Currently, there are **" + str(role_count) + "** roles. We require __exactly__ **" + str(required_role_count) + "** because you want a Camp Counselor\n"
+        if role_count != required_role_count:
+            error_line += "**ERROR!** Currently, you chose **" + str(role_count) + "** roles. We require __exactly__ **" + str(required_role_count) + "** because you want a __Camp Counselor__ (Note: Pair of BFFs counts as 2 roles)\n"
+    else:
+        required_role_count = num_players
+        if role_count != required_role_count:
+            error_line += "**ERROR!** Currently, you chose **" + str(role_count) + "** roles. We require __exactly__ **" + str(required_role_count) + "** (Note: Pair of BFFs counts as 2 roles)\n"
     
     if error_line != "":
         return False, error_line
@@ -184,7 +188,7 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
         embed = create_welcome_camper_msg(role_list)
         await ctx.send(embed=embed)
 
-    await ctx.send("Do you want to customize roles? please enter **y** or **n**")
+    await ctx.send("Do you want to change the number of each role? please enter **y** or **n**")
 
     def check_y_n(msg):
         return msg.author == ctx.author and msg.channel == ctx.channel and \
@@ -226,6 +230,9 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             custom_roles = CUSTOM_ROLES
             game=roles.GameState(nameList, roles_dictionary, True, custom_roles=custom_roles)
             # game.set_random_roles()
+            global UNUSED_ROLES
+            UNUSED_ROLES = game.get_unused_roles()
+            get_unused_roles()
 
             await send_role(game,ctx)
             print(game.players)
@@ -280,6 +287,11 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     #player_booted, num_votes = game.tally_votes()
 
         #determine winners
+
+def get_unused_roles():
+    unused_roles = UNUSED_ROLES.copy()
+    print(f"UNUSED_ROLES ARE: {unused_roles}")
+    return unused_roles
 
 ################ ROLE HANDOUT TO DMS ######################
 async def send_role(game,ctx):
