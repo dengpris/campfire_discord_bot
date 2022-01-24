@@ -407,9 +407,11 @@ async def start(ctx):
         reaction = message.reactions[0] # checkmark reactions only
         
         async for user in reaction.users():
+            if user.bot:
+                continue
+            else:
                 userlist.append(user)
                 await ctx.send(user.name) 
-        userlist.pop(0)
         await gameLogic(ctx, 1, 1, CUSTOM_ROLES)
     else:
         await ctx.send("The game is running already! Type !reset if you want to restart the game.")
@@ -536,7 +538,7 @@ async def win_conditions(ctx, eliminated):
             for player in camp_counselor_list:
                 winners.append(player.name)
             for player in best_friend_list:
-                winners.apend(player.name)
+                winners.append(player.name)
             break
         #if wannabe or camper voted
         elif player.role == "Wannabe" or player.role == "Camper" or player.role == "Best Friend" or player.role == "Camp Counsellor":
