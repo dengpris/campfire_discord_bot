@@ -46,11 +46,11 @@ def create_camper_msg():
     embed.set_image(url=camper_url)
     return embed
 
-def create_werewolf_msg(wolf_list):
+def create_werewolf_msg(wolf_list, me):
     names = []
     delimeter = '\n'
     for wolf in wolf_list:
-        if wolf.bot:
+        if wolf.bot or wolf == me:
             continue
         else:
             names.append(wolf.name)
@@ -82,7 +82,7 @@ def create_best_friend_msg(bestie_list, me):
     names = []
     delimeter = '\n'
     for bestie in bestie_list:
-        if bestie.bot or bestie==me:
+        if bestie.bot or bestie == me:
             continue
         else:
             names.append(bestie.name)
