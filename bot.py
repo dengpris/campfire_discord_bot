@@ -79,7 +79,7 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
     if num_players < 3:
         #num_players = 4
         await ctx.send(f"Not enough players... maybe find more friends? {num_players}")
-        #exit()
+        await reset_bot(ctx)
     
     if not custom_roles:
         if num_players > 10:
