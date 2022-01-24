@@ -22,7 +22,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='$', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -242,7 +242,7 @@ async def send_role(game,ctx):
             await ctx.send("Your role has been sent %s!" %camper.name)
     
     for werewolf in werewolf_list:
-        embed = create_werewolf_msg(werewolf_list)
+        embed = create_werewolf_msg(werewolf_list, werewolf)
         if not werewolf.bot:
             channel = await werewolf.create_dm()
             msg = await channel.send(embed=embed)
@@ -336,7 +336,14 @@ async def start(ctx):
         await message.add_reaction('✅')
 
         # Waits 5 seconds for people to react
-        await asyncio.sleep(5)
+        moon_message = await ctx.send(5 * "🌕")
+        for i in range(4,0,-1):
+            await asyncio.sleep(1)
+            update_moon = i * "🌕"
+            await moon_message.edit(content=update_moon)
+        await moon_message.delete()
+        await ctx.send("\n**Time is up!**\nHere's everyone that made it to camp:")
+
         message = await ctx.channel.fetch_message(message.id)
         reaction = message.reactions[0] # checkmark reactions only
         

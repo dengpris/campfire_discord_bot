@@ -26,6 +26,7 @@ CUSTOM_ROLES = False
 
 BOT_RUNNING = True
 GAME_RUNNING = False
+
 #Default MAXIMUM role values per each number (Note cannot play with 3 players or less)
 DEFAULT_ROLE_VALUES = {  "3": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":2},
                     "4": {"Werewolf":1, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3}, #7 -> 3
