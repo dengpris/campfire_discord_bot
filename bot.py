@@ -580,6 +580,17 @@ async def win_conditions(ctx, eliminated):
     )
     await ctx.send(embed = embed)
 
+    text=""
+    for u in player_list:
+        text=text+u.name+" is a "+u.role+"\n"
+
+    embed = discord.Embed(
+        title = ("All Roles Revealed:"),
+        description = (text),
+        color = discord.Color.blurple()
+    )
+    await ctx.send(embed = embed)
+
 ###################### REVEAL LOGIC ######################
 async def reveal_roles(ctx, eliminated, poll_list):
     poll_list.sort(key=lambda x: x.votes, reverse=False)
