@@ -228,14 +228,11 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             # game.set_random_roles()
 
             await send_role(game,ctx)
-            print(game.players)
-            print("printing game object")
-            print(game)
             #night time timer
-            await timer(ctx, 0, 5)
-            await ctx.send("Werewolf list")
-            await ctx.send(werewolf_list)
-            # ensure camp Counselor made choices (if applicalble)
+            await timer(ctx, 0, 5)   
+            # ensure camp Counselor made choices (if applicalble)   
+            global new_day 
+            new_day = True
 
             embed = create_poll(userlist, poll_list)
             #member = ctx.message.author
@@ -250,7 +247,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
                         await message.add_reaction(unicode_letters[i])
                         i = i+1
             # start day time timer
-            await timer(ctx, 0, 5)
+            await timer(ctx, 0, 10)
 
             #players vote on werewolfs
             poll_list.sort(key=lambda x: x.votes, reverse=True)
@@ -260,7 +257,6 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             print(f"highest votes {highest_votes}")
             for poll in poll_list:     
                 if poll.votes == highest_votes:
-                    print(poll.user)
                     for player in player_list:
                         elim_player = player.find_player(poll.user)
                         if elim_player:
@@ -290,7 +286,6 @@ async def send_role(game,ctx):
             for user in userlist:
                 if user.name == player.name:
                     werewolf_list.append(user)
-            await ctx.send(werewolf_list)
         elif player.get_role_info() == "Camper":
             for user in userlist:
                 if user.name == player.name:
@@ -373,7 +368,7 @@ async def send_role(game,ctx):
     camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
     while True:
         try:
-            reaction, user = await bot.wait_for('reaction_add', timeout=15.0, check=check)
+            reaction, user = await bot.wait_for('reaction_add', timeout=5.0, check=check)
             # if camp counsellor is reacting the first time
             if user.name not in campCounsellorsCheckedIn:
                 for letters in unicode_letters:
@@ -524,33 +519,32 @@ async def reset_roles(ctx):
 async def on_reaction_add(reaction, user):
     # make sure this is in DMs
     if not isinstance(reaction.message.channel, discord.DMChannel): return
-    # make sure reaction is valid
-    if reaction.emoji not in unicode_letters: return
+    # make sure its not bot, make sure reaction is valid and make sure is new day
+    if user.bot or new_day==False or str(reaction.emoji) not in unicode_letters: 
+        return
     
+    voted_name = ""
+    # get name associated with emoji
     for poll in poll_list:
-        if (poll.name == user.name):
+        if poll.get_name_from_emoji(reaction.emoji):
+            voted_name = poll.user
+            break
+    for poll in poll_list:    
+        if (poll.user == user.name):
             # if player already voted, remove old vote
-            if (poll.voted == True):
+            if (poll.voted):
                 for player in poll_list:
-                    if player.name == poll.voted:
+                    if player.user == poll.voted:
                         player.votes = player.votes-1
-            poll.voted = voted
-
-        voted_name = poll.get_name_from_emoji(reaction.emoji)
-        if (voted_name): # the name that was chosen by emoji
+            poll.voted = voted_name
+        
+        if (poll.user == voted_name): # the name that was chosen by emoji
             poll.votes = poll.votes+1
-            await user.send("You are now voting for: " + reaction.emoji + " " + voted_name)   
-
-
-# @bot.event
-# async def on_reaction_remove(reaction, user):
-#     # make sure this occurs in DMs
-#     if not isinstance(reaction.message.channel, discord.DMChannel): return
-#     for poll in poll_list:
-#         name = poll.get_name_from_emoji(reaction.emoji)
-#         if (name): 
-#             await user.send("You are no longer voting for: " + reaction.emoji + " " + name)
-#             poll.votes = poll.votes-1
+            # await user.send("You are now voting for: " + reaction.emoji + " " + voted_name)
+            for player in userlist:
+                if player.name == poll.user:
+                    embed = create_vote_for_msg(player)
+                    await user.send(embed=embed)   
 
 #################### WIN CONDITIONS LOGIC ###################
 async def win_conditions(ctx, eliminated):

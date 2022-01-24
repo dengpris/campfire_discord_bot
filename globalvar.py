@@ -10,6 +10,8 @@ introvert_list = []
 best_friend_list = []
 camp_counselor_list = []
 
+new_day = False
+
 ########## ROLE IMAGE URLS ###########
 welcome_url = 'https://i.imgur.com/OPCZSjx.png'
 camper_url = 'https://i.imgur.com/4AYKSl3.jpg'

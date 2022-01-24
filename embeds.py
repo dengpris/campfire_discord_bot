@@ -183,3 +183,12 @@ def create_cc_missing_reveal_msg(role):
     )
     embed.set_image(url=url)
     return embed
+
+############## VOTE FOR MESSAGE EMBED #################
+def create_vote_for_msg(user):
+    embed = discord.Embed(
+        title = f"You will vote for {user.name}",
+        color = discord.Color.dark_red()
+    )
+    embed.set_image(url=user.avatar_url)
+    return embed
