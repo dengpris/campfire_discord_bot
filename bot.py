@@ -496,27 +496,38 @@ async def reset_roles(ctx):
                     "**If 6 players:**\t2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 1 camper\n" + 
                     "**If 7 or more players:**\t2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 2 or more campers")
 
-
+################### DM VOTING LOGIC ##################
 @bot.event
 async def on_reaction_add(reaction, user):
     # make sure this is in DMs
     if not isinstance(reaction.message.channel, discord.DMChannel): return
-
+    # make sure reaction is valid
+    if reaction.emoji not in unicode_letters: return
+    
     for poll in poll_list:
-        name = poll.get_name_from_emoji(reaction.emoji)
-        if (name): 
-            await user.send("You are now voting for: " + reaction.emoji + " " + name)
+        if (poll.name == user.name):
+            # if player already voted, remove old vote
+            if (poll.voted == True):
+                for player in poll_list:
+                    if player.name == poll.voted:
+                        player.votes = player.votes-1
+            poll.voted = voted
+
+        voted_name = poll.get_name_from_emoji(reaction.emoji)
+        if (voted_name): # the name that was chosen by emoji
             poll.votes = poll.votes+1
-            print(poll.votes)
+            await user.send("You are now voting for: " + reaction.emoji + " " + voted_name)   
 
-@bot.event
-async def on_reaction_remove(reaction, user):
-    if not isinstance(reaction.message.channel, discord.DMChannel): return
-    for poll in poll_list:
-        name = poll.get_name_from_emoji(reaction.emoji)
-        if (name): 
-            await user.send("You are no longer voting for: " + reaction.emoji + " " + name)
-            poll.votes = poll.votes-1
+
+# @bot.event
+# async def on_reaction_remove(reaction, user):
+#     # make sure this occurs in DMs
+#     if not isinstance(reaction.message.channel, discord.DMChannel): return
+#     for poll in poll_list:
+#         name = poll.get_name_from_emoji(reaction.emoji)
+#         if (name): 
+#             await user.send("You are no longer voting for: " + reaction.emoji + " " + name)
+#             poll.votes = poll.votes-1
 
 #################### WIN CONDITIONS LOGIC ###################
 async def win_conditions(ctx, eliminated):

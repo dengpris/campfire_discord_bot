@@ -2,10 +2,11 @@ import discord
 from globalvar import *
 
 class poll:
-    def __init__(self, user, emoji, votes=0):
-        self.user = user
-        self.emoji = emoji
-        self.votes = votes
+    def __init__(self, user, emoji, voted="", votes=0):
+        self.user = user     # name (string)
+        self.emoji = emoji   # emoji
+        self.voted = voted   # name
+        self.votes = votes   # int
 
     def get_data(self):
         print(f'{self.user}+{self.emoji}j')
@@ -15,6 +16,11 @@ class poll:
             return self.user
         else:
             return None
+    
+    def set_voted_for(self, user):
+        self.voted = user
+        return 
+
 
 def create_poll(userlist, poll_list):
     embed = discord.Embed(
