@@ -173,9 +173,10 @@ async def correct_settings_input(ctx, num_players, settings_input):
 
 async def show_current_roles(ctx, num_players, custom_roles=False):
     
-    num_players = 3
+    #num_players = 3
     if num_players < 3:
         await ctx.send("Not enough players... maybe find more friends?")
+        #num_players = 4
         #exit()
     
     if not custom_roles:
