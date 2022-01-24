@@ -37,24 +37,24 @@ DEFAULT_ROLE_VALUES = {  "3": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "I
                     "10": {"Werewolf":4, "Camp Counselor":2, "Wannabe":1, "Introvert":1, "bffpair":1, "Camper":3}} #13
                     
 # Default MAXIMUM role values per each number (Note cannot play with 3 players or less)
-DEFAULT_ROLE_MAX_LIMIT = {  "3": {"Werewolf":1, "Camp Counselor":0, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":2},
-                            "4": {"Werewolf":1, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3}, #7 -> 3
-                            "5": {"Werewolf":2, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3}, #8 -> 3
-                            "6": {"Werewolf":2, "Camp Counselor":2, "Wannabe":1, "Introvert":1, "bffpair":1, "Camper":4}, #
-                            "7": {"Werewolf":3, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":5},
-                            "8": {"Werewolf":3, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":5},
-                            "9": {"Werewolf":4, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":6},
-                            "10": {"Werewolf":4, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":7}}
+CUSTOM_ROLE_MAX_LIMIT = {  "3": {"Werewolf":1, "Camp Counselor":1, "Wannabe":2, "Introvert":2, "bffpair":1, "Camper":2},
+                            "4": {"Werewolf":2, "Camp Counselor":2, "Wannabe":3, "Introvert":3, "bffpair":1, "Camper":3}, #7 -> 3
+                            "5": {"Werewolf":3, "Camp Counselor":3, "Wannabe":4, "Introvert":4, "bffpair":2, "Camper":4}, #8 -> 3
+                            "6": {"Werewolf":4, "Camp Counselor":4, "Wannabe":5, "Introvert":5, "bffpair":2, "Camper":5}, #
+                            "7": {"Werewolf":5, "Camp Counselor":5, "Wannabe":6, "Introvert":6, "bffpair":3, "Camper":6},
+                            "8": {"Werewolf":6, "Camp Counselor":6, "Wannabe":7, "Introvert":7, "bffpair":3, "Camper":7},
+                            "9": {"Werewolf":7, "Camp Counselor":7, "Wannabe":8, "Introvert":8, "bffpair":4, "Camper":8},
+                            "10": {"Werewolf":8, "Camp Counselor":8, "Wannabe":9, "Introvert":9, "bffpair":4, "Camper":9}}
 
 # Default MAXIMUM role values per each number (Note cannot play with 3 players or less)
-DEFAULT_ROLE_MIN_LIMIT = {  "3": {"Werewolf":1, "Camp Counselor":0, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":2},
-                            "4": {"Werewolf":1, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3}, #7 -> 3
-                            "5": {"Werewolf":2, "Camp Counselor":1, "Wannabe":1, "Introvert":1, "bffpair":0, "Camper":3}, #8 -> 3
-                            "6": {"Werewolf":2, "Camp Counselor":2, "Wannabe":1, "Introvert":1, "bffpair":1, "Camper":4}, #
-                            "7": {"Werewolf":3, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":5},
-                            "8": {"Werewolf":3, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":5},
-                            "9": {"Werewolf":4, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":6},
-                            "10": {"Werewolf":4, "Camp Counselor":2, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":7}}
+CUSTOM_ROLE_MIN_LIMIT = {  "3": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0},
+                            "4": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0},
+                            "5": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}, 
+                            "6": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}, 
+                            "7": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0},
+                            "8": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0},
+                            "9": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0},
+                            "10": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}}
 
 
 ROLE_INFO = {"Werewolf": {"About": "see the other werewolves","Limit": 1, "Required": True},
