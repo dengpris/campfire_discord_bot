@@ -20,6 +20,7 @@ from poll import *
 from embeds import *
 from globalvar import *
 
+
 ## CORNER CASE OVER 10 PLAYERS. (CONTAINS ERROR. FIX AS POLISH)
 def check_over_ten_players(num_players,role_dict):
 
@@ -59,14 +60,10 @@ def settings_usage_text():
 def set_start_settings(custom_role_numbers):
     list_of_roles = ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
     number_of_each_role =  {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
-    print(f"CUSTOM ROLE NUMBERS IS {custom_role_numbers}")
     for i in range(6):
             role_int = int(custom_role_numbers[i])
             number_of_each_role[list_of_roles[i]] = role_int
-    global NUM_OF_EACH_ROLE
-    NUM_OF_EACH_ROLE = number_of_each_role.copy()
-    global CUSTOM_ROLES
-    CUSTOM_ROLES = True
+    return number_of_each_role
 
 # Assume list_of_roles are all valid numbers
 def turn_strList_to_intList(strList):
@@ -99,7 +96,7 @@ def valid_role_settings(num_players, custom_role_numbers):
         if minimum_limit[i] > custom_role_numbers[i]:
             error_line += "**ERROR!** The " + role_names[i] + " amount: **" + str(custom_role_numbers[i]) + "** does not meet the __MINIMUM__ requirement of **" + str(minimum_limit[i]) + "** " + role_names[i] + "\n"
         if maximum_limit[i] < custom_role_numbers[i]:
-            error_line += "**ERROR!** The " + role_names[i] + " amount: **" + str(custom_role_numbers[i]) + "** does not meet the __MAXIMUM__ requirement of **" + str(minimum_limit[i]) + "** " + role_names[i] + "\n"
+            error_line += "**ERROR!** The " + role_names[i] + " amount: **" + str(custom_role_numbers[i]) + "** does not meet the __MAXIMUM__ requirement of **" + str(maximum_limit[i]) + "** " + role_names[i] + "\n"
         if role_names[i] == "bffpair":
             role_count += custom_role_numbers[i]*2
         else:
@@ -145,7 +142,8 @@ def all_numbers(settings_input_list):
     return True
 
 async def correct_settings_input(ctx, num_players, settings_input):
-    settings_input_list = settings_input.content.split()
+    #settings_input_list = settings_input.content.split()
+    settings_input_list = settings_input.copy()
     num_args = len(settings_input_list)
     if num_args != 6:
         await send_Error(ctx, 1)
@@ -159,3 +157,5 @@ async def correct_settings_input(ctx, num_players, settings_input):
             await send_Error(ctx, error_msg)
             return False
     return True
+
+

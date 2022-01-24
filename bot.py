@@ -64,6 +64,13 @@ async def werewolfEnd(ctx):
     await ctx.send("imma kil l myself")
     exit()
 
+################# SET SETTINGS ####################
+def submit_start_settings(number_of_each_role):
+    global NUM_OF_EACH_ROLE
+    NUM_OF_EACH_ROLE = number_of_each_role.copy()
+    global CUSTOM_ROLES
+    CUSTOM_ROLES = True
+
 async def show_current_roles(ctx, num_players, custom_roles=False):
     
     #num_players = 3
@@ -101,16 +108,15 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
     if msg.content.lower() == "y":
         await ctx.send("**You said yes!**\n" + settings_usage_text())
         custom_role_numbers = await bot.wait_for("message",check=check)
-
-        while not await correct_settings_input(ctx, num_players, custom_role_numbers):
+        while not await correct_settings_input(ctx, num_players, custom_role_numbers.content.split()):
             custom_role_numbers = await bot.wait_for("message",check=check)
 
-        set_start_settings(custom_role_numbers.content.split())
+        submit_start_settings(set_start_settings(custom_role_numbers.content.split()))
         await see_settings_roles(ctx)
 
     else:
         global CUSTOM_ROLES
-        CUSTOM_ROLES = False
+        CUSTOM_ROLES = custom_roles
 
     await ctx.send("Alright! Let the Games BEGIN!!!")
 
@@ -120,6 +126,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
         while(GAME_RUNNING):
             print('Game Start!')
             nameList=[member.name for member in userlist]
+            nameList=["A", "B", "C", "D"]
             print(nameList)
 
             #number of players
@@ -130,6 +137,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             roles_dictionary = NUM_OF_EACH_ROLE
             custom_roles = CUSTOM_ROLES
             game=roles.GameState(nameList, roles_dictionary, True, custom_roles=custom_roles)
+            nameList=[member.name for member in userlist]
             # game.set_random_roles()
             global UNUSED_ROLES
             UNUSED_ROLES = game.get_unused_roles()
@@ -376,37 +384,41 @@ async def set_settings(ctx, *args):
     def check(message):
          return message.author == ctx.author and message.channel == ctx.channel
 
-    if len(args) !=6 :
-        await ctx.send("You need **6** arguments. Please enter 6 numbers, each will correspond to the number of each roles to be used during the game\n"
-                        + "Do `$settings <num of werewolf> <num of Counselor> <num of wannabe> <num of introverts> <num of bffpair> <num of camper>`\n"
-                        + "For example: **$settings 1 1 0 0 1 3** for 1 werewolf, 1 Counselor, 0 wannabes, 0 introverts, 1 pair of bffs(ie 2 players can have this role), 3 campers. ")
+    if len(args) !=7 :
+        await ctx.send("You need **7** arguments. Please enter 7 numbers, each will correspond to the number of each roles to be used during the game\n"
+                        + "Do `$settings <num of total participants> <num of werewolf> <num of Counselor> <num of wannabe> <num of introverts> <num of bffpair> <num of camper>`\n"
+                        + "For example: **$settings 3 1 1 0 0 1 3** for 3 participants, 1 werewolf, 1 Counselor, 0 wannabes, 0 introverts, 1 pair of bffs(ie 2 players can have this role), 3 campers. ")
         raise BaseException
-    
-    NOT_A_NUMBER = 1
-    while (NOT_A_NUMBER):
-        print(f"The args are: ", args)
-        for i in range(6):
-            try:
-                role_int = int(args[i])
-                number_of_each_role[list_of_roles[i]] = role_int
-                NOT_A_NUMBER = 0
-            except ValueError:
-                await ctx.send("Must be a number!\nPlease enter 6 numbers, each will correspond to the number of each role used during the game")
-                new_arguments = await bot.wait_for("message",check=check)
-                print(f'New arguments are: {new_arguments.content}')
-                args = new_arguments.content.split()
-                NOT_A_NUMBER = 1
-                break
 
-    await ctx.send(f"Set settings successfully.\n" + 
-                    "**Werewolves:** " + str(number_of_each_role["Werewolf"]) + "\t**CampCounsellor:** " + str(number_of_each_role["Camp Counselor"]) +
-                    "\t**Wannabe:** "+ str(number_of_each_role["Wannabe"]) + "\t**Introvert:** " + str(number_of_each_role["Introvert"]) + "\t**Pairs of BFFs:** " + str(number_of_each_role["bffpair"]) +
-                    "\t**Campers:** " + str(number_of_each_role["Camper"]))
-    print(f"New role lmits are: {number_of_each_role}")
-    global NUM_OF_EACH_ROLE
-    NUM_OF_EACH_ROLE = number_of_each_role.copy()
-    global CUSTOM_ROLES
-    CUSTOM_ROLES = True
+    else:
+        custom_role_numbers = list(args)
+        num_players = int(custom_role_numbers[0])
+        custom_role_numbers.pop(0)
+        good_input = False
+        
+        # CHECK IF NUM_PLAYERS IS VALID
+        while not good_input:
+            if num_players < 3:
+                await ctx.send("Need atleast 3 players.")
+                good_input = False
+            else:
+                await ctx.send(f"Thank you! You have chosen **{str(num_players)}** players.")
+                #await ctx.send(settings_usage_text())
+                good_input = True
+        
+        # Check if the other 6 args are valid. number of players have been saved
+        good_input = await correct_settings_input(ctx, num_players, custom_role_numbers)
+        if not good_input:
+            await ctx.send("We now only need the next **6** arguments. Please send arguments again ex: `1 1 0 0 1 3`")
+
+        while not good_input :
+            custom_role_numbers = await bot.wait_for("message",check=check)
+            custom_role_numbers = custom_role_numbers.content.split()
+            good_input = await correct_settings_input(ctx, num_players, custom_role_numbers)
+
+    submit_start_settings(set_start_settings(custom_role_numbers))
+    await see_settings_roles(ctx)
+
 
 @bot.command(name="see_roles", help='see current custom role number settings (note that default will set all to 0)')
 async def see_settings_roles(ctx):
