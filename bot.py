@@ -437,10 +437,7 @@ async def reset_roles(ctx):
     global NUM_OF_EACH_ROLE
     NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
     ## Wrong information
-    await ctx.send("**ROLES HAVE BEEN RESET TO DEFAULT VALUES**.\n" +
-                    "**If less than or equal to 5 players:**\t1 werewolf, 4 or less campers.\n" + 
-                    "**If 6 players:**\t2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 1 camper\n" + 
-                    "**If 7 or more players:**\t2 werewolf, 1 wannabe, 1 introvert, 1 camp Counselor, 2 or more campers")
+    await ctx.send("**ROLES HAVE BEEN RESET TO DEFAULT VALUES**.\n")
 
 ################### DM VOTING LOGIC ##################
 @bot.event
