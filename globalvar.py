@@ -19,6 +19,7 @@ best_friend_url = 'https://i.imgur.com/wHgG64a.jpg'
 werewolf_url = 'https://i.imgur.com/VP45oFp.jpg'
 introvert_url = 'https://i.imgur.com/UFh7Xsp.jpg'
 wannabe_url = 'https://i.imgur.com/XZSDOEU.jpg'
+missing_url = 'https://i.imgur.com/1ADdRCU.jpg'
 
 ###############################################
 

@@ -159,8 +159,9 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             global new_day 
             new_day = True
 
+            # SEND VOTING DM TO EACH PLAYER
+            # Flow: on_reaction_add 
             embed = create_poll(userlist, poll_list)
-            #member = ctx.message.author
             for user in userlist:
                 if user.bot == False: # do not send messages to yourself
                     channel = await user.create_dm()
@@ -171,9 +172,11 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
                     while i<len(userlist):
                         await message.add_reaction(unicode_letters[i])
                         i = i+1
+            
             # start day time timer
             await timer(ctx, 0, 25)
-            #players vote on werewolfs
+            
+            # TALLY VOTES
             poll_list.sort(key=lambda x: x.votes, reverse=True)
             
             eliminated = []
@@ -193,8 +196,6 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
             await reveal_roles(ctx, eliminated, poll_list)
             await win_conditions(ctx, eliminated)
-
-            
 
     #timer ends, initialze vote
     #player_booted, num_votes = game.tally_votes()
@@ -272,6 +273,7 @@ async def send_role(game,ctx):
             await ctx.send("Your role has been sent %s!" %best_friend.name)
 
     player_emoji_dic={}
+    # SEND DM TO ALL CAMP COUNSELORS
     for cc in camp_counselor_list:
         emoji_idx=0
         if not cc.bot:
@@ -291,7 +293,10 @@ async def send_role(game,ctx):
 
     ############### CAMP COUNSELLOR SELECTION ################
     def check(reaction, user):
-        return user in userlist and str(reaction.emoji) in unicode_letters
+        return user in camp_counselor_list and str(reaction.emoji) in unicode_letters
+    
+    def check_missing(reaction, user):
+        return user in camp_counselor_list and str(reaction.emoji) in unicode_letters[:3] # A B C
 
     campCounsellorsCheckedIn=[]
     camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
@@ -303,12 +308,25 @@ async def send_role(game,ctx):
                 for letters in unicode_letters:
                     if str(reaction.emoji) == str(unicode_letters[emoji_idx]) :
                         #get missing roles
-                        await reaction.message.channel.send("These roles are missing")
-                        # UNCOMMENT THIS WHEN MISSING ROLES LOGIC STARTS WORKING
-                        # embed = create_cc_missing_reveal_msg(role_one)
-                        # await reaction.message.channel.send(embed=embed)
-                        # embed = create_cc_missing_reveal_msg(role_two)
-                        # await reaction.message.channel.send(embed=embed)
+                        message = await ctx.send(embed=choose_two_missing_roles_msg())
+                        for emoji_idx in range(3):
+                            message.add_reaction(unicode_letters[emoji_idx])
+                        
+                        missing_revealed = set()
+                        while len(missing_revealed) < 2:
+                            await bot.wait_for('reaction_add', timeout = 4.0, check=check_missing)
+                            embed = discord.Embed()
+                            if reaction.emoji == unicode_letters[0]: # "A"
+                                embed = create_cc_missing_reveal_msg(UNUSED_ROLES[0])
+                                missing_revealed.add(0)
+                            elif reaction.emoji == unicode_letters[1]:
+                                embed = create_cc_missing_reveal_msg(UNUSED_ROLES[1])
+                                missing_revealed.add(1)
+                            else:
+                                embed = create_cc_missing_reveal_msg(UNUSED_ROLES[2])
+                                missing_revealed.add(2)
+                            await reaction.message.channel.send(embed=embed)
+                        
                         campCounsellorsCheckedIn.append(user.name)
                         break
                     

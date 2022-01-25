@@ -151,6 +151,15 @@ def create_cc_role_reveal_msg(user, role):
     embed.set_image(url=user.avatar_url)
     return embed
 
+def choose_two_missing_roles_msg():
+    embed = discord.Embed(
+        title = "Three people have gone missing!",
+        description = "The missing people trouble you greatly, so you decide to look into this a bit further. You may choose to expose two of the three missing roles.",
+        color = discord.Color.blurple()
+    )
+    embed.set_image(url=missing_url)
+    return embed
+
 def create_cc_missing_reveal_msg(role):
     color = discord.Color.blurple()
     url = ""
