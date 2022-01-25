@@ -188,7 +188,34 @@ def create_cc_missing_reveal_msg(role):
 def create_vote_for_msg(user):
     embed = discord.Embed(
         title = f"You will vote for {user.name}",
+        color = discord.Color.green()
+    )
+    embed.set_image(url=user.avatar_url)
+    return embed
+
+def create_no_longer_vote_msg(user):
+    embed = discord.Embed(
+        title = f"You are no longer voting for {user.name}",
         color = discord.Color.dark_red()
     )
     embed.set_image(url=user.avatar_url)
+    return embed
+
+def create_vote_status_msg(poll_list, seconds):
+    name_list = ""
+    voted_emoji = ""
+    
+    for player in poll_list:
+        name_list = name_list + "\n" + player.user
+        if player.voted:
+            voted_emoji = voted_emoji + "\n" + "✅"
+        else:
+            voted_emoji = voted_emoji + "\n" + "❌"
+    
+    embed = discord.Embed(
+        title = f"There are {seconds} seconds left to vote...")
+    
+    embed.add_field(name= "Player", value= name_list, inline= True)
+    embed.add_field(name= "Voted", value= voted_emoji, inline= True)
+        
     return embed

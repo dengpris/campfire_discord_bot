@@ -9,6 +9,7 @@ wannabe_list = []
 introvert_list = []
 best_friend_list = []
 camp_counselor_list = []
+total_voted = 0
 
 ########## ROLE IMAGE URLS ###########
 welcome_url = 'https://i.imgur.com/OPCZSjx.png'

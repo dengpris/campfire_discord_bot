@@ -54,10 +54,13 @@ async def timer(ctx, minutes, seconds=0):
             minuteLeft=totalseconds//60
             secondsLeft=totalseconds%60
             await message.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            await asyncio.sleep(1)
             if (total_voted == len(userlist)):
                 await ctx.send("Everybody has voted! Who will be sent home?")
-                return
+                return True
+            # UPDATE VOTING STATUS EVERY 5 SECONDS
+            if secondsLeft%5 == 0: 
+                await ctx.send(embed=create_vote_status_msg(poll_list, secondsLeft))          
+            await asyncio.sleep(1)
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
     except ValueError:
         await ctx.send("Must be a number!")
@@ -169,7 +172,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
                         await message.add_reaction(unicode_letters[i])
                         i = i+1
             # start day time timer
-            await timer(ctx, 0, 15)
+            await timer(ctx, 0, 25)
             #players vote on werewolfs
             poll_list.sort(key=lambda x: x.votes, reverse=True)
             
@@ -474,6 +477,7 @@ async def on_reaction_add(reaction, user):
                 if player.name == poll.user:
                     embed = create_vote_for_msg(player)
                     await user.send(embed=embed)   
+    # if voting for the first time, send message to channel
     if not has_already_voted:
         global total_voted
         total_voted += 1
