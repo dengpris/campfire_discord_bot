@@ -55,6 +55,9 @@ async def timer(ctx, minutes, seconds=0):
             secondsLeft=totalseconds%60
             await message.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             await asyncio.sleep(1)
+            if (total_voted == len(userlist)):
+                await ctx.send("Everybody has voted! Who will be sent home?")
+                return
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
     except ValueError:
         await ctx.send("Must be a number!")
@@ -166,8 +169,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
                         await message.add_reaction(unicode_letters[i])
                         i = i+1
             # start day time timer
-            await timer(ctx, 0, 10)
-
+            await timer(ctx, 0, 15)
             #players vote on werewolfs
             poll_list.sort(key=lambda x: x.votes, reverse=True)
             
@@ -349,7 +351,7 @@ async def start(ctx):
         reaction = message.reactions[0] # checkmark reactions only
         
         async for user in reaction.users():
-            if user.bot:
+            if user == message.author:
                 continue
             else:
                 userlist.append(user)
@@ -402,7 +404,7 @@ async def set_settings(ctx, *args):
         # CHECK IF NUM_PLAYERS IS VALID
         while not good_input:
             if num_players < 3:
-                await ctx.send("Need atleast 3 players.")
+                await ctx.send("Need at least 3 players.")
                 good_input = False
             else:
                 await ctx.send(f"Thank you! You have chosen **{str(num_players)}** players.")
@@ -446,8 +448,8 @@ async def on_reaction_add(reaction, user):
     if not isinstance(reaction.message.channel, discord.DMChannel): return
     # make sure its not bot, make sure reaction is valid and make sure is new day
     if user.bot or new_day==False or str(reaction.emoji) not in unicode_letters: 
-        return
-    
+        return    
+    has_already_voted = False
     voted_name = ""
     # get name associated with emoji
     for poll in poll_list:
@@ -460,7 +462,9 @@ async def on_reaction_add(reaction, user):
             if (poll.voted):
                 for player in poll_list:
                     if player.user == poll.voted:
-                        player.votes = player.votes-1
+                        player.votes -= 1
+                        has_already_voted = True
+                        break
             poll.voted = voted_name
         
         if (poll.user == voted_name): # the name that was chosen by emoji
@@ -470,6 +474,41 @@ async def on_reaction_add(reaction, user):
                 if player.name == poll.user:
                     embed = create_vote_for_msg(player)
                     await user.send(embed=embed)   
+    if not has_already_voted:
+        global total_voted
+        total_voted += 1
+
+
+@bot.event
+async def on_reaction_remove(reaction, user):
+    # make sure this occurs in DMs
+    if not isinstance(reaction.message.channel, discord.DMChannel): return
+    # make sure its not bot, make sure reaction is valid and make sure is new day
+    if user.bot or new_day==False or str(reaction.emoji) not in unicode_letters: 
+        return
+
+    unvoted_name = ""
+    # get name associated with emoji
+    for poll in poll_list:
+        if poll.get_name_from_emoji(reaction.emoji):
+            unvoted_name = poll.user
+            break
+    for poll in poll_list:
+        if (poll.user == user.name):
+            if poll.voted == unvoted_name:
+                # await user.send("You are no longer voting for: " + reaction.emoji + " " + unvoted_name)
+                poll.voted = ""
+                for poll in poll_list:
+                    if poll.user == unvoted_name:
+                        poll.votes -= 1
+                        global total_voted
+                        total_voted -= 1
+                        break
+    # send embed telling player they are no longer voting
+    for player in userlist:
+        if player.name == unvoted_name:
+            embed = create_no_longer_vote_msg(player)
+            await user.send(embed=embed)
 
 #################### WIN CONDITIONS LOGIC ###################
 async def win_conditions(ctx, eliminated):
