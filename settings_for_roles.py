@@ -1,29 +1,16 @@
-from calendar import c
-from email.errors import FirstHeaderLineIsContinuationDefect
-from tkinter import N
-
-from numpy import maximum
-import os
-from pickle import FALSE
-import random
-import asyncio
-from tabnanny import check
-from webbrowser import Elinks
-import roles
-import sys
-
-from discord.ext import commands
-from dotenv import load_dotenv
 from discord.utils import get
-
-from poll import *
-from embeds import *
 from globalvar import *
 
 
 ## CORNER CASE OVER 10 PLAYERS. (CONTAINS ERROR. FIX AS POLISH)
 def check_over_ten_players(num_players,role_dict):
+    """
+    Check if the combination of roles is playable for over 10 players
+    [Note]: Not working
 
+    :num_players:   Number of player participants
+    :role_dict:     Dictionary where keys are the role names and values are the number of instances of said role
+    """
     players_roles = []
     for role in role_dict:
         num_of_each_role_available = role_dict[role]
@@ -53,11 +40,22 @@ def check_over_ten_players(num_players,role_dict):
     
     return new_role_dict
 
-# Settings text
+#Edit be a global var
 def settings_usage_text():
+    """
+    Returns the instructions to change the role settings
+    """
     return "You need **6** arguments. Please enter 6 numbers, each will correspond to the number of each roles to be used during the game\n" + "Do `<num of werewolf> <num of Counselor> <num of wannabe> <num of introverts> <num of bffpair> <num of camper>`\n" + "For example: **1 1 0 0 1 3** for 1 werewolf, 1 Counselor, 0 wannabes, 0 introverts, 1 pair of bffs(ie 2 players can have this role), 3 campers."
 
 def set_start_settings(custom_role_numbers):
+    """
+    Organizes the given numbers for each role into a dictionary where the role is the key and the number of each role is the value.
+
+    :custom_role_numbers:           A list of strings that have the number(as a string) of each role in order of {Werewolf, Camp Counselor, Wannabe, Introvert, PairofBFFs, Campers}
+    :return (number_of_each_role):  A dictionary specifying the number of each role and the role it's related to
+    """
+
+    #Edit be a globalvar
     list_of_roles = ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
     number_of_each_role =  {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
     for i in range(6):
@@ -67,16 +65,35 @@ def set_start_settings(custom_role_numbers):
 
 # Assume list_of_roles are all valid numbers
 def turn_strList_to_intList(strList):
+    """
+    Turns a list of strings into a list of integers
+
+    :strList:             a list of strings
+    :return (intList):    a list of integers
+    """
     intList = []
     for str in strList:
         intList.append(int(str))
     return intList
 
 def valid_role_settings(num_players, custom_role_numbers):
-    
+    """
+    Checks to see if role combination is playable depending on the number of player participants
+    Takes global values to limit role numbers for num_players 3-10
+    If more than 10 players, uses a set equation to calculate limit role numbers
+    Checks to see if current role numbers are within the max and min limits
+    Checks to see if there are enough roles for all players
+
+    :num_players:           number of player participants
+    :custom_role_numbers:   a list of strings that have the number(as a string) of each role in order of {Werewolf, Camp Counselor, Wannabe, Introvert, PairofBFFs, Campers}
+    :return_1:              True if all coniditons are met else False
+    :return_2 (error_line): Any error messages
+    """
+    #Edit change into a list of ints before input
     custom_role_numbers = turn_strList_to_intList(custom_role_numbers)
     minimum_limit = []
     maximum_limit = []
+    #Edit be a global Var
     role_names = ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
     error_line = ""
     role_count = 0
@@ -119,6 +136,14 @@ def valid_role_settings(num_players, custom_role_numbers):
         return True, error_line
 
 async def send_Error(ctx, error):
+    """
+    Sends an error message to discord 
+
+    :ctx:       passed in to write messages to discord
+    :error:     integer or a string. If it's an interger, error message is taken from error_dict. If its a string, the error message is the string
+    """
+
+    #COULD BE IN GLOBAL VAR
     error_dict = {"1": ("**ERROR!** "+ settings_usage_text()), "2": "**ERROR!** Must be numbers only!"}
 
     try:
@@ -134,7 +159,13 @@ async def send_Error(ctx, error):
     await ctx.send(error_line)
 
 def all_numbers(settings_input_list):
-    for i in range(6):
+    """
+    Checks if a list of strings can be converted to a list of integers 
+
+    :settings_input_list:   a list of strings
+    :return:    True if the above statement is True, else returns false
+    """
+    for i in range(len(settings_input_list)):
             try:
                 int(settings_input_list[i])
             except ValueError:
@@ -142,6 +173,17 @@ def all_numbers(settings_input_list):
     return True
 
 async def correct_settings_input(ctx, num_players, settings_input):
+    """
+    Checks if role_settings input is valid. This will check for:
+    - number of arguments == 6 (the number of different roles we currently have)
+    - all arguments in the list is a number
+    - the combined roles provide proper playability (see valid_role_settings fcn)
+    
+    :ctx:            passed in to write messages to discord
+    :num_players:    number of player participants
+    :settings_input: a list of strings that have the number(as a string) of each role in order of {Werewolf, Camp Counselor, Wannabe, Introvert, PairofBFFs, Campers}
+    :return:         Returns False and if not all conditions are met, else returns True
+    """
     #settings_input_list = settings_input.content.split()
     settings_input_list = settings_input.copy()
     num_args = len(settings_input_list)
