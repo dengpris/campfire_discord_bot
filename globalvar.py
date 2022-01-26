@@ -21,6 +21,8 @@ introvert_url = 'https://i.imgur.com/UFh7Xsp.jpg'
 wannabe_url = 'https://i.imgur.com/XZSDOEU.jpg'
 missing_url = 'https://i.imgur.com/1ADdRCU.jpg'
 
+new_day = False
+
 ###############################################
 
 NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
@@ -40,7 +42,7 @@ DEFAULT_ROLE_VALUES = {  "3": {"Werewolf":1, "Camp Counselor":0, "Wannabe":0, "I
                     "10": {"Werewolf":4, "Camp Counselor":2, "Wannabe":1, "Introvert":1, "bffpair":1, "Camper":3}} #13
                     
 # Default MAXIMUM role values per each number (Note cannot play with 3 players or less)
-CUSTOM_ROLE_MAX_LIMIT = {  "3": {"Werewolf":1, "Camp Counselor":1, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":2},
+CUSTOM_ROLE_MAX_LIMIT = {  "3": {"Werewolf":1, "Camp Counselor":6, "Wannabe":2, "Introvert":1, "bffpair":1, "Camper":2},
                             "4": {"Werewolf":2, "Camp Counselor":2, "Wannabe":3, "Introvert":1, "bffpair":1, "Camper":3}, #7 -> 3
                             "5": {"Werewolf":3, "Camp Counselor":3, "Wannabe":4, "Introvert":1, "bffpair":1, "Camper":4}, #8 -> 3
                             "6": {"Werewolf":4, "Camp Counselor":4, "Wannabe":5, "Introvert":1, "bffpair":1, "Camper":5}, #

@@ -23,13 +23,12 @@ async def create_camp_counsellor_msg(userlist, channel):
     emoji_idx=0
     value = ""
     for u in userlist:
-        if not u.bot:
-            name = u.name
-            emoji = unicode_letters[emoji_idx]
-            value = value + emoji + " " + name + "\n" 
-            # update global variable poll_list, which maps emojis to names
-            # choice_list.append(poll(name, emoji))
-            emoji_idx+=1
+        name = u.name
+        emoji = unicode_letters[emoji_idx]
+        value = value + emoji + " " + name + "\n" 
+        # update global variable poll_list, which maps emojis to names
+        # choice_list.append(poll(name, emoji))
+        emoji_idx+=1
     value = value + unicode_letters[emoji_idx] + " Expose two roles not in the game\n"
     embed.add_field(name = "Options", value = value)
 
@@ -172,7 +171,7 @@ def create_cc_missing_reveal_msg(role):
         url = best_friend_url
     elif role == "Camp Counselor" or role == "Camp Counsellor":
         color = discord.Color.blue()
-        color = cc_url
+        url = cc_url
     # werewolf team is red
     elif role == "Werewolf":
         color = discord.Color.dark_red()

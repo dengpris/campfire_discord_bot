@@ -59,6 +59,7 @@ async def timer(ctx, minutes, seconds=0):
                 return True
             # UPDATE VOTING STATUS EVERY 5 SECONDS
             if secondsLeft%5 == 0: 
+                print(poll_list)
                 await ctx.send(embed=create_vote_status_msg(poll_list, secondsLeft))          
             await asyncio.sleep(1)
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
@@ -154,7 +155,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
             await send_role(game,ctx)
             #night time timer
-            await timer(ctx, 0, 5)   
+            await timer(ctx, 0, 30)   
             # ensure camp Counselor made choices (if applicalble)   
             global new_day 
             new_day = True
@@ -282,10 +283,9 @@ async def send_role(game,ctx):
             message = await channel.send(embed=embed)
 
             for u in userlist:
-                if not u.bot:
-                    await message.add_reaction(unicode_letters[emoji_idx])
-                    player_emoji_dic[unicode_letters[emoji_idx]]=u.name
-                    emoji_idx+=1
+                await message.add_reaction(unicode_letters[emoji_idx])
+                player_emoji_dic[unicode_letters[emoji_idx]]=u.name
+                emoji_idx+=1
             
             await message.add_reaction(unicode_letters[emoji_idx])
             await ctx.send("Your role has been sent %s" %cc.name)
@@ -302,30 +302,33 @@ async def send_role(game,ctx):
     camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
     while True:
         try:
-            reaction, user = await bot.wait_for('reaction_add', timeout=5.0, check=check)
+            reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=check)
             # if camp counsellor is reacting the first time
             if user.name not in campCounsellorsCheckedIn:
-                for letters in unicode_letters:
+                for letters in unicode_letters: # emoji_idx last + 1 (expose two roles option)
                     if str(reaction.emoji) == str(unicode_letters[emoji_idx]) :
                         #get missing roles
-                        message = await ctx.send(embed=choose_two_missing_roles_msg())
-                        for emoji_idx in range(3):
-                            message.add_reaction(unicode_letters[emoji_idx])
+                        message = await reaction.message.channel.send(embed=choose_two_missing_roles_msg())
+                        for i in range(3):
+                            await message.add_reaction(unicode_letters[i])
                         
                         missing_revealed = set()
                         while len(missing_revealed) < 2:
-                            await bot.wait_for('reaction_add', timeout = 4.0, check=check_missing)
+                            reaction_two, user_two = await bot.wait_for('reaction_add', timeout = 29.0, check=check_missing)
                             embed = discord.Embed()
-                            if reaction.emoji == unicode_letters[0]: # "A"
+                            print(str(reaction_two.emoji))
+                            await reaction_two.message.channel.send(str(reaction_two.emoji))
+                            if str(reaction_two.emoji) == unicode_letters[0]: # "A"
                                 embed = create_cc_missing_reveal_msg(UNUSED_ROLES[0])
                                 missing_revealed.add(0)
-                            elif reaction.emoji == unicode_letters[1]:
+                            elif str(reaction_two.emoji) == unicode_letters[1]:
                                 embed = create_cc_missing_reveal_msg(UNUSED_ROLES[1])
                                 missing_revealed.add(1)
                             else:
                                 embed = create_cc_missing_reveal_msg(UNUSED_ROLES[2])
                                 missing_revealed.add(2)
-                            await reaction.message.channel.send(embed=embed)
+                            await reaction_two.message.channel.send(missing_revealed)
+                            await reaction_two.message.channel.send(embed=embed)
                         
                         campCounsellorsCheckedIn.append(user.name)
                         break
