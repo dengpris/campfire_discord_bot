@@ -28,7 +28,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='~', intents=intents)
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -294,9 +294,7 @@ async def send_role(game,ctx):
     ############### CAMP COUNSELLOR SELECTION ################
     def check(reaction, user):
         return user in camp_counselor_list and str(reaction.emoji) in unicode_letters
-    
-    def check_missing(reaction, user):
-        return user in camp_counselor_list and str(reaction.emoji) in unicode_letters[:3] # A B C
+
 
     campCounsellorsCheckedIn=[]
     camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
@@ -308,28 +306,7 @@ async def send_role(game,ctx):
                 for letters in unicode_letters: # emoji_idx last + 1 (expose two roles option)
                     if str(reaction.emoji) == str(unicode_letters[emoji_idx]) :
                         #get missing roles
-                        message = await reaction.message.channel.send(embed=choose_two_missing_roles_msg())
-                        for i in range(3):
-                            await message.add_reaction(unicode_letters[i])
-                        
-                        missing_revealed = set()
-                        while len(missing_revealed) < 2:
-                            reaction_two, user_two = await bot.wait_for('reaction_add', timeout = 29.0, check=check_missing)
-                            embed = discord.Embed()
-                            print(str(reaction_two.emoji))
-                            await reaction_two.message.channel.send(str(reaction_two.emoji))
-                            if str(reaction_two.emoji) == unicode_letters[0]: # "A"
-                                embed = create_cc_missing_reveal_msg(UNUSED_ROLES[0])
-                                missing_revealed.add(0)
-                            elif str(reaction_two.emoji) == unicode_letters[1]:
-                                embed = create_cc_missing_reveal_msg(UNUSED_ROLES[1])
-                                missing_revealed.add(1)
-                            else:
-                                embed = create_cc_missing_reveal_msg(UNUSED_ROLES[2])
-                                missing_revealed.add(2)
-                            await reaction_two.message.channel.send(missing_revealed)
-                            await reaction_two.message.channel.send(embed=embed)
-                        
+                        task = asyncio.create_task(reveal_two_missing_for_cc(ctx, reaction, user))
                         campCounsellorsCheckedIn.append(user.name)
                         break
                     
@@ -351,7 +328,35 @@ async def send_role(game,ctx):
         except asyncio.TimeoutError:
             print("break heare istg")
             break
-            
+    return
+
+async def reveal_two_missing_for_cc(ctx, reaction, user):
+    def check_missing(reaction, user):
+        return user in camp_counselor_list and str(reaction.emoji) in unicode_letters[:3] # A B C
+    
+    message = await reaction.message.channel.send(embed=choose_two_missing_roles_msg())
+    for i in range(3):
+        await message.add_reaction(unicode_letters[i])
+    
+    missing_revealed = set()
+    while len(missing_revealed) < 2:
+        reaction_two, user_two = await bot.wait_for('reaction_add', timeout = 29.0, check=check_missing)
+        embed = discord.Embed()
+        print(str(reaction_two.emoji))
+        await reaction_two.message.channel.send(str(reaction_two.emoji))
+        if str(reaction_two.emoji) == unicode_letters[0]: # "A"
+            embed = create_cc_missing_reveal_msg(UNUSED_ROLES[0])
+            missing_revealed.add(0)
+        elif str(reaction_two.emoji) == unicode_letters[1]:
+            embed = create_cc_missing_reveal_msg(UNUSED_ROLES[1])
+            missing_revealed.add(1)
+        else:
+            embed = create_cc_missing_reveal_msg(UNUSED_ROLES[2])
+            missing_revealed.add(2)
+        await reaction_two.message.channel.send(missing_revealed)
+        await reaction_two.message.channel.send(embed=embed)
+    return
+    
 ################ START GAME ######################
 @bot.command(name='start', help='start the game')
 async def start(ctx):
