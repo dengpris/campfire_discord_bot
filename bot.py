@@ -108,13 +108,17 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
     await ctx.send("Do you want to change the number of each role? please enter **y** or **n**")
 
     def check_y_n(msg):
-        return msg.author == ctx.author and msg.channel == ctx.channel and \
-        msg.content.lower() in ["y", "n"]
+        return msg.author == ctx.author and msg.channel == ctx.channel and msg.content.lower() in ["y", "n", "!reset"]
 
     def check(msg):
         return msg.author == ctx.author and msg.channel == ctx.channel 
 
-    msg = await bot.wait_for("message", check=check_y_n)
+    try:
+        msg = await bot.wait_for("message", check=check_y_n, timeout=10.0)
+    except asyncio.TimeoutError:
+        await reset_bot(ctx)
+        return
+
     if msg.content.lower() == "y":
         await ctx.send("**You said yes!**\n" + settings_usage_text())
         custom_role_numbers = await bot.wait_for("message",check=check)
@@ -123,7 +127,8 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
 
         submit_start_settings(set_start_settings(custom_role_numbers.content.split()))
         await see_settings_roles(ctx)
-
+    elif msg.content == "!reset":
+        return
     else:
         global CUSTOM_ROLES
         CUSTOM_ROLES = custom_roles
