@@ -586,10 +586,14 @@ async def win_conditions(ctx, eliminated):
 
 ###################### REVEAL LOGIC ######################
 async def reveal_roles(ctx, eliminated, poll_list):
+    #sort list from least to greatest
     poll_list.sort(key=lambda x: x.votes, reverse=False)
 
     text=""
     voteVal=0
+    #iterate through each element in the array, compare each element to voteVal while appending the player name to the text
+    #when the element is different to voteVal, update voteVal to the current element value
+    # and then print the text value
     for p in poll_list:
         print(p.user+"  "+str(p.votes))
         if p.votes==voteVal:
@@ -610,13 +614,9 @@ async def reveal_roles(ctx, eliminated, poll_list):
         description = (text),
         color = discord.Color.red()
     )
+
+    #print the most voted off person
     await ctx.send(embed=embed)
-    
-# (ppl who weren't voted off)
-# (ppl who were voted off AND their roles) 
-# (which and how many camper roles that were used) 
-# (which and how many werewolves/wannabe roles that were used) 
-# (missing roles)
-# (who won campers or werewolves)
+
     return 
 bot.run(TOKEN)
