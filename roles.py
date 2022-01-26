@@ -21,23 +21,11 @@ class Player:
         if self.role is None:
             self.role = Role
 
-    # def vote_player(self, name):
-    #     self.last_voted = name
-    #     return self.last_voted
-
     def find_player(self, name):
         if self.name == name:
             return self
         else:
             return None
-                
-        
-# camp counsellor can look at 1 persons role at night
-# 1 camp counsellor only if > 5 ppl
-# have time state in gamestate
-# get 2/3 unpicked roles from group
-
- 
 
 class GameState:
     def __init__(self, player_names, custom_role_dict, extra_roles=False, custom_roles=False ):

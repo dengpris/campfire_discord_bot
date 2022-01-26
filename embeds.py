@@ -23,13 +23,12 @@ async def create_camp_counsellor_msg(userlist, channel):
     emoji_idx=0
     value = ""
     for u in userlist:
-        if not u.bot:
-            name = u.name
-            emoji = unicode_letters[emoji_idx]
-            value = value + emoji + " " + name + "\n" 
-            # update global variable poll_list, which maps emojis to names
-            # choice_list.append(poll(name, emoji))
-            emoji_idx+=1
+        name = u.name
+        emoji = unicode_letters[emoji_idx]
+        value = value + emoji + " " + name + "\n" 
+        # update global variable poll_list, which maps emojis to names
+        # choice_list.append(poll(name, emoji))
+        emoji_idx+=1
     value = value + unicode_letters[emoji_idx] + " Expose two roles not in the game\n"
     embed.add_field(name = "Options", value = value)
 
@@ -151,6 +150,15 @@ def create_cc_role_reveal_msg(user, role):
     embed.set_image(url=user.avatar_url)
     return embed
 
+def choose_two_missing_roles_msg():
+    embed = discord.Embed(
+        title = "Three people have gone missing!",
+        description = "The missing people trouble you greatly, so you decide to look into this a bit further. You may choose to expose two of the three missing roles.",
+        color = discord.Color.blurple()
+    )
+    embed.set_image(url=missing_url)
+    return embed
+
 def create_cc_missing_reveal_msg(role):
     color = discord.Color.blurple()
     url = ""
@@ -163,7 +171,7 @@ def create_cc_missing_reveal_msg(role):
         url = best_friend_url
     elif role == "Camp Counselor" or role == "Camp Counsellor":
         color = discord.Color.blue()
-        color = cc_url
+        url = cc_url
     # werewolf team is red
     elif role == "Werewolf":
         color = discord.Color.dark_red()
@@ -182,4 +190,40 @@ def create_cc_missing_reveal_msg(role):
         color = color
     )
     embed.set_image(url=url)
+    return embed
+
+############## VOTE FOR MESSAGE EMBED #################
+def create_vote_for_msg(user):
+    embed = discord.Embed(
+        title = f"You will vote for {user.name}",
+        color = discord.Color.green()
+    )
+    embed.set_image(url=user.avatar_url)
+    return embed
+
+def create_no_longer_vote_msg(user):
+    embed = discord.Embed(
+        title = f"You are no longer voting for {user.name}",
+        color = discord.Color.dark_red()
+    )
+    embed.set_image(url=user.avatar_url)
+    return embed
+
+def create_vote_status_msg(poll_list, seconds):
+    name_list = ""
+    voted_emoji = ""
+    
+    for player in poll_list:
+        name_list = name_list + "\n" + player.user
+        if player.voted:
+            voted_emoji = voted_emoji + "\n" + "✅"
+        else:
+            voted_emoji = voted_emoji + "\n" + "❌"
+    
+    embed = discord.Embed(
+        title = f"There are {seconds} seconds left to vote...")
+    
+    embed.add_field(name= "Player", value= name_list, inline= True)
+    embed.add_field(name= "Voted", value= voted_emoji, inline= True)
+        
     return embed
