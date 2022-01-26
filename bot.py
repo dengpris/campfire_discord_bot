@@ -32,11 +32,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-<<<<<<< HEAD
 bot = commands.Bot(command_prefix='!', intents=intents)
-=======
-bot = commands.Bot(command_prefix='$', intents=intents)
->>>>>>> 4bb2a26 (Added embeded profile images in reveal polls (reveal_roles fcn))
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -190,19 +186,10 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             get_unused_roles()
 
             #night time timer
-<<<<<<< HEAD
             await asyncio.gather(
                 timer(ctx, 0, 30),
                 send_role(game, ctx),
             )
-=======
-            timer_task = asyncio.create_task(timer(ctx, 0, 10)) #30 before
-            role_task = asyncio.create_task(send_role(game,ctx))
-
-            await timer_task
-            await role_task
-            
->>>>>>> 4bb2a26 (Added embeded profile images in reveal polls (reveal_roles fcn))
             # ensure camp Counselor made choices (if applicalble)   
             global new_day 
             new_day = True
