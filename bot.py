@@ -33,10 +33,13 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
 async def timer(ctx, minutes, seconds=0):
+    moon_dic={0:'', }
     try:
         minuteint = int(minutes)
         secondsint=int(seconds)
         totalseconds=minuteint*60 + secondsint
+
+        totalSecondsLeft=minuteint*60 + secondsint
         if totalseconds > 3600:
             await ctx.send("I dont think im allowed to do go above 60 minutes.")
             raise BaseException
@@ -44,16 +47,27 @@ async def timer(ctx, minutes, seconds=0):
             await ctx.send("I dont think im allowed to do negatives")
             raise BaseException
         
-        message = await ctx.send("Timer: {minuteint} minutes {secondsint} seconds")
+
+        message = await ctx.send("🌕 Timer: {minuteint} minutes {secondsint} seconds")
         while True:
-            totalseconds -= 1
-            if totalseconds == 0:
-                await message.edit(content="Ended!")
+            totalSecondsLeft -= 1
+            if totalSecondsLeft == 0:
+                await message.edit(content="🌑 Ended!")
                 break
                 #return True
-            minuteLeft=totalseconds//60
-            secondsLeft=totalseconds%60
-            await message.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            minuteLeft=totalSecondsLeft//60
+            secondsLeft=totalSecondsLeft%60
+            if(totalSecondsLeft<totalseconds//5):
+                await message.edit(content=f"🌕 Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=totalseconds//5 and totalSecondsLeft<2*totalseconds//5):
+                await message.edit(content=f"🌖 Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=2*totalseconds//5 and totalSecondsLeft<3*totalseconds//5):
+                await message.edit(content=f"🌗 Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=3*totalseconds//5 and totalSecondsLeft<4*totalseconds//5):
+                await message.edit(content=f"🌘 Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=4*totalseconds//5 and totalSecondsLeft<totalseconds):
+                await message.edit(content=f"🌑 Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            
             if (total_voted == len(userlist)):
                 await ctx.send("Everybody has voted! Who will be sent home?")
                 return True
