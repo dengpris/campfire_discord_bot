@@ -545,14 +545,46 @@ async def win_conditions(ctx, eliminated):
     winners = []
     win_roles = []
     global GAME_RUNNING
-    for player in eliminated:
-        # if introvert is voted, everyone auto loses except introvert
-        if player.role == "Introvert":
-            win_roles.append("Introvert")
-            winners.append(introvert_list[0].name)
-            break
-        #if werewolf is voted, all campers win
-        elif player.role == "Werewolf":
+    if(eliminated):
+        for player in eliminated:
+            # if introvert is voted, everyone auto loses except introvert
+            if player.role == "Introvert":
+                win_roles.append("Introvert")
+                winners.append(introvert_list[0].name)
+                break
+            #if werewolf is voted, all campers win
+            elif player.role == "Werewolf":
+                win_roles.append("Campers")
+                for player in camper_list:
+                    winners.append(player.name)
+                for player in camp_counselor_list:
+                    winners.append(player.name)
+                for player in best_friend_list:
+                    winners.append(player.name)
+                break
+            #if wannabe or camper voted
+            elif player.role == "Wannabe" or player.role == "Camper" or player.role == "Best Friend" or player.role == "Camp Counselor":
+                # If wannabes exist
+                if wannabe_list:
+                    win_roles.append("Wannabe")
+                    winners.append(wannabe_list[0].name)
+                # If werewolves exist
+                if werewolf_list:
+                    win_roles.append("Werewolves")
+                    for player in werewolf_list:
+                        winners.append(player.name)
+    else: #No one votes
+        #Counts number of total werewolves in game
+        total_players = len(player_list)
+        if(CUSTOM_ROLES):
+            total_werewolf = NUM_OF_EACH_ROLE.get("Werewolf")
+        else:
+            total_werewolf = DEFAULT_ROLE_VALUES[str(total_players)]["Werewolf"]
+
+        total_unused_werewolf = UNUSED_ROLES.count("Werewolf")
+
+        #If werewolves are all in missing roles
+        if(total_werewolf == total_unused_werewolf):
             win_roles.append("Campers")
             for player in camper_list:
                 winners.append(player.name)
@@ -560,19 +592,12 @@ async def win_conditions(ctx, eliminated):
                 winners.append(player.name)
             for player in best_friend_list:
                 winners.append(player.name)
-            break
-        #if wannabe or camper voted
-        elif player.role == "Wannabe" or player.role == "Camper" or player.role == "Best Friend" or player.role == "Camp Counsellor":
-            # If wannabes exist
-            if wannabe_list:
-                win_roles.append("Wannabe")
-                winners.append(wannabe_list[0].name)
-            # If werewolves exist
-            if werewolf_list:
-                win_roles.append("Werewolf")
-                for player in werewolf_list:
-                    winners.append(player.name)
-
+        #Otherwise, werewolves win
+        else:
+            win_roles.append("Werewolves")
+            for player in werewolf_list:
+                winners.append(player.name)
+    
     embed = discord.Embed(
         title = (f"Winners: {winners}"),
         description = (f"The {win_roles} has/have won! Congratulations!"),
