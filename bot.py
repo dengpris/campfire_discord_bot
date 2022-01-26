@@ -27,7 +27,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='$', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
