@@ -54,13 +54,14 @@ async def timer(ctx, minutes, seconds=0):
             minuteLeft=totalseconds//60
             secondsLeft=totalseconds%60
             await message.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            if (total_voted == len(userlist)):
-                await ctx.send("Everybody has voted! Who will be sent home?")
-                return True
-            # UPDATE VOTING STATUS EVERY 5 SECONDS
-            if secondsLeft%5 == 0: 
-                print(poll_list)
-                await ctx.send(embed=create_vote_status_msg(poll_list, secondsLeft))          
+            if (new_day):
+                if (total_voted == len(userlist)):
+                    await ctx.send("Everybody has voted! Who will be sent home?")
+                    return True
+                # UPDATE VOTING STATUS EVERY 5 SECONDS
+                if secondsLeft%5 == 0: 
+                    print(f"poll list:{poll_list}")
+                    await ctx.send(embed=create_vote_status_msg(poll_list, secondsLeft))          
             await asyncio.sleep(1)
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
     except ValueError:
@@ -153,15 +154,20 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             UNUSED_ROLES = game.get_unused_roles()
             get_unused_roles()
 
-            await send_role(game,ctx)
             #night time timer
-            await timer(ctx, 0, 30)   
+            timer_task = asyncio.create_task(timer(ctx, 0, 30))
+            role_task = asyncio.create_task(send_role(game,ctx))
+
+            await timer_task
+            await role_task
+            
             # ensure camp Counselor made choices (if applicalble)   
             global new_day 
             new_day = True
 
             # SEND VOTING DM TO EACH PLAYER
             # Flow: on_reaction_add 
+            global poll_list
             embed = create_poll(userlist, poll_list)
             for user in userlist:
                 if user.bot == False: # do not send messages to yourself
@@ -326,7 +332,6 @@ async def send_role(game,ctx):
             if all(elem in campCounsellorsCheckedIn for elem in camp_counselor_list_names):
                 break
         except asyncio.TimeoutError:
-            print("break heare istg")
             break
     return
 
@@ -342,7 +347,7 @@ async def reveal_two_missing_for_cc(ctx, reaction, user):
     while len(missing_revealed) < 2:
         reaction_two, user_two = await bot.wait_for('reaction_add', timeout = 29.0, check=check_missing)
         embed = discord.Embed()
-        print(str(reaction_two.emoji))
+
         await reaction_two.message.channel.send(str(reaction_two.emoji))
         if str(reaction_two.emoji) == unicode_letters[0]: # "A"
             embed = create_cc_missing_reveal_msg(UNUSED_ROLES[0])
@@ -625,6 +630,6 @@ async def reveal_roles(ctx, eliminated, poll_list):
 
     #print the most voted off person
     await ctx.send(embed=embed)
-
     return 
+
 bot.run(TOKEN)
