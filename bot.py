@@ -32,7 +32,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -95,7 +95,7 @@ async def timer(ctx, minutes, seconds=0):
 
 @bot.command(name='werewolfEnd', help='kill the game')
 async def werewolfEnd(ctx):
-    await ctx.send("imma kil l myself")
+    await ctx.send("imma kill myself")
     exit()
 
 ################# SET SETTINGS ####################
@@ -168,19 +168,23 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
         while(GAME_RUNNING):
             print('Game Start!')
             nameList=[member.name for member in userlist]
-            #nameList=["A", "B", "C", "D"]
             print(nameList)
            
             #number of players
             num_players = len(nameList)
-            print("Num players ", num_players)
-            await show_current_roles(ctx, num_players,custom_roles)
+            
+            # save photos of players
+            await save_and_resize_avatars(namelist)
 
+            # Show current role numbers
+            await show_current_roles(ctx, num_players,custom_roles)
+            
+            # Assign roles to players
             roles_dictionary = NUM_OF_EACH_ROLE
             custom_roles = CUSTOM_ROLES
             game=roles.GameState(nameList, roles_dictionary, True, custom_roles=custom_roles)
-            #nameList=[member.name for member in userlist]
-            # game.set_random_roles()
+            
+            # Get unused roles
             global UNUSED_ROLES
             UNUSED_ROLES = game.get_unused_roles()
             get_unused_roles()
@@ -681,7 +685,7 @@ async def win_conditions(ctx, eliminated):
 
 #     await ctx.send(embed=embed)
 
-
+# fcn is only for testing
 @bot.command(name="resize_user", help='resize avatar')
 async def resize_user(ctx):
     """
@@ -699,7 +703,7 @@ async def resize_user(ctx):
     file = discord.File(fp=new_avatarjpg)
     await ctx.send("New avatar img", file = file)
 
-
+# fcn is only for testing
 @bot.command(name = "avatar")
 async def avatar(ctx):
  
@@ -736,6 +740,8 @@ async def avatar(ctx):
     attachment = "attachment://" + "avatar2.jpg"
     embed.set_image(url=attachment)
     await ctx.send(embed=embed,file=file)
+########## ABOVE IS TESTING FCNS ONLY
+
 
 def resize_image(image_file, width=200, height=200):
     """
@@ -750,7 +756,7 @@ def resize_image(image_file, width=200, height=200):
     #ASSUMING THAT THE . SEPARATES EVERYTHING BEFORE THE .JPG
     print(f"image_file: {image_file}")
     image_file_split = image_file.split(".")
-    resized_image = image_file_split[0] + "_new." + image_file_split[1]
+    resized_image = image_file_split[0] + "New." + image_file_split[1]
     print(f"new_image: {resized_image}")
 
     image = Image.open(image_file)
@@ -758,11 +764,22 @@ def resize_image(image_file, width=200, height=200):
     new_image.save(resized_image)
     return resized_image
 
-    #     image = Image.open(avatarjpg)
-    #     new_image = image.resize((200, 200))
-    #     new_image.save(new_avatarjpg)
-    #     file = discord.File(fp=new_avatarjpg)
-    #     await ctx.send("New avatar img", file = file)
+async def save_and_resize_avatars(namelist,width=200, height=200):
+    """
+    Saves avatar images in files: <Name>.jpg
+    :namelist:  list of strings of name
+    """
+    for member in userlist:
+        if len(namelist) != 0:
+            if member.name in namelist:
+                #Set name for avatar
+                avatarjpg = member.name + ".jpg"
+                avatardir = IMAGES_FOLDER + avatarjpg
+                userAvatar = member.avatar_url
+                #Save avatar image
+                await userAvatar.save(avatardir)
+                #Change avatar image to appropriate size:
+                avatardir = resize_image(avatardir,width,height)
 
 async def send_user_avatar_and_name(ctx, usernames, embed_colour=discord.Color.blue(), width=200,height=200):
     """
@@ -777,11 +794,10 @@ async def send_user_avatar_and_name(ctx, usernames, embed_colour=discord.Color.b
                 #Set name for avatar
                 avatarjpg = member.name + ".jpg"
                 avatardir = images_folder + avatarjpg
-                userAvatar = member.avatar_url
-                #Save avatar image
-                await userAvatar.save(avatardir)
-                #Change avatar image to appropriate size:
-                avatardir = resize_image(avatardir,width,height)
+                
+                #Change avatar image to appropriate size (assuming that all avatar images are alread 200 by 200):
+                if width != 200 and height!=200:
+                    avatardir = resize_image(avatardir,width,height)
 
                 #Setup Embed
                 file = discord.File(avatardir, filename=avatarjpg)
@@ -817,7 +833,7 @@ async def reveal_roles(ctx, eliminated, poll_list):
                     color = discord.Color.blurple()
                 )
             await ctx.send(embed=embed)
-            await send_user_avatar_and_name(ctx, users_w_same_num_of_votes)
+            await send_user_avatar_and_name(ctx, users_w_same_num_of_votes, discord.Color.blurple())
             users_w_same_num_of_votes = []
             users_w_same_num_of_votes.append(p.user)
             voteVal=p.votes

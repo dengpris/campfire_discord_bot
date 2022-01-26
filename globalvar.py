@@ -23,6 +23,8 @@ missing_url = 'https://i.imgur.com/1ADdRCU.jpg'
 
 new_day = False
 
+IMAGES_FOLDER = "avatarImages/"
+
 ###############################################
 
 NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
