@@ -166,9 +166,10 @@ def create_cc_missing_reveal_msg(role):
     if role == "Camper":
         color = discord.Color.blue()
         url = camper_url
-    elif role == "Best Friend":
+    elif role == "bff_1" or role == "bff_2":
         color == discord.Color.blue()
         url = best_friend_url
+        role = "Best Friend"
     elif role == "Camp Counselor" or role == "Camp Counsellor":
         color = discord.Color.blue()
         url = cc_url

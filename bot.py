@@ -48,7 +48,7 @@ async def timer(ctx, minutes, seconds=0):
             raise BaseException
         
         moonMessage = await ctx.send("🌑")
-        timerMessage = await ctx.send("Timer: {minuteint} minutes {secondsint} seconds")
+        timerMessage = await ctx.send(f"Timer: {minuteint} minutes {secondsint} seconds")
         while True:
             totalSecondsLeft -= 1
             if totalSecondsLeft == 0:
@@ -182,12 +182,10 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             get_unused_roles()
 
             #night time timer
-            timer_task = asyncio.create_task(timer(ctx, 0, 30))
-            role_task = asyncio.create_task(send_role(game,ctx))
-
-            await timer_task
-            await role_task
-            
+            await asyncio.gather(
+                timer(ctx, 0, 30),
+                send_role(game, ctx),
+            )
             # ensure camp Counselor made choices (if applicalble)   
             global new_day 
             new_day = True
