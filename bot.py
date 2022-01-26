@@ -28,15 +28,18 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='~', intents=intents)
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
 async def timer(ctx, minutes, seconds=0):
+    moon_dic={0:'', }
     try:
         minuteint = int(minutes)
         secondsint=int(seconds)
         totalseconds=minuteint*60 + secondsint
+
+        totalSecondsLeft=minuteint*60 + secondsint
         if totalseconds > 3600:
             await ctx.send("I dont think im allowed to do go above 60 minutes.")
             raise BaseException
@@ -44,23 +47,43 @@ async def timer(ctx, minutes, seconds=0):
             await ctx.send("I dont think im allowed to do negatives")
             raise BaseException
         
-        message = await ctx.send("Timer: {minuteint} minutes {secondsint} seconds")
+        moonMessage = await ctx.send("🌑")
+        timerMessage = await ctx.send("Timer: {minuteint} minutes {secondsint} seconds")
         while True:
-            totalseconds -= 1
-            if totalseconds == 0:
-                await message.edit(content="Ended!")
+            totalSecondsLeft -= 1
+            if totalSecondsLeft == 0:
+
+                await timerMessage.edit(content="Ended!")
                 break
                 #return True
-            minuteLeft=totalseconds//60
-            secondsLeft=totalseconds%60
-            await message.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            if (total_voted == len(userlist)):
-                await ctx.send("Everybody has voted! Who will be sent home?")
-                return True
-            # UPDATE VOTING STATUS EVERY 5 SECONDS
-            if secondsLeft%5 == 0: 
-                print(poll_list)
-                await ctx.send(embed=create_vote_status_msg(poll_list, secondsLeft))          
+
+            minuteLeft=totalSecondsLeft//60
+            secondsLeft=totalSecondsLeft%60
+            if(totalSecondsLeft<totalseconds//5):
+                await moonMessage.edit(content=f"🌕")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=totalseconds//5 and totalSecondsLeft<2*totalseconds//5):
+                await moonMessage.edit(content=f"🌖")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=2*totalseconds//5 and totalSecondsLeft<3*totalseconds//5):
+                await moonMessage.edit(content=f"🌗")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=3*totalseconds//5 and totalSecondsLeft<4*totalseconds//5):
+                await moonMessage.edit(content=f"🌘")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=4*totalseconds//5 and totalSecondsLeft<totalseconds):
+                await moonMessage.edit(content=f"🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            
+            if (new_day):
+                if (total_voted == len(userlist)):
+                    await ctx.send("Everybody has voted! Who will be sent home?")
+                    return True
+                # UPDATE VOTING STATUS EVERY 5 SECONDS
+                if secondsLeft%5 == 0: 
+                    print(f"poll list:{poll_list}")
+                    await ctx.send(embed=create_vote_status_msg(poll_list, secondsLeft))    
+                  
             await asyncio.sleep(1)
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
     except ValueError:
@@ -158,15 +181,20 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             UNUSED_ROLES = game.get_unused_roles()
             get_unused_roles()
 
-            await send_role(game,ctx)
             #night time timer
-            await timer(ctx, 0, 30)   
+            timer_task = asyncio.create_task(timer(ctx, 0, 30))
+            role_task = asyncio.create_task(send_role(game,ctx))
+
+            await timer_task
+            await role_task
+            
             # ensure camp Counselor made choices (if applicalble)   
             global new_day 
             new_day = True
 
             # SEND VOTING DM TO EACH PLAYER
             # Flow: on_reaction_add 
+            global poll_list
             embed = create_poll(userlist, poll_list)
             for user in userlist:
                 if user.bot == False: # do not send messages to yourself
@@ -299,9 +327,7 @@ async def send_role(game,ctx):
     ############### CAMP COUNSELLOR SELECTION ################
     def check(reaction, user):
         return user in camp_counselor_list and str(reaction.emoji) in unicode_letters
-    
-    def check_missing(reaction, user):
-        return user in camp_counselor_list and str(reaction.emoji) in unicode_letters[:3] # A B C
+
 
     campCounsellorsCheckedIn=[]
     camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
@@ -313,28 +339,7 @@ async def send_role(game,ctx):
                 for letters in unicode_letters: # emoji_idx last + 1 (expose two roles option)
                     if str(reaction.emoji) == str(unicode_letters[emoji_idx]) :
                         #get missing roles
-                        message = await reaction.message.channel.send(embed=choose_two_missing_roles_msg())
-                        for i in range(3):
-                            await message.add_reaction(unicode_letters[i])
-                        
-                        missing_revealed = set()
-                        while len(missing_revealed) < 2:
-                            reaction_two, user_two = await bot.wait_for('reaction_add', timeout = 29.0, check=check_missing)
-                            embed = discord.Embed()
-                            print(str(reaction_two.emoji))
-                            await reaction_two.message.channel.send(str(reaction_two.emoji))
-                            if str(reaction_two.emoji) == unicode_letters[0]: # "A"
-                                embed = create_cc_missing_reveal_msg(UNUSED_ROLES[0])
-                                missing_revealed.add(0)
-                            elif str(reaction_two.emoji) == unicode_letters[1]:
-                                embed = create_cc_missing_reveal_msg(UNUSED_ROLES[1])
-                                missing_revealed.add(1)
-                            else:
-                                embed = create_cc_missing_reveal_msg(UNUSED_ROLES[2])
-                                missing_revealed.add(2)
-                            await reaction_two.message.channel.send(missing_revealed)
-                            await reaction_two.message.channel.send(embed=embed)
-                        
+                        task = asyncio.create_task(reveal_two_missing_for_cc(ctx, reaction, user))
                         campCounsellorsCheckedIn.append(user.name)
                         break
                     
@@ -354,9 +359,36 @@ async def send_role(game,ctx):
             if all(elem in campCounsellorsCheckedIn for elem in camp_counselor_list_names):
                 break
         except asyncio.TimeoutError:
-            print("break heare istg")
             break
-            
+    return
+
+async def reveal_two_missing_for_cc(ctx, reaction, user):
+    def check_missing(reaction, user):
+        return user in camp_counselor_list and str(reaction.emoji) in unicode_letters[:3] # A B C
+    
+    message = await reaction.message.channel.send(embed=choose_two_missing_roles_msg())
+    for i in range(3):
+        await message.add_reaction(unicode_letters[i])
+    
+    missing_revealed = set()
+    while len(missing_revealed) < 2:
+        reaction_two, user_two = await bot.wait_for('reaction_add', timeout = 29.0, check=check_missing)
+        embed = discord.Embed()
+
+        await reaction_two.message.channel.send(str(reaction_two.emoji))
+        if str(reaction_two.emoji) == unicode_letters[0]: # "A"
+            embed = create_cc_missing_reveal_msg(UNUSED_ROLES[0])
+            missing_revealed.add(0)
+        elif str(reaction_two.emoji) == unicode_letters[1]:
+            embed = create_cc_missing_reveal_msg(UNUSED_ROLES[1])
+            missing_revealed.add(1)
+        else:
+            embed = create_cc_missing_reveal_msg(UNUSED_ROLES[2])
+            missing_revealed.add(2)
+        await reaction_two.message.channel.send(missing_revealed)
+        await reaction_two.message.channel.send(embed=embed)
+    return
+    
 ################ START GAME ######################
 @bot.command(name='start', help='start the game')
 async def start(ctx):
@@ -650,6 +682,6 @@ async def reveal_roles(ctx, eliminated, poll_list):
 
     #print the most voted off person
     await ctx.send(embed=embed)
-
     return 
+
 bot.run(TOKEN)
