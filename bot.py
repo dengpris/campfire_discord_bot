@@ -162,11 +162,11 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
 
     await ctx.send("Alright! Let the Games BEGIN!!!")
 
-def delete_images(nameList):
+def delete_images(nameList, image_folder=AVATAR_FOLDER):
     print(f"Deleting images {nameList}")
     for name in nameList:
         print(f"Looking at {name}")
-        imagedir = IMAGES_FOLDER + name + ".jpg"
+        imagedir = image_folder + name + ".jpg"
         if os.path.exists(imagedir):
             print("WE FOUND IMAGE ", imagedir)
             os.remove(imagedir)
@@ -174,7 +174,37 @@ def delete_images(nameList):
         else:
             print("we couldn't find ", imagedir)
             
+def add_images_together_horizontally(imageNames, image_Folder=ROLE_FOLDER):
 
+    new_image_name =  'avatarImages/allPlayers.jpg'   
+    # Gets all role images locations and put in image_list
+    image_list = []
+    for name in imageNames:
+        image_file = image_Folder + name + ".jpg"
+        image_list.append(image_file)
+        # Resizes all images so that they're all the same 200 by 200
+        resize_image(image_file)
+
+    # Open all images
+    images = [Image.open(x) for x in image_list]
+
+    # Gets proper widths and max height 
+    widths, heights = zip(*(i.size for i in images))
+
+    # This will be a horizontal image that appends them alltogether
+    total_width = sum(widths)
+    max_height = max(heights)
+
+    # Create new image
+    new_im = Image.new('RGB', (total_width, max_height))
+
+    x_offset = 0
+    for im in images:
+        new_im.paste(im, (x_offset,0))
+        x_offset += im.size[0]
+
+    new_im.save(new_image_name)
+    return new_image_name
 
 ################# GAME LOGIC #####################
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
@@ -191,9 +221,17 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
             # save photos of players
             await save_and_resize_avatars(nameList)
+            # await send_user_avatar_and_name(ctx, nameList)
+            
             # Show current players
-            await send_user_avatar_and_name(ctx, nameList)
-          
+            imageDir = add_images_together_horizontally(nameList,image_Folder=AVATAR_FOLDER)
+            await create_all_participants_who_reacted_msg(ctx, imageDir)
+            
+            
+            # roleList:
+            #rolelist = ["Werewolf", "Camper", "Wannabe"]
+            #add_images_together_horizontally(rolelist)
+
             # Show current role numbers
             await show_current_roles(ctx, num_players,custom_roles)
             
@@ -430,8 +468,8 @@ async def start(ctx):
             update_moon = i * "🌕"
             await moon_message.edit(content=update_moon)
         await moon_message.delete()
-        await ctx.send("\n**Time is up!**\nHere's everyone that made it to camp:")
-
+        
+        #await ctx.send("\n**Time is up!**\nHere's everyone that made it to camp:")
         message = await ctx.channel.fetch_message(message.id)
         reaction = message.reactions[0] # checkmark reactions only
         
@@ -440,7 +478,7 @@ async def start(ctx):
                 continue
             else:
                 userlist.append(user)
-                await ctx.send(user.name) 
+                #await ctx.send(user.name) 
         await gameLogic(ctx, 1, 1, CUSTOM_ROLES)
     else:
         await ctx.send("The game is running already! Type !reset if you want to restart the game.")
@@ -461,8 +499,8 @@ async def reset_bot(ctx):
     GAME_RUNNING = False
     
     # Delete avatar images
-    nameList = PARTICIPANT_LIST.copy()
-    delete_images(nameList)
+    #nameList = PARTICIPANT_LIST.copy()
+    #delete_images(nameList)
     await ctx.send("Resetting!")
 
 ################ ROLE SETTINGS ######################
@@ -789,7 +827,7 @@ def resize_image(image_file, width=200, height=200):
     new_image.save(resized_image)
     return resized_image
 
-async def save_and_resize_avatars(nameList,width=200, height=200):
+async def save_and_resize_avatars(nameList, image_folder=AVATAR_FOLDER, width=200, height=200):
     """
     Saves avatar images in files: <Name>.jpg
     :namelist:  list of strings of name
@@ -801,14 +839,14 @@ async def save_and_resize_avatars(nameList,width=200, height=200):
             if member.name in namelist:
                 #Set name for avatar
                 avatarjpg = member.name + ".jpg"
-                avatardir = IMAGES_FOLDER + avatarjpg
+                avatardir = image_folder + avatarjpg
                 userAvatar = member.avatar_url
                 #Save avatar image
                 await userAvatar.save(avatardir)
                 #Change avatar image to appropriate size:
                 avatardir = resize_image(avatardir,width,height)
 
-async def send_user_avatar_and_name(ctx, nameList, embed_colour=discord.Color.blue(), width=200,height=200):
+async def send_user_avatar_and_name(ctx, nameList, embed_colour=discord.Color.blue(), image_folder=AVATAR_FOLDER, width=200,height=200):
     """
     :usernames:     string of list of usernames
     :width:         width of avatar to be sent
@@ -816,13 +854,13 @@ async def send_user_avatar_and_name(ctx, nameList, embed_colour=discord.Color.bl
     """
     usernames = nameList.copy()
 
-    #images_folder = "avatarImages/"
+    #AVATAR_FOLDER = "avatarImages/"
     for member in userlist:
         if len(usernames) != 0:
             if member.name in usernames:
                 #Set name for avatar
                 avatarjpg = member.name + ".jpg"
-                avatardir = IMAGES_FOLDER + avatarjpg
+                avatardir = image_folder + avatarjpg
                 
                 #Change avatar image to appropriate size (assuming that all avatar images are alread 200 by 200):
                 if width != 200 and height!=200:

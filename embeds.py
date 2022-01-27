@@ -3,6 +3,23 @@ import discord
 from globalvar import *
 
 # all functions to create embeds go here
+async def create_all_participants_who_reacted_msg(ctx, imageDir):
+
+    # Assuming imageDir is in form of <FolderName>/<FileName>.jpg
+    imageSplit = imageDir.split("/")
+    imageFile = imageSplit[1]
+
+    file = discord.File(imageDir, filename=imageFile)
+    embed = discord.Embed(
+        title = f"TIME'S UP!",
+        description = f"Congrats to everyone who reacted fast enough!!",
+        color = discord.Color.blue()
+    )
+    #attachment://avatar_images/avatar2.jpg
+    attachment = "attachment://" + imageFile
+    embed.set_image(url=attachment)
+    await ctx.send(embed=embed,file=file)
+
 def create_welcome_camper_msg(role_list):
     embed = discord.Embed(
         title = "Welcome to the CAMP!",

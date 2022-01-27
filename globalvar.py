@@ -23,7 +23,8 @@ missing_url = 'https://i.imgur.com/1ADdRCU.jpg'
 
 new_day = False
 
-IMAGES_FOLDER = "avatarImages/"
+AVATAR_FOLDER = "avatarImages/"
+ROLE_FOLDER = "roleImages/"
 PARTICIPANT_LIST = []
 
 ###############################################
