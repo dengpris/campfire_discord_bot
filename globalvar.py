@@ -24,6 +24,7 @@ missing_url = 'https://i.imgur.com/1ADdRCU.jpg'
 new_day = False
 
 IMAGES_FOLDER = "avatarImages/"
+PARTICIPANT_LIST = []
 
 ###############################################
 

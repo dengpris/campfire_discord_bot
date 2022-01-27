@@ -162,6 +162,20 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
 
     await ctx.send("Alright! Let the Games BEGIN!!!")
 
+def delete_images(nameList):
+    print(f"Deleting images {nameList}")
+    for name in nameList:
+        print(f"Looking at {name}")
+        imagedir = IMAGES_FOLDER + name + ".jpg"
+        if os.path.exists(imagedir):
+            print("WE FOUND IMAGE ", imagedir)
+            os.remove(imagedir)
+            print("WE DELETED ", imagedir)
+        else:
+            print("we couldn't find ", imagedir)
+            
+
+
 ################# GAME LOGIC #####################
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     while(BOT_RUNNING):
@@ -172,10 +186,14 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
            
             #number of players
             num_players = len(nameList)
-            
-            # save photos of players
-            await save_and_resize_avatars(namelist)
+            global PARTICIPANT_LIST
+            PARTICIPANT_LIST = nameList.copy()
 
+            # save photos of players
+            await save_and_resize_avatars(nameList)
+            # Show current players
+            await send_user_avatar_and_name(ctx, nameList)
+          
             # Show current role numbers
             await show_current_roles(ctx, num_players,custom_roles)
             
@@ -441,6 +459,10 @@ async def reset_bot(ctx):
     camp_counselor_list.clear()
 
     GAME_RUNNING = False
+    
+    # Delete avatar images
+    nameList = PARTICIPANT_LIST.copy()
+    delete_images(nameList)
     await ctx.send("Resetting!")
 
 ################ ROLE SETTINGS ######################
@@ -637,12 +659,14 @@ async def win_conditions(ctx, eliminated):
                 winners.append(player.name)
     
     embed = discord.Embed(
-        title = (f"Winners: {winners}"),
-        description = (f"The {win_roles} has/have won! Congratulations!"),
+        title = ("The {win_roles} has/have won! Congratulations! Winners: "),
         color = discord.Color.red()
     )
     await ctx.send(embed = embed)
 
+    await send_user_avatar_and_name(ctx, winners)
+
+    # Reveal Role
     text=""
     for u in player_list:
         text=text+u.name+" is a "+u.role+"\n"
@@ -754,9 +778,10 @@ def resize_image(image_file, width=200, height=200):
     """
 
     #ASSUMING THAT THE . SEPARATES EVERYTHING BEFORE THE .JPG
-    print(f"image_file: {image_file}")
+    #print(f"image_file: {image_file}")
     image_file_split = image_file.split(".")
-    resized_image = image_file_split[0] + "New." + image_file_split[1]
+    #resized_image = image_file_split[0] + "New." + image_file_split[1]
+    resized_image = image_file
     print(f"new_image: {resized_image}")
 
     image = Image.open(image_file)
@@ -764,11 +789,13 @@ def resize_image(image_file, width=200, height=200):
     new_image.save(resized_image)
     return resized_image
 
-async def save_and_resize_avatars(namelist,width=200, height=200):
+async def save_and_resize_avatars(nameList,width=200, height=200):
     """
     Saves avatar images in files: <Name>.jpg
     :namelist:  list of strings of name
     """
+
+    namelist = nameList.copy()
     for member in userlist:
         if len(namelist) != 0:
             if member.name in namelist:
@@ -781,19 +808,21 @@ async def save_and_resize_avatars(namelist,width=200, height=200):
                 #Change avatar image to appropriate size:
                 avatardir = resize_image(avatardir,width,height)
 
-async def send_user_avatar_and_name(ctx, usernames, embed_colour=discord.Color.blue(), width=200,height=200):
+async def send_user_avatar_and_name(ctx, nameList, embed_colour=discord.Color.blue(), width=200,height=200):
     """
     :usernames:     string of list of usernames
     :width:         width of avatar to be sent
     :height:        height of avatar to be sent
     """
-    images_folder = "avatarImages/"
+    usernames = nameList.copy()
+
+    #images_folder = "avatarImages/"
     for member in userlist:
         if len(usernames) != 0:
             if member.name in usernames:
                 #Set name for avatar
                 avatarjpg = member.name + ".jpg"
-                avatardir = images_folder + avatarjpg
+                avatardir = IMAGES_FOLDER + avatarjpg
                 
                 #Change avatar image to appropriate size (assuming that all avatar images are alread 200 by 200):
                 if width != 200 and height!=200:
