@@ -51,32 +51,65 @@ async def timer(ctx, minutes, seconds=0):
             await ctx.send("I dont think im allowed to do negatives")
             raise BaseException
         
-        moonMessage = await ctx.send("🌑")
-        timerMessage = await ctx.send(f"Timer: {minuteint} minutes {secondsint} seconds")
+        moonMessage = await ctx.send("🌑🌑🌑🌑")
+        timerMessage = await ctx.send(content=f"Timer: {minuteint} minutes {secondsint} seconds")
         while True:
             totalSecondsLeft -= 1
             if totalSecondsLeft == 0:
-
+                await moonMessage.edit(content=f"🌕🌕🌕🌕")
                 await timerMessage.edit(content="Ended!")
                 break
                 #return True
 
             minuteLeft=totalSecondsLeft//60
             secondsLeft=totalSecondsLeft%60
-            if(totalSecondsLeft<totalseconds//5):
-                await moonMessage.edit(content=f"🌕")
+            if(totalSecondsLeft<totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌕🌖")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=totalseconds//5 and totalSecondsLeft<2*totalseconds//5):
-                await moonMessage.edit(content=f"🌖")
+            elif(totalSecondsLeft>=totalseconds//16 and totalSecondsLeft<2*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌕🌗")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=2*totalseconds//5 and totalSecondsLeft<3*totalseconds//5):
-                await moonMessage.edit(content=f"🌗")
+            elif(totalSecondsLeft>=2*totalseconds//16 and totalSecondsLeft<3*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌕🌘")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=3*totalseconds//5 and totalSecondsLeft<4*totalseconds//5):
-                await moonMessage.edit(content=f"🌘")
+            elif(totalSecondsLeft>=3*totalseconds//16 and totalSecondsLeft<4*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌕🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=4*totalseconds//5 and totalSecondsLeft<totalseconds):
-                await moonMessage.edit(content=f"🌑")
+            elif(totalSecondsLeft>=4*totalseconds//16 and totalSecondsLeft<5*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌖🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=5*totalseconds//16 and totalSecondsLeft<6*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌗🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=6*totalseconds//16 and totalSecondsLeft<7*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌘🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=7*totalseconds//16 and totalSecondsLeft<8*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=8*totalseconds//16 and totalSecondsLeft<9*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌖🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=9*totalseconds//16 and totalSecondsLeft<10*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌗🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=10*totalseconds//16 and totalSecondsLeft<11*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌘🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=11*totalseconds//16 and totalSecondsLeft<12*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌑🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=12*totalseconds//16 and totalSecondsLeft<13*totalseconds//16):
+                await moonMessage.edit(content=f"🌖🌑🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=13*totalseconds//16 and totalSecondsLeft<14*totalseconds//16):
+                await moonMessage.edit(content=f"🌗🌑🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=14*totalseconds//16 and totalSecondsLeft<15*totalseconds//16):
+                await moonMessage.edit(content=f"🌘🌑🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")1
+            elif(totalSecondsLeft>=15*totalseconds//16 and totalSecondsLeft<totalseconds):
+                await moonMessage.edit(content=f"🌑🌑🌑🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             
             if (new_day):
