@@ -32,7 +32,6 @@ PARTICIPANT_LIST = []
 NUM_OF_EACH_ROLE = {"Werewolf":0, "Camp Counselor":0, "Wannabe":0, "Introvert":0, "bffpair":0, "Camper":0}
 CUSTOM_ROLES = False
 
-BOT_RUNNING = True
 GAME_RUNNING = False
 
 #Default MAXIMUM role values per each number (Note cannot play with 3 players or less)

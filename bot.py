@@ -238,91 +238,92 @@ def add_images_together_horizontally(imageNames, image_Folder=ROLE_FOLDER):
 
 ################# GAME LOGIC #####################
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
-    while(BOT_RUNNING):
-        print("Bot running!")
-        while(GAME_RUNNING):
-            print('Game Start!')
-            nameList=[member.name for member in userlist]
-            print(nameList)
+    while(GAME_RUNNING):
+        print('Game Start!')
+        nameList=[member.name for member in userlist]
+        print(nameList)
 
-            #number of players
-            num_players = len(nameList)
-            global PARTICIPANT_LIST
-            PARTICIPANT_LIST = nameList.copy()
+        #number of players
+        num_players = len(nameList)
+        global PARTICIPANT_LIST
+        PARTICIPANT_LIST = nameList.copy()
 
-            # save photos of players
-            await save_and_resize_avatars(nameList)
-            # await send_user_avatar_and_name(ctx, nameList)
-            
-            # Show current players
-            imageDir = add_images_together_horizontally(nameList,image_Folder=AVATAR_FOLDER)
-            await create_all_participants_who_reacted_msg(ctx, imageDir)
-            
-            
-            # roleList:
-            #rolelist = ["Werewolf", "Camper", "Wannabe"]
-            #add_images_together_horizontally(rolelist)
+        # save photos of players
+        await save_and_resize_avatars(nameList)
+        # await send_user_avatar_and_name(ctx, nameList)
+        
+        # Show current players
+        imageDir = add_images_together_horizontally(nameList,image_Folder=AVATAR_FOLDER)
+        await create_all_participants_who_reacted_msg(ctx, imageDir)
+        
+        
+        # roleList:
+        #rolelist = ["Werewolf", "Camper", "Wannabe"]
+        #add_images_together_horizontally(rolelist)
 
-            # Show current role numbers
-            await show_current_roles(ctx, num_players,custom_roles)
-            
-            # Assign roles to players
-            roles_dictionary = NUM_OF_EACH_ROLE
-            custom_roles = CUSTOM_ROLES
-            game=roles.GameState(nameList, roles_dictionary, True, custom_roles=custom_roles)
-            
-            # Get unused roles
-            global UNUSED_ROLES
-            UNUSED_ROLES = game.get_unused_roles()
-            get_unused_roles()
+        # Show current role numbers
+        await show_current_roles(ctx, num_players,custom_roles)
+        
+        # Assign roles to players
+        roles_dictionary = NUM_OF_EACH_ROLE
+        custom_roles = CUSTOM_ROLES
+        game=roles.GameState(nameList, roles_dictionary, True, custom_roles=custom_roles)
+        
+        # Get unused roles
+        global UNUSED_ROLES
+        UNUSED_ROLES = game.get_unused_roles()
+        get_unused_roles()
 
-            #night time timer
-            await asyncio.gather(
-                timer(ctx, 0, 10),
-                send_role(game, ctx),
-            )
-            # ensure camp Counselor made choices (if applicalble)   
-            global new_day 
-            new_day = True
+        #night time timer
+        await asyncio.gather(
+            timer(ctx, 0, 10),
+            send_role(game, ctx),
+        )
 
-            # SEND VOTING DM TO EACH PLAYER
+        # ensure camp Counselor made choices (if applicable)   
+        global new_day 
+        new_day = True
+
+        # SEND VOTING DM TO EACH PLAYER
+        # Flow: on_reaction_add 
             # Flow: on_reaction_add 
-            global poll_list
-            embed = create_poll(userlist, poll_list)
-            for user in userlist:
-                if user.bot == False: # do not send messages to yourself
-                    channel = await user.create_dm()
-                    message = await channel.send(embed=embed)
+        # Flow: on_reaction_add 
+        global poll_list
+        embed = create_poll(userlist, poll_list)
+        for user in userlist:
+            if user.bot == False: # do not send messages to yourself
+                channel = await user.create_dm()
+                message = await channel.send(embed=embed)
 
-                # add reactions
-                    i=0
-                    while i<len(userlist):
-                        await message.add_reaction(unicode_letters[i])
-                        i = i+1
-            
-            # start day time timer
-            await timer(ctx, 0, 25)
-            
-            # TALLY VOTES
-            poll_list.sort(key=lambda x: x.votes, reverse=True)
-            
-            eliminated = []
-            highest_votes = poll_list[0].votes
-            print(f"highest votes {highest_votes}")
-            for poll in poll_list:     
-                if poll.votes == highest_votes:
-                    for player in player_list:
-                        elim_player = player.find_player(poll.user)
-                        if elim_player:
-                            eliminated.append(elim_player)
-                else:
-                    break
+            # add reactions
+                i=0
+                while i<len(userlist):
+                    await message.add_reaction(unicode_letters[i])
+                    i = i+1
+        
+        # start day time timer
+        await timer(ctx, 0, 25)
+        
+        # TALLY VOTES
+        poll_list.sort(key=lambda x: x.votes, reverse=True)
+        
+        eliminated = []
+        highest_votes = poll_list[0].votes
+        print(f"highest votes {highest_votes}")  
+        for poll in poll_list:     
+            if poll.votes == highest_votes:
+                for player in player_list:
+                    elim_player = player.find_player(poll.user)
+                    if elim_player:
+                        eliminated.append(elim_player)
+            else:
+                break
 
-            for player in eliminated:
-                await ctx.send(f"{player.name} has been voted out with {highest_votes} votes.")
+        for player in eliminated:
+            await ctx.send(f"{player.name} has been voted out with {highest_votes} votes.")
 
-            await reveal_roles(ctx, eliminated, poll_list)
-            await win_conditions(ctx, eliminated)
+        await reveal_roles(ctx, eliminated, poll_list)
+        await win_conditions(ctx, eliminated)
 
     #timer ends, initialze vote
     #player_booted, num_votes = game.tally_votes()
@@ -426,8 +427,6 @@ async def send_role(game,ctx):
     camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
     while True:
         try:
-            #if(GAME_RUNNING==FALSE):
-                #raise Exception {"GAME_RESET"}
             reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=check)
             # if camp counsellor is reacting the first time
             if user.name not in campCounsellorsCheckedIn:
@@ -460,7 +459,6 @@ async def send_role(game,ctx):
 async def reveal_two_missing_for_cc(ctx, reaction, user):
     def check_missing(reaction, user):
         return user in camp_counselor_list and str(reaction.emoji) in unicode_letters[:3] # A B C
-    
     message = await reaction.message.channel.send(embed=choose_two_missing_roles_msg())
     for i in range(3):
         await message.add_reaction(unicode_letters[i])
@@ -519,6 +517,7 @@ async def start(ctx):
 @bot.command(name="reset", help='reset bot')
 async def reset_bot(ctx):
     global GAME_RUNNING
+    global new_day
     userlist.clear()
     poll_list.clear()
     player_list.clear()
@@ -530,7 +529,7 @@ async def reset_bot(ctx):
     camp_counselor_list.clear()
 
     GAME_RUNNING = False
-    
+    new_day = False
     # Delete avatar images
     #nameList = PARTICIPANT_LIST.copy()
     #delete_images(nameList)
@@ -578,6 +577,8 @@ async def set_settings(ctx, *args):
 
         while not good_input :
             custom_role_numbers = await bot.wait_for("message",check=check)
+            if custom_role_numbers.content() == "!reset":
+                return
             custom_role_numbers = custom_role_numbers.content.split()
             good_input = await correct_settings_input(ctx, num_players, custom_role_numbers)
 
