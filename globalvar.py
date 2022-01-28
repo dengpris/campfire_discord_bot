@@ -10,6 +10,23 @@ introvert_list = []
 best_friend_list = []
 camp_counselor_list = []
 total_voted = 0
+moonTimerEmojiList=[
+                "🌘🌑🌑🌑", 
+                "🌗🌑🌑🌑",
+                "🌖🌑🌑🌑",
+                "🌕🌑🌑🌑",
+                "🌕🌘🌑🌑",
+                "🌕🌗🌑🌑",
+                "🌕🌖🌑🌑",
+                "🌕🌕🌑🌑",
+                "🌕🌕🌘🌑",
+                "🌕🌕🌗🌑",
+                "🌕🌕🌖🌑",
+                "🌕🌕🌕🌑",
+                "🌕🌕🌕🌘",
+                "🌕🌕🌕🌗",
+                "🌕🌕🌕🌖",
+                "🌕🌕🌕🌕"]
 
 ########## ROLE IMAGE URLS ###########
 welcome_url = 'https://i.imgur.com/OPCZSjx.png'
@@ -22,6 +39,7 @@ wannabe_url = 'https://i.imgur.com/XZSDOEU.jpg'
 missing_url = 'https://i.imgur.com/1ADdRCU.jpg'
 
 new_day = False
+voting_poll_exists=False
 
 AVATAR_FOLDER = "avatarImages/"
 ROLE_FOLDER = "roleImages/"

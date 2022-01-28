@@ -32,7 +32,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='*', intents=intents)
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -52,75 +52,42 @@ async def timer(ctx, minutes, seconds=0):
             raise BaseException
         
         moonMessage = await ctx.send("🌑🌑🌑🌑")
-        timerMessage = await ctx.send(content=f"Timer: {minuteint} minutes {secondsint} seconds")
+        #timerMessage = await ctx.send(content=f"Timer: {minuteint} minutes {secondsint} seconds")
         while True:
             totalSecondsLeft -= 1
+
+            if GAME_RUNNING==False:
+                break
             if totalSecondsLeft == 0:
                 await moonMessage.edit(content=f"🌕🌕🌕🌕")
-                await timerMessage.edit(content="Ended!")
+                #await timerMessage.edit(content="Ended!")
                 break
                 #return True
 
             minuteLeft=totalSecondsLeft//60
             secondsLeft=totalSecondsLeft%60
-            if(totalSecondsLeft<totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌕")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=totalseconds//16 and totalSecondsLeft<2*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌖")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=2*totalseconds//16 and totalSecondsLeft<3*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌗")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=3*totalseconds//16 and totalSecondsLeft<4*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌘")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=4*totalseconds//16 and totalSecondsLeft<5*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=5*totalseconds//16 and totalSecondsLeft<6*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌖🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=6*totalseconds//16 and totalSecondsLeft<7*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌗🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=7*totalseconds//16 and totalSecondsLeft<8*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌘🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=8*totalseconds//16 and totalSecondsLeft<9*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=9*totalseconds//16 and totalSecondsLeft<10*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌖🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=10*totalseconds//16 and totalSecondsLeft<11*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌗🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=11*totalseconds//16 and totalSecondsLeft<12*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌘🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=12*totalseconds//16 and totalSecondsLeft<13*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌑🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=13*totalseconds//16 and totalSecondsLeft<14*totalseconds//16):
-                await moonMessage.edit(content=f"🌖🌑🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=14*totalseconds//16 and totalSecondsLeft<15*totalseconds//16):
-                await moonMessage.edit(content=f"🌗🌑🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=15*totalseconds//16 and totalSecondsLeft<totalseconds):
-                await moonMessage.edit(content=f"🌘🌑🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            for i in range(15, -1, -1):
+                if(totalSecondsLeft>= i*totalseconds//16 and totalSecondsLeft< (i+1)*totalseconds//16):
+                    await moonMessage.edit(content=moonTimerEmojiList[15-i])
+                    #break;
+                if(totalSecondsLeft<totalseconds//16):
+                    await moonMessage.edit(content=f"🌕🌕🌕🌕")
+                    break;
             
             if (new_day):
                 if (total_voted == len(userlist)):
                     await ctx.send("Everybody has voted! Who will be sent home?")
                     return True
                 # UPDATE VOTING STATUS EVERY 5 SECONDS
-                if secondsLeft%5 == 0: 
+                global voting_poll_exists
+                if voting_poll_exists==False:
+                    voting_poll_exists=True
                     print(f"poll list:{poll_list}")
-                    await ctx.send(embed=create_vote_status_msg(poll_list, secondsLeft))    
-                  
+                    voteEmbed = await ctx.send(embed=create_vote_status_msg(poll_list, secondsLeft)) 
+                if secondsLeft%5 == 0 and voting_poll_exists: 
+                    print(f"poll list:{poll_list}")
+                    await voteEmbed.edit(embed=create_vote_status_msg(poll_list, secondsLeft))    
+                
             await asyncio.sleep(1)
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
     except ValueError:
@@ -284,6 +251,9 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
         global new_day 
         new_day = True
 
+        global voting_poll_exists
+        voting_poll_exists=False
+
         # SEND VOTING DM TO EACH PLAYER
         # Flow: on_reaction_add 
             # Flow: on_reaction_add 
@@ -324,6 +294,10 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
         await reveal_roles(ctx, eliminated, poll_list)
         await win_conditions(ctx, eliminated)
+
+        # Delete avatar images
+        nameList = PARTICIPANT_LIST.copy()
+        delete_images(nameList)
 
     #timer ends, initialze vote
     #player_booted, num_votes = game.tally_votes()
@@ -518,6 +492,7 @@ async def start(ctx):
 async def reset_bot(ctx):
     global GAME_RUNNING
     global new_day
+    global voting_poll_exists
     userlist.clear()
     poll_list.clear()
     player_list.clear()
@@ -530,6 +505,8 @@ async def reset_bot(ctx):
 
     GAME_RUNNING = False
     new_day = False
+    voting_poll_exists=False
+    
     # Delete avatar images
     #nameList = PARTICIPANT_LIST.copy()
     #delete_images(nameList)
@@ -634,7 +611,8 @@ async def on_reaction_add(reaction, user):
             for player in userlist:
                 if player.name == poll.user:
                     embed = create_vote_for_msg(player)
-                    await user.send(embed=embed)   
+                    await user.send(embed=embed)
+
     # if voting for the first time, send message to channel
     if not has_already_voted:
         global total_voted
@@ -694,17 +672,21 @@ async def win_conditions(ctx, eliminated):
                 for player in best_friend_list:
                     winners.append(player.name)
                 break
-            #if wannabe or camper voted
-            elif player.role == "Wannabe" or player.role == "Camper" or player.role == "Best Friend" or player.role == "Camp Counselor":
-                # If wannabes exist
-                if wannabe_list:
-                    win_roles.append("Wannabe")
-                    winners.append(wannabe_list[0].name)
-                # If werewolves exist
-                if werewolf_list:
-                    win_roles.append("Werewolves")
-                    for player in werewolf_list:
-                        winners.append(player.name)
+
+            #if the player is the last element in eliminated
+            if player == eliminated[-1]:
+                #if wannabe or camper voted
+                if player.role == "Wannabe" or player.role == "Camper" or player.role == "Best Friend" or player.role == "Camp Counselor":
+                    # If wannabes exist
+                    if wannabe_list:
+                        win_roles.append("Wannabe")
+                        winners.append(wannabe_list[0].name)
+                    # If werewolves exist
+                    if werewolf_list:
+                        win_roles.append("Werewolves")
+                        for player in werewolf_list:
+                            winners.append(player.name)
+                        
     else: #No one votes
         #Counts number of total werewolves in game
         total_players = len(player_list)
@@ -892,7 +874,7 @@ async def send_user_avatar_and_name(ctx, nameList, embed_colour=discord.Color.bl
     :height:        height of avatar to be sent
     """
     usernames = nameList.copy()
-
+    print(f"Here with {nameList}")
     #AVATAR_FOLDER = "avatarImages/"
     for member in userlist:
         if len(usernames) != 0:
@@ -932,6 +914,7 @@ async def reveal_roles(ctx, eliminated, poll_list):
         print(p.user+"  "+str(p.votes))
         if p.votes==voteVal:
             text=text+p.user+"\n"
+            users_w_same_num_of_votes.append(p.user)
         if p.votes!=voteVal:    
             embed = discord.Embed(
                     title = (f"People with "+ str(voteVal) +" votes"),
@@ -939,6 +922,7 @@ async def reveal_roles(ctx, eliminated, poll_list):
                     color = discord.Color.blurple()
                 )
             await ctx.send(embed=embed)
+            print(f"Sending embeds of these useres: {users_w_same_num_of_votes}")
             await send_user_avatar_and_name(ctx, users_w_same_num_of_votes, discord.Color.blurple())
             users_w_same_num_of_votes = []
             users_w_same_num_of_votes.append(p.user)
