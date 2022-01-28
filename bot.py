@@ -47,32 +47,65 @@ async def timer(ctx, minutes, seconds=0):
             await ctx.send("I dont think im allowed to do negatives")
             raise BaseException
         
-        moonMessage = await ctx.send("🌑")
-        timerMessage = await ctx.send("Timer: {minuteint} minutes {secondsint} seconds")
+        moonMessage = await ctx.send("🌑🌑🌑🌑")
+        timerMessage = await ctx.send(content=f"Timer: {minuteint} minutes {secondsint} seconds")
         while True:
             totalSecondsLeft -= 1
             if totalSecondsLeft == 0:
-
+                await moonMessage.edit(content=f"🌕🌕🌕🌕")
                 await timerMessage.edit(content="Ended!")
                 break
                 #return True
 
             minuteLeft=totalSecondsLeft//60
             secondsLeft=totalSecondsLeft%60
-            if(totalSecondsLeft<totalseconds//5):
-                await moonMessage.edit(content=f"🌕")
+            if(totalSecondsLeft<totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌕🌕")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=totalseconds//5 and totalSecondsLeft<2*totalseconds//5):
-                await moonMessage.edit(content=f"🌖")
+            elif(totalSecondsLeft>=totalseconds//16 and totalSecondsLeft<2*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌕🌖")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=2*totalseconds//5 and totalSecondsLeft<3*totalseconds//5):
-                await moonMessage.edit(content=f"🌗")
+            elif(totalSecondsLeft>=2*totalseconds//16 and totalSecondsLeft<3*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌕🌗")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=3*totalseconds//5 and totalSecondsLeft<4*totalseconds//5):
-                await moonMessage.edit(content=f"🌘")
+            elif(totalSecondsLeft>=3*totalseconds//16 and totalSecondsLeft<4*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌕🌘")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=4*totalseconds//5 and totalSecondsLeft<totalseconds):
-                await moonMessage.edit(content=f"🌑")
+            elif(totalSecondsLeft>=4*totalseconds//16 and totalSecondsLeft<5*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌕🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=5*totalseconds//16 and totalSecondsLeft<6*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌖🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=6*totalseconds//16 and totalSecondsLeft<7*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌗🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=7*totalseconds//16 and totalSecondsLeft<8*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌘🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=8*totalseconds//16 and totalSecondsLeft<9*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌕🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=9*totalseconds//16 and totalSecondsLeft<10*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌖🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=10*totalseconds//16 and totalSecondsLeft<11*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌗🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=11*totalseconds//16 and totalSecondsLeft<12*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌘🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=12*totalseconds//16 and totalSecondsLeft<13*totalseconds//16):
+                await moonMessage.edit(content=f"🌕🌑🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=13*totalseconds//16 and totalSecondsLeft<14*totalseconds//16):
+                await moonMessage.edit(content=f"🌖🌑🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=14*totalseconds//16 and totalSecondsLeft<15*totalseconds//16):
+                await moonMessage.edit(content=f"🌗🌑🌑🌑")
+                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            elif(totalSecondsLeft>=15*totalseconds//16 and totalSecondsLeft<totalseconds):
+                await moonMessage.edit(content=f"🌘🌑🌑🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             
             if (new_day):
@@ -91,7 +124,7 @@ async def timer(ctx, minutes, seconds=0):
 
 @bot.command(name='werewolfEnd', help='kill the game')
 async def werewolfEnd(ctx):
-    await ctx.send("imma kil l myself")
+    await ctx.send("imma kill myself")
     exit()
 
 ################# SET SETTINGS ####################
@@ -155,36 +188,94 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
 
     await ctx.send("Alright! Let the Games BEGIN!!!")
 
+def delete_images(nameList, image_folder=AVATAR_FOLDER):
+    print(f"Deleting images {nameList}")
+    for name in nameList:
+        print(f"Looking at {name}")
+        imagedir = image_folder + name + ".jpg"
+        if os.path.exists(imagedir):
+            print("WE FOUND IMAGE ", imagedir)
+            os.remove(imagedir)
+            print("WE DELETED ", imagedir)
+        else:
+            print("we couldn't find ", imagedir)
+            
+def add_images_together_horizontally(imageNames, image_Folder=ROLE_FOLDER):
+
+    new_image_name =  'avatarImages/allPlayers.jpg'   
+    # Gets all role images locations and put in image_list
+    image_list = []
+    for name in imageNames:
+        image_file = image_Folder + name + ".jpg"
+        image_list.append(image_file)
+        # Resizes all images so that they're all the same 200 by 200
+        resize_image(image_file)
+
+    # Open all images
+    images = [Image.open(x) for x in image_list]
+
+    # Gets proper widths and max height 
+    widths, heights = zip(*(i.size for i in images))
+
+    # This will be a horizontal image that appends them alltogether
+    total_width = sum(widths)
+    max_height = max(heights)
+
+    # Create new image
+    new_im = Image.new('RGB', (total_width, max_height))
+
+    x_offset = 0
+    for im in images:
+        new_im.paste(im, (x_offset,0))
+        x_offset += im.size[0]
+
+    new_im.save(new_image_name)
+    return new_image_name
+
 ################# GAME LOGIC #####################
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     while(BOT_RUNNING):
         while(GAME_RUNNING):
             print('Game Start!')
             nameList=[member.name for member in userlist]
-            #nameList=["A", "B", "C", "D"]
             print(nameList)
 
             #number of players
             num_players = len(nameList)
-            print("Num players ", num_players)
-            await show_current_roles(ctx, num_players,custom_roles)
+            global PARTICIPANT_LIST
+            PARTICIPANT_LIST = nameList.copy()
 
+            # save photos of players
+            await save_and_resize_avatars(nameList)
+            # await send_user_avatar_and_name(ctx, nameList)
+            
+            # Show current players
+            imageDir = add_images_together_horizontally(nameList,image_Folder=AVATAR_FOLDER)
+            await create_all_participants_who_reacted_msg(ctx, imageDir)
+            
+            
+            # roleList:
+            #rolelist = ["Werewolf", "Camper", "Wannabe"]
+            #add_images_together_horizontally(rolelist)
+
+            # Show current role numbers
+            await show_current_roles(ctx, num_players,custom_roles)
+            
+            # Assign roles to players
             roles_dictionary = NUM_OF_EACH_ROLE
             custom_roles = CUSTOM_ROLES
             game=roles.GameState(nameList, roles_dictionary, True, custom_roles=custom_roles)
-            #nameList=[member.name for member in userlist]
-            # game.set_random_roles()
+            
+            # Get unused roles
             global UNUSED_ROLES
             UNUSED_ROLES = game.get_unused_roles()
             get_unused_roles()
 
             #night time timer
-            timer_task = asyncio.create_task(timer(ctx, 0, 30))
-            role_task = asyncio.create_task(send_role(game,ctx))
-
-            await timer_task
-            await role_task
-            
+            await asyncio.gather(
+                timer(ctx, 0, 10),
+                send_role(game, ctx),
+            )
             # ensure camp Counselor made choices (if applicalble)   
             global new_day 
             new_day = True
@@ -403,8 +494,8 @@ async def start(ctx):
             update_moon = i * "🌕"
             await moon_message.edit(content=update_moon)
         await moon_message.delete()
-        await ctx.send("\n**Time is up!**\nHere's everyone that made it to camp:")
-
+        
+        #await ctx.send("\n**Time is up!**\nHere's everyone that made it to camp:")
         message = await ctx.channel.fetch_message(message.id)
         reaction = message.reactions[0] # checkmark reactions only
         
@@ -413,7 +504,7 @@ async def start(ctx):
                 continue
             else:
                 userlist.append(user)
-                await ctx.send(user.name) 
+                #await ctx.send(user.name) 
         await gameLogic(ctx, 1, 1, CUSTOM_ROLES)
     else:
         await ctx.send("The game is running already! Type !reset if you want to restart the game.")
@@ -432,6 +523,10 @@ async def reset_bot(ctx):
     camp_counselor_list.clear()
 
     GAME_RUNNING = False
+    
+    # Delete avatar images
+    #nameList = PARTICIPANT_LIST.copy()
+    #delete_images(nameList)
     await ctx.send("Resetting!")
 
 ################ ROLE SETTINGS ######################
@@ -626,14 +721,20 @@ async def win_conditions(ctx, eliminated):
             win_roles.append("Werewolves")
             for player in werewolf_list:
                 winners.append(player.name)
-    
+    winnerText=""
+    for w in win_roles:
+        winnerText=winnerText+", "+w
+
+    winnerText=winnerText[1:]
     embed = discord.Embed(
-        title = (f"Winners: {winners}"),
-        description = (f"The {win_roles} has/have won! Congratulations!"),
+        title = "The"+ winnerText+" has/have won! Congratulations! Winners: ",
         color = discord.Color.red()
     )
     await ctx.send(embed = embed)
 
+    await send_user_avatar_and_name(ctx, winners)
+
+    # Reveal Role
     text=""
     for u in player_list:
         text=text+u.name+" is a "+u.role+"\n"
@@ -648,6 +749,167 @@ async def win_conditions(ctx, eliminated):
     return
 
 ###################### REVEAL LOGIC ######################
+# @bot.command(name="show_user", help='shows user avatar')
+# async def show_user_avatar(ctx, username):
+#     """
+#     userlist is a global variable of user types
+#     username is the name of user 
+#     GOAL: to input a username, and output their photos 
+#     - photos should be set to the same size
+#     """
+#     await ctx.send(userlist)
+#     userAvatar = ""
+#     avatarjpg = "avatar3.jpg"
+#     for member in userlist:
+#         if member.name == username:
+#             userAvatar = member.avatar_url
+#             await ctx.send(userAvatar)
+#             await userAvatar.save(avatarjpg)
+#             file = discord.File(fp=avatarjpg)
+
+#     await ctx.send("Sending embed")
+
+#     embed = discord.Embed(
+#         title = f"This is what {username} looks like!",
+#         description = f"Do you like their face?",
+#         color = discord.Color.blue()
+#     )
+#     embed.set_image(url=userAvatar)
+
+#     await ctx.send(embed=embed)
+
+# fcn is only for testing
+@bot.command(name="resize_user", help='resize avatar')
+async def resize_user(ctx):
+    """
+    Resize user image, make sure to change avatarjpg and new_avatarjpg
+    """
+
+    avatarjpg = "avatar_images/Emiwana.jpg"
+    new_avatarjpg = "avatar_images/Emiwana_1.jpg"
+    file = discord.File(fp=avatarjpg)
+    await ctx.send("Current avatar img", file = file)
+
+    image = Image.open(avatarjpg)
+    new_image = image.resize((200, 200)).convert('RGB')
+    new_image.save(new_avatarjpg)
+    file = discord.File(fp=new_avatarjpg)
+    await ctx.send("New avatar img", file = file)
+
+# fcn is only for testing
+@bot.command(name = "avatar")
+async def avatar(ctx):
+ 
+    # Send user avatar
+    await ctx.send(ctx.author.avatar_url)
+
+    # Save avatar url as a file
+    avatarjpg = "avatarImages/avatar2.jpg"
+    await ctx.author.avatar_url.save(avatarjpg)
+
+    # Send an image file
+    file = discord.File(fp=avatarjpg)
+    await ctx.send("Enjoy :>", file=file)
+
+    # Send image file IN an embed 
+    file = discord.File("werewolf.jpg")
+    embed = discord.Embed(
+        title = f"This is what a werewolf looks like!",
+        description = f"Do you like their face?",
+        color = discord.Color.blue()
+    )
+    embed.set_image(url="attachment://werewolf.jpg")
+    await ctx.send(embed=embed,file=file)
+
+    # Send image from folder IN an emebed
+    #avatarjpg = "avatar0.jpg"
+    file = discord.File(avatarjpg, filename="avatar2.jpg")
+    embed = discord.Embed(
+        title = f"This is what a werewolf looks like!",
+        description = f"Do you like their face?",
+        color = discord.Color.blue()
+    )
+    #attachment://avatar_images/avatar2.jpg
+    attachment = "attachment://" + "avatar2.jpg"
+    embed.set_image(url=attachment)
+    await ctx.send(embed=embed,file=file)
+########## ABOVE IS TESTING FCNS ONLY
+
+
+def resize_image(image_file, width=200, height=200):
+    """
+    Resizes image to given size
+
+    :image_file:    string of image location (.jpg file)
+    :width:         int width (default is 200)
+    :height:        int height (default is 200)
+    :return:        string location of new image
+    """
+
+    #ASSUMING THAT THE . SEPARATES EVERYTHING BEFORE THE .JPG
+    #print(f"image_file: {image_file}")
+    image_file_split = image_file.split(".")
+    #resized_image = image_file_split[0] + "New." + image_file_split[1]
+    resized_image = image_file
+    print(f"new_image: {resized_image}")
+
+    image = Image.open(image_file)
+    new_image = image.resize((width, height)).convert('RGB')
+    new_image.save(resized_image)
+    return resized_image
+
+async def save_and_resize_avatars(nameList, image_folder=AVATAR_FOLDER, width=200, height=200):
+    """
+    Saves avatar images in files: <Name>.jpg
+    :namelist:  list of strings of name
+    """
+
+    namelist = nameList.copy()
+    for member in userlist:
+        if len(namelist) != 0:
+            if member.name in namelist:
+                #Set name for avatar
+                avatarjpg = member.name + ".jpg"
+                avatardir = image_folder + avatarjpg
+                userAvatar = member.avatar_url
+                #Save avatar image
+                await userAvatar.save(avatardir)
+                #Change avatar image to appropriate size:
+                avatardir = resize_image(avatardir,width,height)
+
+async def send_user_avatar_and_name(ctx, nameList, embed_colour=discord.Color.blue(), image_folder=AVATAR_FOLDER, width=200,height=200):
+    """
+    :usernames:     string of list of usernames
+    :width:         width of avatar to be sent
+    :height:        height of avatar to be sent
+    """
+    usernames = nameList.copy()
+
+    #AVATAR_FOLDER = "avatarImages/"
+    for member in userlist:
+        if len(usernames) != 0:
+            if member.name in usernames:
+                #Set name for avatar
+                avatarjpg = member.name + ".jpg"
+                avatardir = image_folder + avatarjpg
+                
+                #Change avatar image to appropriate size (assuming that all avatar images are alread 200 by 200):
+                if width != 200 and height!=200:
+                    avatardir = resize_image(avatardir,width,height)
+
+                #Setup Embed
+                file = discord.File(avatardir, filename=avatarjpg)
+                embed = discord.Embed(
+                    title = member.name,
+                    color = embed_colour
+                )
+                attach_avatar = "attachment://" + avatarjpg
+                embed.set_image(url=attach_avatar)
+                #Send embed
+                await ctx.send(embed=embed,file=file)
+                usernames.remove(member.name)
+
+
 async def reveal_roles(ctx, eliminated, poll_list):
     #sort list from least to greatest
     poll_list.sort(key=lambda x: x.votes, reverse=False)
@@ -668,6 +930,10 @@ async def reveal_roles(ctx, eliminated, poll_list):
                     color = discord.Color.blurple()
                 )
             await ctx.send(embed=embed)
+            await send_user_avatar_and_name(ctx, users_w_same_num_of_votes, discord.Color.blurple())
+            users_w_same_num_of_votes = []
+            users_w_same_num_of_votes.append(p.user)
+            voteVal=p.votes
 
             text=""
             text=text+p.user+"\n"
@@ -681,6 +947,8 @@ async def reveal_roles(ctx, eliminated, poll_list):
 
     #print the most voted off person
     await ctx.send(embed=embed)
+    await send_user_avatar_and_name(ctx, users_w_same_num_of_votes,discord.Color.red(),width=400,height=400)
+    #NEED TO DELETE ALL FILES IN ./avatar_images
     return 
 
 bot.run(TOKEN)
