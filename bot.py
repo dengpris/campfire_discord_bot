@@ -79,9 +79,14 @@ async def timer(ctx, minutes, seconds=0):
                     await ctx.send("Everybody has voted! Who will be sent home?")
                     return True
                 # UPDATE VOTING STATUS EVERY 5 SECONDS
-                if secondsLeft%5 == 0: 
+                global voting_poll_exists
+                if voting_poll_exists==False:
+                    voting_poll_exists=True
                     print(f"poll list:{poll_list}")
-                    await ctx.send(embed=create_vote_status_msg(poll_list, secondsLeft))    
+                    voteEmbed = await ctx.send(embed=create_vote_status_msg(poll_list, secondsLeft)) 
+                if secondsLeft%5 == 0 and voting_poll_exists: 
+                    print(f"poll list:{poll_list}")
+                    await voteEmbed.edit(embed=create_vote_status_msg(poll_list, secondsLeft))    
                 
             await asyncio.sleep(1)
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
@@ -246,6 +251,9 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
             # ensure camp Counselor made choices (if applicalble)   
             global new_day 
             new_day = True
+
+            global voting_poll_exists
+            voting_poll_exists=False
 
             # SEND VOTING DM TO EACH PLAYER
             # Flow: on_reaction_add 
@@ -481,6 +489,7 @@ async def start(ctx):
 @bot.command(name="reset", help='reset bot')
 async def reset_bot(ctx):
     global GAME_RUNNING
+    global voting_poll_exists
     userlist.clear()
     poll_list.clear()
     player_list.clear()
@@ -492,6 +501,7 @@ async def reset_bot(ctx):
     camp_counselor_list.clear()
 
     GAME_RUNNING = False
+    voting_poll_exists=False
     
     # Delete avatar images
     #nameList = PARTICIPANT_LIST.copy()
