@@ -3,10 +3,6 @@ from calendar import c
 from email.errors import FirstHeaderLineIsContinuationDefect
 from tkinter import N
 
-#To resize image:
-from PIL import Image
-from io import BytesIO
-
 from numpy import maximum
 import os
 from pickle import FALSE
@@ -21,6 +17,10 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from discord.utils import get
 
+#To resize image:
+from PIL import Image
+from io import BytesIO
+
 from poll import *
 from embeds import *
 from globalvar import *
@@ -32,7 +32,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='$', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -108,7 +108,7 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
     if num_players < 3:
         #num_players = 4
         await ctx.send(f"Not enough players... maybe find more friends? {num_players}")
-        #await reset_bot(ctx)
+        await reset_bot(ctx)
     
     if not custom_roles:
         if num_players > 10:
@@ -135,11 +135,8 @@ async def show_current_roles(ctx, num_players, custom_roles=False):
     def check(msg):
         return msg.author == ctx.author and msg.channel == ctx.channel 
 
-    try:
-        msg = await bot.wait_for("message", check=check_y_n, timeout=10.0)
-    except asyncio.TimeoutError:
-        await reset_bot(ctx)
-        return
+
+    msg = await bot.wait_for("message", check=check_y_n)
 
     if msg.content.lower() == "y":
         await ctx.send("**You said yes!**\n" + settings_usage_text())
@@ -204,11 +201,12 @@ def add_images_together_horizontally(imageNames, image_Folder=ROLE_FOLDER):
 ################# GAME LOGIC #####################
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     while(BOT_RUNNING):
+        print("Bot running!")
         while(GAME_RUNNING):
             print('Game Start!')
             nameList=[member.name for member in userlist]
             print(nameList)
-           
+
             #number of players
             num_players = len(nameList)
             global PARTICIPANT_LIST
@@ -265,7 +263,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
                         i = i+1
             
             # start day time timer
-            await timer(ctx, 0, 10)#25 before 
+            await timer(ctx, 0, 25)
             
             # TALLY VOTES
             poll_list.sort(key=lambda x: x.votes, reverse=True)
@@ -390,6 +388,8 @@ async def send_role(game,ctx):
     camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
     while True:
         try:
+            #if(GAME_RUNNING==FALSE):
+                #raise Exception {"GAME_RESET"}
             reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=check)
             # if camp counsellor is reacting the first time
             if user.name not in campCounsellorsCheckedIn:
@@ -718,7 +718,8 @@ async def win_conditions(ctx, eliminated):
         color = discord.Color.blurple()
     )
     await ctx.send(embed = embed)
-    GAME_RUNNING=False
+    GAME_RUNNING = False
+    return
 
 ###################### REVEAL LOGIC ######################
 # @bot.command(name="show_user", help='shows user avatar')
@@ -896,10 +897,10 @@ async def reveal_roles(ctx, eliminated, poll_list):
         print(p.user+"  "+str(p.votes))
         if p.votes==voteVal:
             text=text+p.user+"\n"
-            users_w_same_num_of_votes.append(p.user)
         if p.votes!=voteVal:    
             embed = discord.Embed(
-                    title = (f"PEOPLE WITH "+ str(voteVal) +" VOTES"),
+                    title = (f"People with "+ str(voteVal) +" votes"),
+                    description = (text),
                     color = discord.Color.blurple()
                 )
             await ctx.send(embed=embed)
@@ -908,12 +909,15 @@ async def reveal_roles(ctx, eliminated, poll_list):
             users_w_same_num_of_votes.append(p.user)
             voteVal=p.votes
 
-    
-    embed = discord.Embed(
-        title = (f"PEOPLE VOTED OFF WITH {str(voteVal)} VOTES"),
-        description = "sORRY but Bye felicIa",
-        color = discord.Color.red()
-    )
+            text=""
+            text=text+p.user+"\n"
+            voteVal=p.votes
+    if voteVal != 0:
+        embed = discord.Embed(
+            title = (f"People voted off"),
+            description = (text),
+            color = discord.Color.red()
+        )
 
     #print the most voted off person
     await ctx.send(embed=embed)
