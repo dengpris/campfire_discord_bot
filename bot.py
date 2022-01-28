@@ -32,7 +32,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='*', intents=intents)
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -655,7 +655,8 @@ async def win_conditions(ctx, eliminated):
     winners = []
     win_roles = []
     global GAME_RUNNING
-    if(poll_list[0].votes != 0):
+
+    if(poll_list[-1].votes != 0):
         for player in eliminated:
             # if introvert is voted, everyone auto loses except introvert
             if player.role == "Introvert":
