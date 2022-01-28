@@ -17,6 +17,10 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from discord.utils import get
 
+#To resize image:
+from PIL import Image
+from io import BytesIO
+
 from poll import *
 from embeds import *
 from globalvar import *
@@ -235,6 +239,7 @@ def add_images_together_horizontally(imageNames, image_Folder=ROLE_FOLDER):
 ################# GAME LOGIC #####################
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     while(BOT_RUNNING):
+        print("Bot running!")
         while(GAME_RUNNING):
             print('Game Start!')
             nameList=[member.name for member in userlist]
@@ -421,6 +426,8 @@ async def send_role(game,ctx):
     camp_counselor_list_names=[cc.name for cc in camp_counselor_list if not cc.bot]
     while True:
         try:
+            #if(GAME_RUNNING==FALSE):
+                #raise Exception {"GAME_RESET"}
             reaction, user = await bot.wait_for('reaction_add', timeout=30.0, check=check)
             # if camp counsellor is reacting the first time
             if user.name not in campCounsellorsCheckedIn:
@@ -915,6 +922,7 @@ async def reveal_roles(ctx, eliminated, poll_list):
     poll_list.sort(key=lambda x: x.votes, reverse=False)
 
     text=""
+    users_w_same_num_of_votes = []
     voteVal=0
     #iterate through each element in the array, compare each element to voteVal while appending the player name to the text
     #when the element is different to voteVal, update voteVal to the current element value
