@@ -52,65 +52,27 @@ async def timer(ctx, minutes, seconds=0):
             raise BaseException
         
         moonMessage = await ctx.send("🌑🌑🌑🌑")
-        timerMessage = await ctx.send(content=f"Timer: {minuteint} minutes {secondsint} seconds")
+        #timerMessage = await ctx.send(content=f"Timer: {minuteint} minutes {secondsint} seconds")
         while True:
             totalSecondsLeft -= 1
+
+            if GAME_RUNNING==False:
+                break
             if totalSecondsLeft == 0:
                 await moonMessage.edit(content=f"🌕🌕🌕🌕")
-                await timerMessage.edit(content="Ended!")
+                #await timerMessage.edit(content="Ended!")
                 break
                 #return True
 
             minuteLeft=totalSecondsLeft//60
             secondsLeft=totalSecondsLeft%60
-            if(totalSecondsLeft<totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌕")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=totalseconds//16 and totalSecondsLeft<2*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌖")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=2*totalseconds//16 and totalSecondsLeft<3*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌗")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=3*totalseconds//16 and totalSecondsLeft<4*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌘")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=4*totalseconds//16 and totalSecondsLeft<5*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=5*totalseconds//16 and totalSecondsLeft<6*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌖🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=6*totalseconds//16 and totalSecondsLeft<7*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌗🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=7*totalseconds//16 and totalSecondsLeft<8*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌘🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=8*totalseconds//16 and totalSecondsLeft<9*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=9*totalseconds//16 and totalSecondsLeft<10*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌖🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=10*totalseconds//16 and totalSecondsLeft<11*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌗🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=11*totalseconds//16 and totalSecondsLeft<12*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌘🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=12*totalseconds//16 and totalSecondsLeft<13*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌑🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=13*totalseconds//16 and totalSecondsLeft<14*totalseconds//16):
-                await moonMessage.edit(content=f"🌖🌑🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=14*totalseconds//16 and totalSecondsLeft<15*totalseconds//16):
-                await moonMessage.edit(content=f"🌗🌑🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
-            elif(totalSecondsLeft>=15*totalseconds//16 and totalSecondsLeft<totalseconds):
-                await moonMessage.edit(content=f"🌘🌑🌑🌑")
-                await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
+            for i in range(15, -1, -1):
+                if(totalSecondsLeft>= i*totalseconds//16 and totalSecondsLeft< (i+1)*totalseconds//16):
+                    await moonMessage.edit(content=moonTimerEmojiList[15-i])
+                    #break;
+                if(totalSecondsLeft<totalseconds//16):
+                    await moonMessage.edit(content=f"🌕🌕🌕🌕")
+                    break;
             
             if (new_day):
                 if (total_voted == len(userlist)):
@@ -120,7 +82,7 @@ async def timer(ctx, minutes, seconds=0):
                 if secondsLeft%5 == 0: 
                     print(f"poll list:{poll_list}")
                     await ctx.send(embed=create_vote_status_msg(poll_list, secondsLeft))    
-                  
+                
             await asyncio.sleep(1)
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
     except ValueError:
@@ -693,17 +655,21 @@ async def win_conditions(ctx, eliminated):
                 for player in best_friend_list:
                     winners.append(player.name)
                 break
-            #if wannabe or camper voted
-            elif player.role == "Wannabe" or player.role == "Camper" or player.role == "Best Friend" or player.role == "Camp Counselor":
-                # If wannabes exist
-                if wannabe_list:
-                    win_roles.append("Wannabe")
-                    winners.append(wannabe_list[0].name)
-                # If werewolves exist
-                if werewolf_list:
-                    win_roles.append("Werewolves")
-                    for player in werewolf_list:
-                        winners.append(player.name)
+
+            #if the player is the last element in eliminated
+            if player == eliminated[-1]:
+                #if wannabe or camper voted
+                if player.role == "Wannabe" or player.role == "Camper" or player.role == "Best Friend" or player.role == "Camp Counselor":
+                    # If wannabes exist
+                    if wannabe_list:
+                        win_roles.append("Wannabe")
+                        winners.append(wannabe_list[0].name)
+                    # If werewolves exist
+                    if werewolf_list:
+                        win_roles.append("Werewolves")
+                        for player in werewolf_list:
+                            winners.append(player.name)
+                        
     else: #No one votes
         #Counts number of total werewolves in game
         total_players = len(player_list)
