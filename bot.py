@@ -64,52 +64,52 @@ async def timer(ctx, minutes, seconds=0):
             minuteLeft=totalSecondsLeft//60
             secondsLeft=totalSecondsLeft%60
             if(totalSecondsLeft<totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌖")
+                await moonMessage.edit(content=f"🌕🌕🌕🌕")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=totalseconds//16 and totalSecondsLeft<2*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌗")
+                await moonMessage.edit(content=f"🌕🌕🌕🌖")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=2*totalseconds//16 and totalSecondsLeft<3*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌘")
+                await moonMessage.edit(content=f"🌕🌕🌕🌗")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=3*totalseconds//16 and totalSecondsLeft<4*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌕🌑")
+                await moonMessage.edit(content=f"🌕🌕🌕🌘")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=4*totalseconds//16 and totalSecondsLeft<5*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌖🌑")
+                await moonMessage.edit(content=f"🌕🌕🌕🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=5*totalseconds//16 and totalSecondsLeft<6*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌗🌑")
+                await moonMessage.edit(content=f"🌕🌕🌖🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=6*totalseconds//16 and totalSecondsLeft<7*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌘🌑")
+                await moonMessage.edit(content=f"🌕🌕🌗🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=7*totalseconds//16 and totalSecondsLeft<8*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌕🌑🌑")
+                await moonMessage.edit(content=f"🌕🌕🌘🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=8*totalseconds//16 and totalSecondsLeft<9*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌖🌑🌑")
+                await moonMessage.edit(content=f"🌕🌕🌑🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=9*totalseconds//16 and totalSecondsLeft<10*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌗🌑🌑")
+                await moonMessage.edit(content=f"🌕🌖🌑🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=10*totalseconds//16 and totalSecondsLeft<11*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌘🌑🌑")
+                await moonMessage.edit(content=f"🌕🌗🌑🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=11*totalseconds//16 and totalSecondsLeft<12*totalseconds//16):
-                await moonMessage.edit(content=f"🌕🌑🌑🌑")
+                await moonMessage.edit(content=f"🌕🌘🌑🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=12*totalseconds//16 and totalSecondsLeft<13*totalseconds//16):
-                await moonMessage.edit(content=f"🌖🌑🌑🌑")
+                await moonMessage.edit(content=f"🌕🌑🌑🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=13*totalseconds//16 and totalSecondsLeft<14*totalseconds//16):
-                await moonMessage.edit(content=f"🌗🌑🌑🌑")
+                await moonMessage.edit(content=f"🌖🌑🌑🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=14*totalseconds//16 and totalSecondsLeft<15*totalseconds//16):
-                await moonMessage.edit(content=f"🌘🌑🌑🌑")
+                await moonMessage.edit(content=f"🌗🌑🌑🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             elif(totalSecondsLeft>=15*totalseconds//16 and totalSecondsLeft<totalseconds):
-                await moonMessage.edit(content=f"🌑🌑🌑🌑")
+                await moonMessage.edit(content=f"🌘🌑🌑🌑")
                 await timerMessage.edit(content=f"Timer: {minuteLeft} minutes {secondsLeft} seconds")
             
             if (new_day):
@@ -280,7 +280,7 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
             #night time timer
             await asyncio.gather(
-                timer(ctx, 0, 30),
+                timer(ctx, 0, 10),
                 send_role(game, ctx),
             )
             # ensure camp Counselor made choices (if applicalble)   
@@ -728,9 +728,13 @@ async def win_conditions(ctx, eliminated):
             win_roles.append("Werewolves")
             for player in werewolf_list:
                 winners.append(player.name)
-    
+    winnerText=""
+    for w in win_roles:
+        winnerText=winnerText+", "+w
+
+    winnerText=winnerText[1:]
     embed = discord.Embed(
-        title = ("The {win_roles} has/have won! Congratulations! Winners: "),
+        title = "The"+ winnerText+" has/have won! Congratulations! Winners: ",
         color = discord.Color.red()
     )
     await ctx.send(embed = embed)
@@ -947,7 +951,7 @@ async def reveal_roles(ctx, eliminated, poll_list):
 
     #print the most voted off person
     await ctx.send(embed=embed)
-    await send_user_avatar_and_name(ctx, users_w_same_num_of_votes,discord.Color.red(),400,400)
+    await send_user_avatar_and_name(ctx, users_w_same_num_of_votes,discord.Color.red(),width=400,height=400)
     #NEED TO DELETE ALL FILES IN ./avatar_images
     return 
 
