@@ -35,9 +35,7 @@ intents.members = True
 bot = commands.Bot(command_prefix='!', intents=intents)
 
 #################################
-@bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
 async def timer(ctx, minutes, seconds=0):
-    moon_dic={0:'', }
     try:
         minuteint = int(minutes)
         secondsint=int(seconds)
@@ -93,9 +91,9 @@ async def timer(ctx, minutes, seconds=0):
     except ValueError:
         await ctx.send("Must be a number!")
 
-@bot.command(name='end', help='Kills the bot.')
+@bot.command(name='die', help='Kills the bot')
 async def werewolfEnd(ctx):
-    await ctx.send("Killing the bot!")
+    await ctx.send("imma kil l mahself UwU")
     exit()
 
 ################# SET SETTINGS ####################
@@ -570,7 +568,7 @@ async def see_settings_roles(ctx):
                     "\t**Wannabe:** "+ str(NUM_OF_EACH_ROLE["Wannabe"]) + "\t**Introvert:** " + str(NUM_OF_EACH_ROLE["Introvert"]) + 
                     "\t**Pairs of BFFs:** " + str(NUM_OF_EACH_ROLE["bffpair"]) + "\t**Campers:** " + str(NUM_OF_EACH_ROLE["Camper"]))
 
-@bot.command(name="reset_roles", help='reset the roles to have default values')
+@bot.command(name="reset_roles", help='Reset the roles to have default values')
 async def reset_roles(ctx):
     global CUSTOM_ROLES
     CUSTOM_ROLES = False
@@ -741,7 +739,7 @@ async def win_conditions(ctx, eliminated):
 
 ###################### REVEAL LOGIC ######################
 # fcn is only for testing
-@bot.command(name = "avatar")
+#@bot.command(name = "avatar")
 async def avatar(ctx):
  
     # Send user avatar
