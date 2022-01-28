@@ -32,7 +32,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='$', intents=intents)
+bot = commands.Bot(command_prefix='*', intents=intents)
 
 #################################
 @bot.command(name='timer', help='timer command. usage !timer <num of minutes> <num of seconds>')
@@ -206,7 +206,7 @@ def add_images_together_horizontally(imageNames, image_Folder=ROLE_FOLDER):
 ################# GAME LOGIC #####################
 async def gameLogic(ctx, minutes, seconds, custom_roles=False):
     while(BOT_RUNNING):
-        print("Bot running!")
+        #print("Bot running!")
         while(GAME_RUNNING):
             print('Game Start!')
             nameList=[member.name for member in userlist]
@@ -293,7 +293,10 @@ async def gameLogic(ctx, minutes, seconds, custom_roles=False):
 
             await reveal_roles(ctx, eliminated, poll_list)
             await win_conditions(ctx, eliminated)
-
+            
+            # Delete avatar images
+            nameList = PARTICIPANT_LIST.copy()
+            delete_images(nameList)
     #timer ends, initialze vote
     #player_booted, num_votes = game.tally_votes()
 
@@ -605,7 +608,8 @@ async def on_reaction_add(reaction, user):
             for player in userlist:
                 if player.name == poll.user:
                     embed = create_vote_for_msg(player)
-                    await user.send(embed=embed)   
+                    await user.send(embed=embed)
+
     # if voting for the first time, send message to channel
     if not has_already_voted:
         global total_voted
@@ -867,7 +871,7 @@ async def send_user_avatar_and_name(ctx, nameList, embed_colour=discord.Color.bl
     :height:        height of avatar to be sent
     """
     usernames = nameList.copy()
-
+    print(f"Here with {nameList}")
     #AVATAR_FOLDER = "avatarImages/"
     for member in userlist:
         if len(usernames) != 0:
@@ -907,6 +911,7 @@ async def reveal_roles(ctx, eliminated, poll_list):
         print(p.user+"  "+str(p.votes))
         if p.votes==voteVal:
             text=text+p.user+"\n"
+            users_w_same_num_of_votes.append(p.user)
         if p.votes!=voteVal:    
             embed = discord.Embed(
                     title = (f"People with "+ str(voteVal) +" votes"),
@@ -914,6 +919,7 @@ async def reveal_roles(ctx, eliminated, poll_list):
                     color = discord.Color.blurple()
                 )
             await ctx.send(embed=embed)
+            print(f"Sending embeds of these useres: {users_w_same_num_of_votes}")
             await send_user_avatar_and_name(ctx, users_w_same_num_of_votes, discord.Color.blurple())
             users_w_same_num_of_votes = []
             users_w_same_num_of_votes.append(p.user)

@@ -219,6 +219,19 @@ def create_vote_for_msg(user):
     embed.set_image(url=user.avatar_url)
     return embed
 
+def create_vote_for_msg_new(user):
+    userjpg = user.name + ".jpg"
+    userdir = AVATAR_FOLDER + userjpg
+    print(f"Voting for {user.name} find image in: {userdir}")
+    file = discord.File(userdir, filename=userjpg)
+    embed = discord.Embed(
+        title = f"Hi MJ You will vote for {user.name}",
+        color = discord.Color.green()
+    )
+    attach_avatar = "attachment://" + userjpg
+    embed.set_image(url=attach_avatar)
+    return embed
+
 def create_no_longer_vote_msg(user):
     embed = discord.Embed(
         title = f"You are no longer voting for {user.name}",
