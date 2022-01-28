@@ -93,9 +93,9 @@ async def timer(ctx, minutes, seconds=0):
     except ValueError:
         await ctx.send("Must be a number!")
 
-@bot.command(name='werewolfEnd', help='kill the game')
+@bot.command(name='end', help='Kills the bot.')
 async def werewolfEnd(ctx):
-    await ctx.send("imma kill myself")
+    await ctx.send("Killing the bot!")
     exit()
 
 ################# SET SETTINGS ####################
@@ -457,7 +457,7 @@ async def reveal_two_missing_for_cc(ctx, reaction, user):
     return
     
 ################ START GAME ######################
-@bot.command(name='start', help='start the game')
+@bot.command(name='start', help='Starts the game')
 async def start(ctx):
     global GAME_RUNNING
     if(GAME_RUNNING == False):
@@ -488,7 +488,7 @@ async def start(ctx):
     else:
         await ctx.send("The game is running already! Type !reset if you want to restart the game.")
 
-@bot.command(name="reset", help='reset bot')
+@bot.command(name="reset", help='Resets the game')
 async def reset_bot(ctx):
     global GAME_RUNNING
     global new_day
@@ -516,7 +516,7 @@ async def reset_bot(ctx):
 # Set the Settings for number of roles
 # Note has a writing error if number error is not at the end
 
-@bot.command(name="settings", help='Set a custom number of each role, run !settings to see usage')
+@bot.command(name="settings", help='Set a custom number of each role')
 async def set_settings(ctx, *args):
 
     list_of_roles = ["Werewolf", "Camp Counselor", "Wannabe", "Introvert", "bffpair","Camper"]
@@ -563,7 +563,7 @@ async def set_settings(ctx, *args):
     await see_settings_roles(ctx)
 
 
-@bot.command(name="see_roles", help='see current custom role number settings (note that default will set all to 0)')
+@bot.command(name="see_roles", help='See current custom role settings')
 async def see_settings_roles(ctx):
     await ctx.send("Current Customized Number of Each Role: \n" + 
                     "**Werewolves:** " + str(NUM_OF_EACH_ROLE["Werewolf"]) + "\t**CampCounsellor:** " + str(NUM_OF_EACH_ROLE["Camp Counselor"]) +
@@ -740,53 +740,6 @@ async def win_conditions(ctx, eliminated):
     return
 
 ###################### REVEAL LOGIC ######################
-# @bot.command(name="show_user", help='shows user avatar')
-# async def show_user_avatar(ctx, username):
-#     """
-#     userlist is a global variable of user types
-#     username is the name of user 
-#     GOAL: to input a username, and output their photos 
-#     - photos should be set to the same size
-#     """
-#     await ctx.send(userlist)
-#     userAvatar = ""
-#     avatarjpg = "avatar3.jpg"
-#     for member in userlist:
-#         if member.name == username:
-#             userAvatar = member.avatar_url
-#             await ctx.send(userAvatar)
-#             await userAvatar.save(avatarjpg)
-#             file = discord.File(fp=avatarjpg)
-
-#     await ctx.send("Sending embed")
-
-#     embed = discord.Embed(
-#         title = f"This is what {username} looks like!",
-#         description = f"Do you like their face?",
-#         color = discord.Color.blue()
-#     )
-#     embed.set_image(url=userAvatar)
-
-#     await ctx.send(embed=embed)
-
-# fcn is only for testing
-@bot.command(name="resize_user", help='resize avatar')
-async def resize_user(ctx):
-    """
-    Resize user image, make sure to change avatarjpg and new_avatarjpg
-    """
-
-    avatarjpg = "avatar_images/Emiwana.jpg"
-    new_avatarjpg = "avatar_images/Emiwana_1.jpg"
-    file = discord.File(fp=avatarjpg)
-    await ctx.send("Current avatar img", file = file)
-
-    image = Image.open(avatarjpg)
-    new_image = image.resize((200, 200)).convert('RGB')
-    new_image.save(new_avatarjpg)
-    file = discord.File(fp=new_avatarjpg)
-    await ctx.send("New avatar img", file = file)
-
 # fcn is only for testing
 @bot.command(name = "avatar")
 async def avatar(ctx):
