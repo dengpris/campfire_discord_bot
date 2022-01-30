@@ -2,6 +2,7 @@
 from calendar import c
 from email.errors import FirstHeaderLineIsContinuationDefect
 from tkinter import N
+from turtle import title
 
 from numpy import maximum
 import os
@@ -32,7 +33,7 @@ TOKEN = os.getenv('DISCORD_TOKEN')
 intents = discord.Intents.default()
 intents.members = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+bot = commands.Bot(command_prefix='!', help_command=None, intents=intents)
 
 #################################
 async def timer(ctx, minutes, seconds=0):
@@ -90,6 +91,18 @@ async def timer(ctx, minutes, seconds=0):
         await ctx.send(f"{ctx.author.mention} Your countdown Has ended!")
     except ValueError:
         await ctx.send("Must be a number!")
+
+@bot.command(name="help", help="help command")
+async def help(context):
+    em = discord.Embed(title="Help", discription="Use this help command to show more detail about the other commands.", color = discord.Color.green())
+    commandStrings="start\n"+"reset\n"+"settings\n"+"see_roles\n"+"reset_roles\n"
+    explanationStrings="start a game\n"+"reset a currently running game\n"+"input the number of roles for a game\n"+"see the roles in a current game\n"+"reset the current roles to default"
+    usageStrings="!start\n"+"!reset\n"+"!settings x x x x x x\n"+"!see_roles\n"+"!reset_roles\n"
+    em.add_field(name="Command", value=commandStrings)
+    em.add_field(name="Usage", value=usageStrings)
+    em.add_field(name="Explanation", value=explanationStrings)
+    
+    await context.send(embed=em)
 
 @bot.command(name='die', help='Kills the bot')
 async def werewolfEnd(ctx):
